@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VLSI CMOS Circuit Design — Sami Rana</title>
+  <meta name="description" content="CMOS circuit design implementing F = B(A+C) with full layout, verification, and performance analysis using Cadence Virtuoso." />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a0a0a'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%2300ffd5' font-family='monospace' font-weight='bold'>SR</text></svg>">
+  <style>
+    :root {
+      --bg: #050508;
+      --panel: rgba(15, 17, 22, 0.9);
+      --panel-solid: #0f1116;
+      --text: #e8eaed;
+      --muted: #8b919e;
+      --accent: #00ffd5;
+      --accent-2: #7b61ff;
+      --border: rgba(255,255,255,0.08);
+      --glow: 0 0 30px rgba(0,255,213,0.15);
+      --radius: 16px;
+      --mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --trace-color: rgba(0,255,213,0.08);
+      --trace-glow: rgba(0,255,213,0.04);
+    }
+    :root.light {
+      --bg: #f0f2f8;
+      --panel: rgba(255,255,255,0.9);
+      --panel-solid: #ffffff;
+      --text: #0a0c10;
+      --muted: #5a6070;
+      --accent: #0891b2;
+      --accent-2: #6366f1;
+      --border: rgba(0,0,0,0.08);
+      --glow: 0 4px 30px rgba(8,145,178,0.25);
+      --trace-color: rgba(8,145,178,0.12);
+      --trace-glow: rgba(8,145,178,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Semiconductor circuit pattern background */
+    .circuit-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .circuit-bg svg { width: 100%; height: 100%; }
+    .circuit-bg .trace { fill: none; stroke: var(--trace-color); stroke-width: 1; }
+    .circuit-bg .trace-thick { fill: none; stroke: var(--trace-color); stroke-width: 2; }
+    .circuit-bg .via { fill: var(--trace-color); }
+    .circuit-bg .pad { fill: none; stroke: var(--trace-color); stroke-width: 1.5; }
+    .circuit-bg .glow-orb { fill: var(--trace-glow); }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 100% 60% at 0% 0%, var(--trace-glow), transparent 50%),
+        radial-gradient(ellipse 80% 50% at 100% 100%, var(--trace-glow), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
+    header {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: saturate(1.5) blur(20px);
+      background: color-mix(in oklab, var(--bg), transparent 40%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); font-weight: 700; font-family: var(--mono); }
+    .brand .logo { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--glow); display: grid; place-items: center; color: var(--bg); font-weight: 800; font-size: 0.9rem; transition: transform 0.3s, box-shadow 0.3s; }
+    .brand:hover .logo { transform: scale(1.05); }
+    nav a { color: var(--muted); text-decoration: none; padding: 10px 16px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+    nav a:hover { color: var(--accent); background: rgba(0,255,213,0.05); }
+    :root.light nav a:hover { background: rgba(8,145,178,0.05); }
+    .right { display: flex; align-items: center; gap: 12px; }
+    .social-link {
+      color: var(--muted);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 8px;
+    }
+    .social-link:hover {
+      color: var(--accent);
+      background: rgba(0,255,213,0.05);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+      padding: 12px 20px; border-radius: 12px; font-weight: 600;
+      transition: all 0.3s; cursor: pointer; font-size: 0.95rem; border: none;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--bg);
+      box-shadow: 0 4px 20px rgba(0,255,213,0.3);
+    }
+    .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,255,213,0.4); }
+    .btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px); }
+    .btn.secondary:hover { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); }
+
+    .card {
+      background: var(--panel);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.3s;
+    }
+    .card:hover { border-color: rgba(0,255,213,0.15); box-shadow: var(--glow); }
+    :root.light .card:hover { border-color: rgba(8,145,178,0.2); }
+    .pad { padding: 28px; }
+
+    h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; margin: 0 0 16px; }
+    h2 { font-size: clamp(1.3rem, 3vw, 1.6rem); margin: 48px 0 16px; color: var(--accent); }
+    h3 { font-size: 1.1rem; margin: 24px 0 12px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    ul, ol { color: var(--muted); padding-left: 24px; }
+    li { margin-bottom: 8px; }
+    strong { color: var(--text); }
+
+    .hero-section { padding: 48px 0 32px; }
+    .kicker { color: var(--accent); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .85rem; margin-bottom: 8px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .tag { font-family: var(--mono); font-size: .8rem; border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; color: var(--muted); background: var(--panel); }
+
+    .section { margin: 32px 0; }
+
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem; }
+    th, td { padding: 12px; text-align: left; border: 1px solid var(--border); }
+    th { background: var(--panel); color: var(--text); font-weight: 600; }
+    td { color: var(--muted); }
+
+    code { font-family: var(--mono); background: var(--panel); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+
+    .highlight-box { background: color-mix(in oklab, var(--accent), transparent 90%); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+    .highlight-box p { margin: 0; color: var(--text); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); text-decoration: none; margin-bottom: 24px; }
+    .back-link:hover { color: var(--text); }
+
+    figure { margin: 24px 0; }
+    figure img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
+    figcaption { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+    .img-placeholder {
+      width: 100%;
+      min-height: 200px;
+      background: var(--panel);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer { border-top: 1px solid var(--border); margin-top: 48px; }
+  </style>
+  <script>
+    const preferred = localStorage.getItem('theme');
+    if (preferred) {
+      document.documentElement.classList.toggle('light', preferred === 'light');
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.documentElement.classList.add('light');
+    }
+    function toggleTheme(){
+      const isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+  </script>
+</head>
+<body>
+  <!-- Semiconductor circuit pattern background -->
+  <div class="circuit-bg">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <!-- Main horizontal bus lines -->
+      <path class="trace-thick" d="M0,100 H400 L420,120 H800"/>
+      <path class="trace-thick" d="M0,300 H200 L240,340 H600 L640,300 H1920"/>
+      <path class="trace-thick" d="M0,600 H300 L340,640 H700"/>
+      <path class="trace-thick" d="M1920,200 H1500 L1460,240 H1100"/>
+      <path class="trace-thick" d="M1920,500 H1600 L1560,460 H1200"/>
+      <path class="trace-thick" d="M1920,800 H1400 L1360,840 H900"/>
+
+      <!-- Vertical traces -->
+      <path class="trace" d="M200,0 V200 L240,240 V400"/>
+      <path class="trace" d="M400,100 V300"/>
+      <path class="trace" d="M600,0 V150 L640,190 V340"/>
+      <path class="trace" d="M800,120 V280 L840,320 V500"/>
+      <path class="trace" d="M1200,460 V600 L1160,640 V800"/>
+      <path class="trace" d="M1400,0 V150 L1360,190 V350"/>
+      <path class="trace" d="M1600,200 V400 L1560,440 V600"/>
+      <path class="trace" d="M1100,240 V450"/>
+
+      <!-- Cross traces -->
+      <path class="trace" d="M300,200 L350,250 H500 L550,200"/>
+      <path class="trace" d="M700,340 L750,390 H900 L950,340"/>
+      <path class="trace" d="M1000,500 L1050,550 H1150 L1200,500"/>
+      <path class="trace" d="M1300,350 L1350,400 H1500 L1550,350"/>
+
+      <!-- Bottom section traces -->
+      <path class="trace-thick" d="M0,900 H250 L290,860 H550 L590,900 H850"/>
+      <path class="trace" d="M250,900 V1080"/>
+      <path class="trace" d="M550,860 V700 L590,660 H750"/>
+      <path class="trace" d="M850,900 L890,860 V750"/>
+      <path class="trace-thick" d="M1920,950 H1650 L1610,910 H1350 L1310,950 H1100"/>
+      <path class="trace" d="M1350,910 V780 L1310,740 H1150"/>
+
+      <!-- Vias (connection points) -->
+      <circle class="via" cx="200" cy="200" r="4"/>
+      <circle class="via" cx="400" cy="100" r="4"/>
+      <circle class="via" cx="400" cy="300" r="4"/>
+      <circle class="via" cx="600" cy="150" r="4"/>
+      <circle class="via" cx="800" cy="120" r="4"/>
+      <circle class="via" cx="800" cy="280" r="4"/>
+      <circle class="via" cx="240" cy="340" r="4"/>
+      <circle class="via" cx="640" cy="300" r="4"/>
+      <circle class="via" cx="1100" cy="240" r="4"/>
+      <circle class="via" cx="1200" cy="460" r="4"/>
+      <circle class="via" cx="1200" cy="600" r="4"/>
+      <circle class="via" cx="1400" cy="150" r="4"/>
+      <circle class="via" cx="1500" cy="200" r="4"/>
+      <circle class="via" cx="1600" cy="400" r="4"/>
+      <circle class="via" cx="1560" cy="460" r="4"/>
+      <circle class="via" cx="1360" cy="840" r="4"/>
+      <circle class="via" cx="250" cy="900" r="4"/>
+      <circle class="via" cx="550" cy="860" r="4"/>
+      <circle class="via" cx="850" cy="900" r="4"/>
+      <circle class="via" cx="1350" cy="910" r="4"/>
+      <circle class="via" cx="1650" cy="950" r="4"/>
+
+      <!-- Pads (larger connection squares) -->
+      <rect class="pad" x="180" y="380" width="20" height="20" rx="2"/>
+      <rect class="pad" x="620" y="170" width="20" height="20" rx="2"/>
+      <rect class="pad" x="820" y="300" width="20" height="20" rx="2"/>
+      <rect class="pad" x="1080" y="430" width="20" height="20" rx="2"/>
+      <rect class="pad" x="1380" y="170" width="20" height="20" rx="2"/>
+      <rect class="pad" x="1580" y="580" width="20" height="20" rx="2"/>
+      <rect class="pad" x="340" y="620" width="20" height="20" rx="2"/>
+      <rect class="pad" x="730" y="640" width="20" height="20" rx="2"/>
+      <rect class="pad" x="1130" y="780" width="20" height="20" rx="2"/>
+      <rect class="pad" x="870" y="730" width="20" height="20" rx="2"/>
+
+      <!-- Glow orbs for depth -->
+      <circle class="glow-orb" cx="300" cy="250" r="150"/>
+      <circle class="glow-orb" cx="1600" cy="350" r="180"/>
+      <circle class="glow-orb" cx="900" cy="700" r="200"/>
+      <circle class="glow-orb" cx="1200" cy="900" r="160"/>
+      <circle class="glow-orb" cx="500" cy="850" r="140"/>
+    </svg>
+  </div>
+
+  <header>
+    <div class="container nav">
+      <a class="brand" href="porfolio.html" aria-label="Home">
+        <span class="logo" aria-hidden="true">SR</span>
+        <span>sami.dev</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="porfolio.html#projects">Projects</a>
+        <a href="porfolio.html#blog">Blog</a>
+        <a href="porfolio.html#about">About</a>
+        <a href="porfolio.html#contact">Contact</a>
+      </nav>
+      <div class="right">
+        <a href="https://github.com/samisrana" target="_blank" aria-label="GitHub" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" aria-label="LinkedIn" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <button class="btn secondary" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="porfolio.html#projects" class="back-link">← Back to projects</a>
+
+    <section class="hero-section">
+      <p class="kicker">VLSI Design Project</p>
+      <h1>CMOS Logic Circuit Design & Layout</h1>
+      <figure>
+        <img src="images/cmos_layout.png" alt="Full layout of the implemented CMOS circuit" />
+        <figcaption>Figure: Full layout of the implemented CMOS circuit for F = B(A + C)</figcaption>
+      </figure>
+      <p style="font-size: 1.1rem; color: var(--text);">Designed and implemented a complementary static CMOS circuit for the Boolean function F = AB + BC, including schematic capture, physical layout, DRC/LVS verification, and post-layout performance analysis using Cadence Virtuoso.</p>
+      <div class="tags">
+        <span class="tag">VLSI</span>
+        <span class="tag">CMOS</span>
+        <span class="tag">Cadence Virtuoso</span>
+        <span class="tag">Calibre DRC/LVS</span>
+        <span class="tag">Circuit Design</span>
+        <span class="tag">Layout</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Project Overview</h2>
+      <div class="card pad">
+        <p>This project involved the complete design flow for implementing a Boolean logic function using complementary static CMOS technology. The goal was to implement <strong>F = AB + BC</strong> while minimizing transistor count and optimizing layout area.</p>
+        <p>The design was completed using <strong>Cadence Virtuoso</strong> for schematic capture and layout, with <strong>Calibre</strong> for design rule checking (DRC) and layout vs. schematic (LVS) verification.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Function Analysis & Optimization</h2>
+      <div class="card pad">
+        <h3>Boolean Simplification</h3>
+        <p>Using K-map analysis, the original function was simplified to reduce transistor count:</p>
+        <div class="highlight-box">
+          <p><strong>F = AB + BC = B(A + C)</strong></p>
+        </div>
+        <p>This simplified form allows direct implementation using CMOS pull-up network (PUN) and pull-down network (PDN), reducing the total transistor count to <strong>8 transistors</strong> (including the output inverter).</p>
+
+        <figure>
+          <img src="images/kmap.png" alt="K-map for F = AB + BC" />
+          <figcaption>Figure 1: K-map for F = AB + BC</figcaption>
+        </figure>
+
+        <h3>Network Design</h3>
+        <div class="grid-2">
+          <div>
+            <strong>Pull-Up Network (PUN):</strong>
+            <ul>
+              <li>1 pMOS controlled by B in parallel with</li>
+              <li>2 series pMOS controlled by A and C</li>
+              <li>Total: 3 pMOS transistors</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Pull-Down Network (PDN):</strong>
+            <ul>
+              <li>1 nMOS controlled by B in series with</li>
+              <li>2 parallel nMOS controlled by A and C</li>
+              <li>Total: 3 nMOS transistors</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Transistor Sizing</h2>
+      <div class="card pad">
+        <p>Transistor sizing followed the standard 2:1 PMOS:NMOS ratio to compensate for the lower hole mobility compared to electrons, ensuring balanced rise and fall times.</p>
+        <table>
+          <thead>
+            <tr><th>Network</th><th>Transistor</th><th>Width</th><th>Length</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PUN (pMOS)</td><td>A, B, C</td><td>480 nm</td><td>60 nm</td></tr>
+            <tr><td>PDN (nMOS)</td><td>A, B, C</td><td>240 nm</td><td>60 nm</td></tr>
+            <tr><td>Inverter</td><td>pMOS</td><td>480 nm</td><td>60 nm</td></tr>
+            <tr><td>Inverter</td><td>nMOS</td><td>240 nm</td><td>60 nm</td></tr>
+          </tbody>
+        </table>
+        <p>After equivalent resistance calculations, the PUN:PDN ratio maintains the desired 2:1 ratio (240nm:120nm effective widths) for balanced pull-up and pull-down strengths.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Schematic Design</h2>
+      <div class="card pad">
+        <figure>
+          <img src="images/schematic.png" alt="Detailed schematic of the implemented CMOS circuit" />
+          <figcaption>Figure 2: Detailed schematic of the implemented CMOS circuit for F = B(A + C)</figcaption>
+        </figure>
+        <figure>
+          <img src="images/testbench.png" alt="Test bench schematic with input pattern generators" />
+          <figcaption>Figure 3: Test bench schematic showing the function circuit with input pattern generators</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Simulation Results</h2>
+      <div class="card pad">
+        <figure>
+          <img src="images/waveform.png" alt="Waveform showing inputs A, B, C, and output F" />
+          <figcaption>Figure 4: Waveform showing inputs A, B, C, and output F</figcaption>
+        </figure>
+        <p>The output F is high when either both A and B are high, or when both B and C are high, confirming correct functionality.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Layout Design Strategy</h2>
+      <div class="card pad">
+        <h3>Source/Drain Sharing</h3>
+        <p>Strategic source/drain sharing was implemented to minimize area and reduce parasitic capacitances:</p>
+        <ul>
+          <li>pMOS transistors arranged to maximize diffusion sharing between adjacent devices</li>
+          <li>nMOS transistors placed to optimize diffusion continuity</li>
+          <li>Vias used for cross-layer connections (C's drain to A's drain)</li>
+        </ul>
+
+        <h3>Interconnect Optimization</h3>
+        <ul>
+          <li><strong>Metal1:</strong> Horizontal tracks for power distribution (VDD top, GND bottom)</li>
+          <li><strong>Polysilicon:</strong> Vertical gate connections with minimal bends</li>
+          <li>Input signals routed efficiently from the left; output taken from the right</li>
+          <li>Multiple contacts at critical junctions to reduce resistance</li>
+        </ul>
+
+        <h3>Stick Diagram</h3>
+        <figure>
+          <img src="images/stick_diagram.png" alt="Drawn stick diagram of transistors" />
+          <figcaption>Figure 5: Drawn stick diagram of Transistors A, B, & C with the inverter</figcaption>
+        </figure>
+
+        <h3>Full Layout</h3>
+        <figure>
+          <img src="images/cmos_layout.png" alt="Full layout of the implemented CMOS circuit" />
+          <figcaption>Figure 6: Full layout of the implemented CMOS circuit for F = B(A + C)</figcaption>
+        </figure>
+
+        <h3>Layout Area</h3>
+        <figure>
+          <img src="images/layout_size.png" alt="Layout size measurement" />
+          <figcaption>Figure 7: Layout size — Total area: 12.748 µm²</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Verification Results</h2>
+      <div class="card pad">
+        <div class="grid-2">
+          <div>
+            <h3>Design Rule Check (DRC)</h3>
+            <p>Layout verified against foundry design rules using <strong>Calibre DRC</strong>. All checks passed after resolving initial errors related to:</p>
+            <ul>
+              <li>Metal1 track misalignment (fixed with Align tool)</li>
+              <li>Minimum spacing violations (fixed by adjusting PDN position)</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Layout vs. Schematic (LVS)</h3>
+            <p>Verified using <strong>Calibre LVS</strong> — netlists match, confirming correct implementation. Resolved issues with:</p>
+            <ul>
+              <li>Label settings configuration</li>
+              <li>Missing connection (fixed using via for cross-layer routing)</li>
+            </ul>
+          </div>
+        </div>
+
+        <figure>
+          <img src="images/drc_results.png" alt="DRC dialogue box showing clearance of all design rules" />
+          <figcaption>Figure 8: DRC dialogue box showing clearance of all design rules</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/lvs_results.png" alt="LVS output log showing successful comparison" />
+          <figcaption>Figure 9: LVS output log showing successful comparison between layout and schematic</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/pex_results.png" alt="Calibre Interactive window showing xRC extraction" />
+          <figcaption>Figure 10: Calibre Interactive window showing xRC warnings and no errors</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Performance Analysis</h2>
+      <div class="card pad">
+        <h3>0.5 fF Load Capacitor</h3>
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Change</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rise Time</td><td>0.01355 ns</td><td>0.01872 ns</td><td>+38.2%</td></tr>
+            <tr><td>Fall Time</td><td>0.01346 ns</td><td>0.01903 ns</td><td>+41.4%</td></tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <figure>
+            <img src="images/sim_schematic_0.5fF.png" alt="Schematic simulation with 0.5 fF load" />
+            <figcaption>Figure 11: Schematic simulation with 0.5 fF load capacitor</figcaption>
+          </figure>
+          <figure>
+            <img src="images/sim_postlayout_0.5fF.png" alt="Post-layout simulation with 0.5 fF load" />
+            <figcaption>Figure 12: Post-layout simulation with 0.5 fF load capacitor</figcaption>
+          </figure>
+        </div>
+
+        <h3>15 fF Load Capacitor</h3>
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Change</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rise Time</td><td>0.10671 ns</td><td>0.14796 ns</td><td>+38.7%</td></tr>
+            <tr><td>Fall Time</td><td>0.14556 ns</td><td>0.13406 ns</td><td>-7.9%</td></tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <figure>
+            <img src="images/sim_schematic_15fF.png" alt="Schematic simulation with 15 fF load" />
+            <figcaption>Figure 13: Schematic simulation with 15 fF load capacitor</figcaption>
+          </figure>
+          <figure>
+            <img src="images/sim_postlayout_15fF.png" alt="Post-layout simulation with 15 fF load" />
+            <figcaption>Figure 14: Post-layout simulation with 15 fF load capacitor</figcaption>
+          </figure>
+        </div>
+
+        <h3>Analysis</h3>
+        <p>The post-layout simulation shows increased propagation delays compared to schematic simulation due to parasitic elements not modeled in schematic:</p>
+        <ul>
+          <li>Junction capacitances at source/drain regions</li>
+          <li>Metal interconnect resistances and capacitances</li>
+          <li>Contact and via resistances</li>
+          <li>Gate-to-diffusion coupling capacitances</li>
+        </ul>
+        <p>The 30x increase in load capacitance (0.5 fF → 15 fF) resulted in approximately <strong>8x longer propagation delays</strong>, consistent with the RC time constant relationship.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Truth Table Verification</h2>
+      <div class="card pad">
+        <p>Simulation verified correct functionality across all input combinations:</p>
+        <table>
+          <thead>
+            <tr><th>A</th><th>B</th><th>C</th><th>F = B(A+C)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+            <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Tools Used</h2>
+      <div class="card pad">
+        <ul>
+          <li><strong>Cadence Virtuoso:</strong> Schematic Editor, Layout Suite XL, ADE Explorer</li>
+          <li><strong>Calibre:</strong> DRC, LVS, xRC (Parasitic Extraction)</li>
+          <li><strong>Process:</strong> GlobalFoundries PDK</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Key Takeaways</h2>
+      <div class="card pad">
+        <ul>
+          <li>Boolean simplification before implementation reduces transistor count and area</li>
+          <li>Post-layout verification is essential — parasitic effects significantly impact timing</li>
+          <li>Source/drain sharing and interconnect optimization are critical for compact layouts</li>
+          <li>Iterative DRC/LVS debugging is a normal part of the physical design flow</li>
+          <li>The 2:1 PMOS:NMOS sizing ratio effectively balances rise/fall times</li>
+        </ul>
+      </div>
+    </section>
+
+    <div style="margin-top: 48px;">
+      <a class="btn" href="porfolio.html#projects">← Back to all projects</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:20px 24px;">
+      <small>© <span id="year"></span> Sami Rana</small>
+      <div style="display:flex; gap:10px;">
+        <a href="https://github.com/samisrana" aria-label="GitHub">GitHub</a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" aria-label="LinkedIn">LinkedIn</a>
+        <a href="porfolio.html">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
