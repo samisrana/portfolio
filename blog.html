@@ -3,477 +3,345 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blog — Sami Rana</title>
-  <meta name="description" content="Thoughts on embedded systems, hardware design, and engineering by Sami Rana." />
+  <title>Sami's Log — Engineering Notebook</title>
+  <meta name="description" content="Engineering notebook — thoughts on embedded systems, hardware design, and the intersection of silicon and software." />
   <meta name="color-scheme" content="light dark" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a0a0a'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%2300ffd5' font-family='monospace' font-weight='bold'>SR</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23c9983a' font-family='monospace' font-weight='700'>SR</text></svg>">
+  <link rel="stylesheet" href="workshop.css" />
   <style>
-    :root {
-      --bg: #050508;
-      --panel: rgba(15, 17, 22, 0.8);
-      --panel-solid: #0f1116;
-      --text: #e8eaed;
-      --muted: #8b919e;
-      --accent: #00ffd5;
-      --accent-2: #7b61ff;
-      --accent-3: #ff6b9d;
-      --border: rgba(255,255,255,0.08);
-      --glow: 0 0 30px rgba(0,255,213,0.15);
-      --radius: 16px;
-      --mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --trace-color: rgba(0,255,213,0.08);
-      --trace-glow: rgba(0,255,213,0.04);
-    }
-    :root.light {
-      --bg: #f0f2f8;
-      --panel: rgba(255,255,255,0.85);
-      --panel-solid: #ffffff;
-      --text: #0a0c10;
-      --muted: #5a6070;
-      --accent: #0891b2;
-      --accent-2: #6366f1;
-      --accent-3: #db2777;
-      --border: rgba(0,0,0,0.08);
-      --glow: 0 4px 30px rgba(8,145,178,0.25);
-      --trace-color: rgba(8,145,178,0.12);
-      --trace-glow: rgba(8,145,178,0.08);
+    /* ── Sami's Log — page-specific styles ── */
+
+    .log-container { max-width: 820px; }
+
+    /* ── Page header — engineering notebook cover ── */
+    .log-page-header {
+      padding: 56px 0 36px;
+      border-bottom: 1px solid var(--gold-border);
+      margin-bottom: var(--g);
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: var(--sans);
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* Semiconductor circuit pattern background */
-    .circuit-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .circuit-bg svg { width: 100%; height: 100%; }
-    .circuit-bg .trace { fill: none; stroke: var(--trace-color); stroke-width: 1; }
-    .circuit-bg .trace-thick { fill: none; stroke: var(--trace-color); stroke-width: 2; }
-    .circuit-bg .via { fill: var(--trace-color); }
-    .circuit-bg .pad { fill: none; stroke: var(--trace-color); stroke-width: 1.5; }
-    .circuit-bg .glow-orb { fill: var(--trace-glow); }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(ellipse 100% 60% at 0% 0%, var(--trace-glow), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 100% 100%, var(--trace-glow), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container { max-width: 900px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
-
-    header {
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: saturate(1.5) blur(20px);
-      background: color-mix(in oklab, var(--bg), transparent 40%);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .brand {
-      display: inline-flex; align-items: center; gap: 12px;
-      text-decoration: none; color: var(--text); font-weight: 700;
-      font-family: var(--mono);
-    }
-    .brand .logo {
-      width: 42px; height: 42px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: grid; place-items: center; color: var(--bg);
-      font-weight: 800; font-size: 0.9rem;
-      box-shadow: var(--glow);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .brand:hover .logo { transform: scale(1.05); }
-    nav a {
-      color: var(--muted); text-decoration: none;
-      padding: 10px 16px; border-radius: 10px;
-      font-weight: 500; transition: all 0.2s;
-    }
-    nav a:hover { color: var(--accent); background: rgba(0,255,213,0.05); }
-    :root.light nav a:hover { background: rgba(8,145,178,0.05); }
-    .right { display: flex; align-items: center; gap: 12px; }
-    .social-link {
-      color: var(--muted);
-      transition: all 0.2s;
+    /* Notebook identity bar: NB-001 · Engineering Notebook · INITIATED 2025 */
+    .log-nb-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    .social-link:hover {
-      color: var(--accent);
-      background: rgba(0,255,213,0.05);
-    }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-      padding: 12px 20px; border-radius: 12px; font-weight: 600;
-      transition: all 0.3s; cursor: pointer; font-size: 0.95rem; border: none;
-    }
-    .btn.secondary {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(10px);
-    }
-    .btn.secondary:hover {
-      border-color: var(--accent); color: var(--accent);
-      box-shadow: var(--glow);
-    }
-
-    .card {
-      background: var(--panel);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .card:hover::before { opacity: 1; }
-    .card:hover {
-      border-color: rgba(0,255,213,0.2);
-      box-shadow: var(--glow);
-      transform: translateY(-4px);
-    }
-    :root.light .card:hover { border-color: rgba(8,145,178,0.2); }
-    .pad { padding: 28px; }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      line-height: 1.2;
-      margin: 0 0 16px;
-      font-weight: 800;
-    }
-    .gradient-text {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    p { margin: 0 0 16px; color: var(--muted); }
-
-    .hero-section {
-      padding: 60px 0 40px;
-      text-align: center;
-    }
-    .hero-section p {
-      font-size: 1.1rem;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .back-link {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--muted); text-decoration: none; margin-bottom: 24px;
-      transition: color 0.2s;
-    }
-    .back-link:hover { color: var(--accent); }
-
-    .blog-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-      margin-top: 40px;
-    }
-
-    .blog-post {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 24px;
-      align-items: center;
-    }
-    @media (max-width: 600px) {
-      .blog-post { grid-template-columns: 1fr; }
-    }
-
-    .blog-post .image-wrapper {
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-    }
-    .blog-post img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s;
-    }
-    .blog-post:hover img { transform: scale(1.05); }
-
-    .blog-post h3 {
-      font-size: 1.3rem;
-      margin: 0 0 8px;
-    }
-    .blog-post h3 a {
-      color: inherit;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .blog-post h3 a:hover { color: var(--accent); }
-    .blog-post .meta {
+      gap: 10px;
+      margin-bottom: 18px;
       font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .blog-post .excerpt {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin: 0;
-    }
-
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .tag {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      color: var(--accent);
-      background: rgba(0,255,213,0.08);
-      border: 1px solid rgba(0,255,213,0.2);
-    }
-    :root.light .tag {
-      background: rgba(8,145,178,0.08);
-      border-color: rgba(8,145,178,0.2);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 80px 24px;
-    }
-    .empty-state svg {
-      width: 80px;
-      height: 80px;
-      color: var(--muted);
-      opacity: 0.5;
-      margin-bottom: 24px;
-    }
-    .empty-state h2 {
-      color: var(--text);
-      margin: 0 0 12px;
-    }
-    .empty-state p {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    footer {
-      border-top: 1px solid var(--border);
-      margin-top: 80px;
-      padding: 40px 0;
-    }
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
     }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
+    .log-nb-id {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.10em;
     }
-    .footer-links a:hover { color: var(--accent); }
-    .copyright {
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-family: var(--mono);
+    .log-nb-sep {
+      color: var(--text-dim);
+      opacity: 0.35;
+      font-size: 0.80rem;
     }
+    .log-nb-label, .log-nb-date {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+
+    .log-page-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .log-page-header p {
+      color: var(--text-dim);
+      font-size: 0.925rem;
+      margin: 0;
+      max-width: 500px;
+      line-height: 1.7;
+    }
+
+    /* Ruled underline — extends with gold fade */
+    .log-header-rule {
+      margin-top: 28px;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold-border), transparent 65%);
+    }
+
+    /* Entries region */
+    .log-entries-region { margin-top: 0; }
+
+    /* ALL ENTRIES section label override — tighter margin */
+    .log-entries-region .section-label { margin-bottom: 0; }
   </style>
+
   <script>
-    const preferred = localStorage.getItem('theme');
-    if (preferred) {
-      document.documentElement.classList.toggle('light', preferred === 'light');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      document.documentElement.classList.add('light');
-    }
-    function toggleTheme(){
-      const isLight = document.documentElement.classList.toggle('light');
+    (function(){
+      var p = localStorage.getItem('theme');
+      if (p) { document.documentElement.classList.toggle('light', p === 'light'); }
+      else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.documentElement.classList.toggle('light');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     }
   </script>
 </head>
-<body>
-  <!-- Semiconductor circuit pattern background -->
-  <div class="circuit-bg">
+
+<body class="zone-log">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Background Layer 1: Circuit Traces -->
+  <div class="bg-layer bg-circuit" aria-hidden="true">
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-      <!-- Main horizontal bus lines -->
-      <path class="trace-thick" d="M0,100 H400 L420,120 H800"/>
-      <path class="trace-thick" d="M0,300 H200 L240,340 H600 L640,300 H1920"/>
-      <path class="trace-thick" d="M0,600 H300 L340,640 H700"/>
-      <path class="trace-thick" d="M1920,200 H1500 L1460,240 H1100"/>
-      <path class="trace-thick" d="M1920,500 H1600 L1560,460 H1200"/>
-      <path class="trace-thick" d="M1920,800 H1400 L1360,840 H900"/>
-
-      <!-- Vertical traces -->
-      <path class="trace" d="M200,0 V200 L240,240 V400"/>
-      <path class="trace" d="M400,100 V300"/>
-      <path class="trace" d="M600,0 V150 L640,190 V340"/>
-      <path class="trace" d="M800,120 V280 L840,320 V500"/>
-      <path class="trace" d="M1200,460 V600 L1160,640 V800"/>
-      <path class="trace" d="M1400,0 V150 L1360,190 V350"/>
-      <path class="trace" d="M1600,200 V400 L1560,440 V600"/>
-      <path class="trace" d="M1100,240 V450"/>
-
-      <!-- Cross traces -->
-      <path class="trace" d="M300,200 L350,250 H500 L550,200"/>
-      <path class="trace" d="M700,340 L750,390 H900 L950,340"/>
-      <path class="trace" d="M1000,500 L1050,550 H1150 L1200,500"/>
-      <path class="trace" d="M1300,350 L1350,400 H1500 L1550,350"/>
-
-      <!-- Bottom section traces -->
-      <path class="trace-thick" d="M0,900 H250 L290,860 H550 L590,900 H850"/>
-      <path class="trace" d="M250,900 V1080"/>
-      <path class="trace" d="M550,860 V700 L590,660 H750"/>
-      <path class="trace" d="M850,900 L890,860 V750"/>
-      <path class="trace-thick" d="M1920,950 H1650 L1610,910 H1350 L1310,950 H1100"/>
-      <path class="trace" d="M1350,910 V780 L1310,740 H1150"/>
-
-      <!-- Vias (connection points) -->
-      <circle class="via" cx="200" cy="200" r="4"/>
-      <circle class="via" cx="400" cy="100" r="4"/>
-      <circle class="via" cx="400" cy="300" r="4"/>
-      <circle class="via" cx="600" cy="150" r="4"/>
-      <circle class="via" cx="800" cy="120" r="4"/>
-      <circle class="via" cx="800" cy="280" r="4"/>
-      <circle class="via" cx="240" cy="340" r="4"/>
-      <circle class="via" cx="640" cy="300" r="4"/>
-      <circle class="via" cx="1100" cy="240" r="4"/>
-      <circle class="via" cx="1200" cy="460" r="4"/>
-      <circle class="via" cx="1200" cy="600" r="4"/>
-      <circle class="via" cx="1400" cy="150" r="4"/>
-      <circle class="via" cx="1500" cy="200" r="4"/>
-      <circle class="via" cx="1600" cy="400" r="4"/>
-      <circle class="via" cx="1560" cy="460" r="4"/>
-      <circle class="via" cx="1360" cy="840" r="4"/>
-      <circle class="via" cx="250" cy="900" r="4"/>
-      <circle class="via" cx="550" cy="860" r="4"/>
-      <circle class="via" cx="850" cy="900" r="4"/>
-      <circle class="via" cx="1350" cy="910" r="4"/>
-      <circle class="via" cx="1650" cy="950" r="4"/>
-
-      <!-- Pads (larger connection squares) -->
-      <rect class="pad" x="180" y="380" width="20" height="20" rx="2"/>
-      <rect class="pad" x="620" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="820" y="300" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1080" y="430" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1380" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1580" y="580" width="20" height="20" rx="2"/>
-      <rect class="pad" x="340" y="620" width="20" height="20" rx="2"/>
-      <rect class="pad" x="730" y="640" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1130" y="780" width="20" height="20" rx="2"/>
-      <rect class="pad" x="870" y="730" width="20" height="20" rx="2"/>
-
-      <!-- Glow orbs for depth -->
-      <circle class="glow-orb" cx="300" cy="250" r="150"/>
-      <circle class="glow-orb" cx="1600" cy="350" r="180"/>
-      <circle class="glow-orb" cx="900" cy="700" r="200"/>
-      <circle class="glow-orb" cx="1200" cy="900" r="160"/>
-      <circle class="glow-orb" cx="500" cy="850" r="140"/>
+      <path class="trace-thick" d="M0,120 H350 L380,150 H760"/>
+      <path class="trace-thick" d="M0,320 H180 L220,360 H560 L600,320 H1920"/>
+      <path class="trace-thick" d="M0,620 H280 L320,660 H680"/>
+      <path class="trace-thick" d="M1920,220 H1480 L1440,260 H1080"/>
+      <path class="trace-thick" d="M1920,520 H1560 L1520,480 H1160"/>
+      <path class="trace-thick" d="M1920,820 H1360 L1320,860 H880"/>
+      <path class="trace" d="M180,0 V210 L220,250 V420"/>
+      <path class="trace" d="M380,120 V320"/>
+      <path class="trace" d="M580,0 V160 L620,200 V360"/>
+      <path class="trace" d="M760,150 V300 L800,340 V520"/>
+      <path class="trace" d="M1160,480 V620 L1120,660 V820"/>
+      <path class="trace" d="M1360,0 V160 L1320,200 V370"/>
+      <path class="trace" d="M1560,220 V420 L1520,460 V620"/>
+      <path class="trace" d="M1080,260 V470"/>
+      <path class="trace" d="M280,220 L330,270 H480 L530,220"/>
+      <path class="trace" d="M680,360 L730,410 H880 L930,360"/>
+      <path class="trace" d="M980,520 L1030,570 H1120 L1170,520"/>
+      <path class="trace" d="M1260,370 L1310,420 H1460 L1510,370"/>
+      <path class="trace-thick" d="M0,920 H240 L280,880 H520 L560,920 H820"/>
+      <path class="trace" d="M240,920 V1080"/>
+      <path class="trace" d="M520,880 V720 L560,680 H720"/>
+      <path class="trace" d="M820,920 L860,880 V760"/>
+      <path class="trace-thick" d="M1920,960 H1620 L1580,920 H1320 L1280,960 H1060"/>
+      <path class="trace" d="M1320,920 V800 L1280,760 H1120"/>
+      <circle class="via" cx="180" cy="210" r="3.5"/>
+      <circle class="via" cx="380" cy="120" r="3.5"/>
+      <circle class="via" cx="380" cy="320" r="3.5"/>
+      <circle class="via" cx="580" cy="160" r="3.5"/>
+      <circle class="via" cx="760" cy="150" r="3.5"/>
+      <circle class="via" cx="760" cy="300" r="3.5"/>
+      <circle class="via" cx="220" cy="360" r="3.5"/>
+      <circle class="via" cx="600" cy="320" r="3.5"/>
+      <circle class="via" cx="1080" cy="260" r="3.5"/>
+      <circle class="via" cx="1160" cy="480" r="3.5"/>
+      <circle class="via" cx="1160" cy="620" r="3.5"/>
+      <circle class="via" cx="1360" cy="160" r="3.5"/>
+      <circle class="via" cx="1480" cy="220" r="3.5"/>
+      <circle class="via" cx="1560" cy="420" r="3.5"/>
+      <circle class="via" cx="1520" cy="460" r="3.5"/>
+      <circle class="via" cx="1320" cy="860" r="3.5"/>
+      <circle class="via" cx="240"  cy="920" r="3.5"/>
+      <circle class="via" cx="520"  cy="880" r="3.5"/>
+      <circle class="via" cx="820"  cy="920" r="3.5"/>
+      <circle class="via" cx="1320" cy="920" r="3.5"/>
+      <circle class="via" cx="1620" cy="960" r="3.5"/>
+      <rect class="pad" x="163" y="395" width="18" height="18" rx="2"/>
+      <rect class="pad" x="603" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="802" y="318" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1062" y="448" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1342" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1542" y="598" width="18" height="18" rx="2"/>
+      <rect class="pad" x="318"  y="640" width="18" height="18" rx="2"/>
+      <rect class="pad" x="708"  y="658" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1102" y="798" width="18" height="18" rx="2"/>
+      <rect class="pad" x="848"  y="748" width="18" height="18" rx="2"/>
+      <circle class="glow-orb" cx="280"  cy="270"  r="160"/>
+      <circle class="glow-orb" cx="1580" cy="360"  r="190"/>
+      <circle class="glow-orb" cx="880"  cy="720"  r="210"/>
+      <circle class="glow-orb" cx="1180" cy="920"  r="170"/>
+      <circle class="glow-orb" cx="500"  cy="860"  r="150"/>
     </svg>
   </div>
 
+  <!-- Background Layer 2: Girih Geometry (canvas) -->
+  <canvas class="bg-layer bg-geo" id="geo-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 3: Signal Waves (canvas) -->
+  <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 4: Physical Scene — Writing room (one-point perspective, VP 960,380) -->
+  <div class="bg-layer bg-scene" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+
+      <!-- ── ROOM STRUCTURE ── -->
+      <line class="s-thick" x1="0"    y1="0"    x2="960" y2="380"/>
+      <line class="s-thick" x1="1920" y1="0"    x2="960" y2="380"/>
+      <line class="s-thick" x1="0"    y1="1080" x2="960" y2="380"/>
+      <line class="s-thick" x1="1920" y1="1080" x2="960" y2="380"/>
+      <line class="s-line"  x1="480"  y1="1080" x2="960" y2="380"/>
+      <line class="s-line"  x1="1440" y1="1080" x2="960" y2="380"/>
+      <line class="s-line"  x1="240"  y1="954"  x2="1680" y2="954"/>
+      <line class="s-line"  x1="360"  y1="840"  x2="1560" y2="840"/>
+
+      <!-- ── REFERENCE SHELF on back-left wall ── -->
+      <line class="s-line"  x1="380"  y1="455" x2="920"  y2="455"/>
+      <line class="s-line"  x1="380"  y1="498" x2="920"  y2="498"/>
+      <line class="s-line"  x1="380"  y1="455" x2="380"  y2="498"/>
+      <line class="s-line"  x1="438"  y1="455" x2="438"  y2="498"/>
+      <line class="s-line"  x1="502"  y1="455" x2="502"  y2="498"/>
+      <line class="s-line"  x1="554"  y1="455" x2="554"  y2="498"/>
+      <line class="s-line"  x1="618"  y1="455" x2="618"  y2="498"/>
+      <line class="s-line"  x1="672"  y1="455" x2="672"  y2="498"/>
+      <line class="s-line"  x1="736"  y1="455" x2="736"  y2="498"/>
+      <line class="s-line"  x1="800"  y1="455" x2="800"  y2="498"/>
+      <line class="s-line"  x1="858"  y1="455" x2="858"  y2="498"/>
+      <line class="s-line"  x1="920"  y1="455" x2="920"  y2="498"/>
+
+      <!-- ── DESK SURFACE — single edge line ── -->
+      <line class="s-line"  x1="0"    y1="840" x2="1920" y2="840"/>
+
+      <!-- ── DESK ITEMS ── -->
+      <!-- Pen -->
+      <line class="s-thick" x1="1720" y1="726" x2="1858" y2="706"/>
+      <ellipse class="s-line" cx="1716" cy="727" rx="5" ry="3" transform="rotate(-4 1716 727)"/>
+      <line class="s-line"   x1="1858" y1="706" x2="1868" y2="704"/>
+
+      <!-- Coffee mug -->
+      <rect class="s-line" x="80"  y="694" width="66" height="82" rx="4"/>
+      <rect class="s-fill" x="84"  y="698" width="58" height="32" rx="2"/>
+      <path class="s-line" d="M146,716 Q172,716 172,734 Q172,752 146,752"/>
+      <ellipse class="s-fill" cx="113" cy="698" rx="29" ry="7"/>
+      <ellipse class="s-line" cx="113" cy="698" rx="29" ry="7"/>
+
+      <!-- Desk lamp -->
+      <rect class="s-fill"  x="1720" y="778" width="20" height="12" rx="2"/>
+      <line class="s-thick" x1="1730" y1="784" x2="1730" y2="712"/>
+      <line class="s-thick" x1="1730" y1="712" x2="1768" y2="644"/>
+      <ellipse class="s-line" cx="1780" cy="638" rx="22" ry="10"/>
+      <line   class="s-line" x1="1768" y1="644" x2="1792" y2="632"/>
+
+      <!-- Glow orbs -->
+      <circle class="s-glow" cx="600"  cy="660" r="150"/>
+      <circle class="s-glow" cx="1320" cy="660" r="130"/>
+      <circle class="s-glow" cx="960"  cy="380" r="110"/>
+
+    </svg>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="container nav">
-      <a class="brand" href="porfolio.html" aria-label="Home">
-        <span class="logo" aria-hidden="true">SR</span>
-        <span>sami.dev</span>
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop — home">
+        <span class="monogram" aria-hidden="true">SR</span>
+        <span class="brand-text">
+          <span class="brand-label">Engineer</span>
+          <span class="brand-name">Sami's Workshop</span>
+        </span>
       </a>
-      <nav aria-label="Primary">
-        <a href="porfolio.html#projects">Projects</a>
-        <a href="porfolio.html#blog">Blog</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="porfolio.html">Workbench</a>
+        <a href="porfolio.html#projects">Build Bench</a>
+        <a href="blog.html" class="active">Sami's Log</a>
         <a href="porfolio.html#about">About</a>
         <a href="porfolio.html#contact">Contact</a>
       </nav>
-      <div class="right">
-        <a href="https://github.com/samisrana" target="_blank" aria-label="GitHub" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <div class="nav-right">
+        <a href="https://github.com/samisrana" target="_blank" rel="noopener"
+           aria-label="GitHub" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
         </a>
-        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" aria-label="LinkedIn" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" rel="noopener"
+           aria-label="LinkedIn" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
         </a>
-        <button class="btn secondary" onclick="toggleTheme()" aria-label="Toggle theme">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="container">
-    <a href="porfolio.html" class="back-link">← Back to home</a>
+  <main id="main">
+    <div class="container log-container">
 
-    <section class="hero-section">
-      <h1><span class="gradient-text">Blog</span></h1>
-      <p>Thoughts on embedded systems, hardware design, and the intersection of silicon and software.</p>
-    </section>
-
-    <section class="blog-grid">
-      <!-- Blog Post: Meeting Lisa Su -->
-      <article class="blog-post card pad">
-        <div class="image-wrapper">
-          <a href="posts/meeting-lisa-su.html">
-            <img src="images/amd.jpg" alt="Meeting Lisa Su at RPI" />
-          </a>
+      <div class="log-page-header">
+        <div class="log-nb-bar">
+          <span class="log-nb-id">NB-001</span>
+          <span class="log-nb-sep">·</span>
+          <span class="log-nb-label">Engineering Notebook</span>
+          <span class="log-nb-sep">·</span>
+          <span class="log-nb-date">Initiated 2025</span>
         </div>
-        <div class="content">
-          <div class="meta">May 2025</div>
-          <h3><a href="posts/meeting-lisa-su.html">Meeting Lisa Su at RPI's Fireside Chat</a></h3>
-          <div class="tags">
-            <span class="tag">AMD</span>
-            <span class="tag">Semiconductors</span>
-            <span class="tag">RPI</span>
+        <h1>Sami's Log</h1>
+        <p>Notes from the workshop — events, experiments, and observations on hardware, software, and the industry.</p>
+        <div class="log-header-rule"></div>
+      </div>
+
+      <div class="log-entries-region">
+        <div class="section-label">
+          <span class="area-code">ALL ENTRIES</span>
+        </div>
+
+        <div class="log-entries-list">
+
+          <div class="log-volume">
+            <span class="log-volume-id">VOL.I</span>
+            <span class="log-volume-label">2025 — Present</span>
+            <span class="log-volume-count">1 entry</span>
           </div>
-          <p class="excerpt">Attending AMD CEO Lisa Su's fireside chat at RPI and getting to meet one of the most influential people in semiconductors.</p>
+
+          <article class="log-entry">
+            <div class="entry-margin">
+              <span class="entry-id">LOG-001</span>
+              <span class="entry-date">2025<br>MAY 14</span>
+              <span class="entry-type">Field Note</span>
+            </div>
+            <div class="entry-body">
+              <a class="entry-title" href="posts/meeting-lisa-su.html">Meeting Lisa Su at RPI's Fireside Chat</a>
+              <div class="entry-meta">
+                <span class="entry-meta-item">S. Rana</span>
+                <span class="entry-meta-item">Event</span>
+                <span class="entry-meta-item">Semiconductors</span>
+              </div>
+              <p class="entry-excerpt">Attending AMD CEO Lisa Su's fireside chat at RPI — and getting to meet one of the most influential people in semiconductors.</p>
+              <div class="entry-footer">
+                <div class="tags">
+                  <span class="tag">AMD</span>
+                  <span class="tag">Semiconductors</span>
+                  <span class="tag">RPI</span>
+                  <span class="tag">Event</span>
+                </div>
+                <a class="entry-read-link" href="posts/meeting-lisa-su.html">→ Read entry</a>
+              </div>
+            </div>
+          </article>
+
         </div>
-      </article>
-    </section>
+      </div>
+
+    </div>
   </main>
 
   <footer>
-    <div class="container footer-content">
-      <span class="copyright">© <span id="year"></span> Sami Rana. Built with care.</span>
-      <div class="footer-links">
+    <div class="container footer-inner">
+      <span class="copyright">© <span id="yr"></span> Sami Rana</span>
+      <nav class="footer-links" aria-label="Footer navigation">
         <a href="https://github.com/samisrana">GitHub</a>
         <a href="https://www.linkedin.com/in/sami-rana-aa722a210/">LinkedIn</a>
-        <a href="porfolio.html">Back to home</a>
-      </div>
+        <a href="porfolio.html">Workbench</a>
+        <a href="#top">↑ Top</a>
+      </nav>
     </div>
   </footer>
 
+  <script src="workshop-bg.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    WorkshopBG.init();
   </script>
 </body>
 </html>

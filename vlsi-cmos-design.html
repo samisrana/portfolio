@@ -3,613 +3,855 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VLSI CMOS Circuit Design — Sami Rana</title>
+  <title>CMOS Logic Circuit Design — Build Bench — Sami's Workshop</title>
   <meta name="description" content="CMOS circuit design implementing F = B(A+C) with full layout, verification, and performance analysis using Cadence Virtuoso." />
   <meta name="color-scheme" content="light dark" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a0a0a'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%2300ffd5' font-family='monospace' font-weight='bold'>SR</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%232ea89a' font-family='monospace' font-weight='700'>SR</text></svg>">
+  <link rel="stylesheet" href="workshop.css" />
   <style>
-    :root {
-      --bg: #050508;
-      --panel: rgba(15, 17, 22, 0.9);
-      --panel-solid: #0f1116;
-      --text: #e8eaed;
-      --muted: #8b919e;
-      --accent: #00ffd5;
-      --accent-2: #7b61ff;
-      --border: rgba(255,255,255,0.08);
-      --glow: 0 0 30px rgba(0,255,213,0.15);
-      --radius: 16px;
-      --mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --trace-color: rgba(0,255,213,0.08);
-      --trace-glow: rgba(0,255,213,0.04);
-    }
-    :root.light {
-      --bg: #f0f2f8;
-      --panel: rgba(255,255,255,0.9);
-      --panel-solid: #ffffff;
-      --text: #0a0c10;
-      --muted: #5a6070;
-      --accent: #0891b2;
-      --accent-2: #6366f1;
-      --border: rgba(0,0,0,0.08);
-      --glow: 0 4px 30px rgba(8,145,178,0.25);
-      --trace-color: rgba(8,145,178,0.12);
-      --trace-glow: rgba(8,145,178,0.08);
-    }
+    /* ── Project detail — page-specific styles ── */
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: var(--sans);
+    .doc-container { max-width: 860px; }
+
+    /* Module header */
+    .module-header { padding: 48px 0 32px; }
+    .module-kicker {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .module-kicker::before { content: ''; width: 20px; height: 1px; background: var(--turquoise); }
+    .module-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 700;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
       color: var(--text);
-      background: var(--bg);
-      line-height: 1.7;
-      overflow-x: hidden;
+      line-height: 1.25;
     }
 
-    /* Semiconductor circuit pattern background */
-    .circuit-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
+    /* Hero figure */
+    .hero-figure {
+      margin: 0 0 28px;
     }
-    .circuit-bg svg { width: 100%; height: 100%; }
-    .circuit-bg .trace { fill: none; stroke: var(--trace-color); stroke-width: 1; }
-    .circuit-bg .trace-thick { fill: none; stroke: var(--trace-color); stroke-width: 2; }
-    .circuit-bg .via { fill: var(--trace-color); }
-    .circuit-bg .pad { fill: none; stroke: var(--trace-color); stroke-width: 1.5; }
-    .circuit-bg .glow-orb { fill: var(--trace-glow); }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(ellipse 100% 60% at 0% 0%, var(--trace-glow), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 100% 100%, var(--trace-glow), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+    .hero-figure img {
+      width: 100%;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .hero-figure figcaption {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+      letter-spacing: 0.02em;
     }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
-    header {
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: saturate(1.5) blur(20px);
-      background: color-mix(in oklab, var(--bg), transparent 40%);
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      margin-bottom: 28px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--turquoise); }
+
+    /* Content sections */
+    .doc-section { margin: 48px 0; }
+    .doc-section h2 {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border);
     }
-    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); font-weight: 700; font-family: var(--mono); }
-    .brand .logo { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--glow); display: grid; place-items: center; color: var(--bg); font-weight: 800; font-size: 0.9rem; transition: transform 0.3s, box-shadow 0.3s; }
-    .brand:hover .logo { transform: scale(1.05); }
-    nav a { color: var(--muted); text-decoration: none; padding: 10px 16px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
-    nav a:hover { color: var(--accent); background: rgba(0,255,213,0.05); }
-    :root.light nav a:hover { background: rgba(8,145,178,0.05); }
-    .right { display: flex; align-items: center; gap: 12px; }
-    .social-link {
-      color: var(--muted);
-      transition: all 0.2s;
+
+    /* Spec strip — quick-reference row under module header */
+    .spec-strip {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    .social-link:hover {
-      color: var(--accent);
-      background: rgba(0,255,213,0.05);
-    }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-      padding: 12px 20px; border-radius: 12px; font-weight: 600;
-      transition: all 0.3s; cursor: pointer; font-size: 0.95rem; border: none;
-    }
-    .btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: var(--bg);
-      box-shadow: 0 4px 20px rgba(0,255,213,0.3);
-    }
-    .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,255,213,0.4); }
-    .btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px); }
-    .btn.secondary:hover { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); }
-
-    .card {
-      background: var(--panel);
-      backdrop-filter: blur(20px);
+      flex-wrap: wrap;
+      gap: 0;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: all 0.3s;
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin-bottom: 32px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
     }
-    .card:hover { border-color: rgba(0,255,213,0.15); box-shadow: var(--glow); }
-    :root.light .card:hover { border-color: rgba(8,145,178,0.2); }
-    .pad { padding: 28px; }
-
-    h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.2; margin: 0 0 16px; }
-    h2 { font-size: clamp(1.3rem, 3vw, 1.6rem); margin: 48px 0 16px; color: var(--accent); }
-    h3 { font-size: 1.1rem; margin: 24px 0 12px; }
-    p { margin: 0 0 16px; color: var(--muted); }
-    ul, ol { color: var(--muted); padding-left: 24px; }
-    li { margin-bottom: 8px; }
-    strong { color: var(--text); }
-
-    .hero-section { padding: 48px 0 32px; }
-    .kicker { color: var(--accent); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .85rem; margin-bottom: 8px; }
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
-    .tag { font-family: var(--mono); font-size: .8rem; border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; color: var(--muted); background: var(--panel); }
-
-    .section { margin: 32px 0; }
-
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem; }
-    th, td { padding: 12px; text-align: left; border: 1px solid var(--border); }
-    th { background: var(--panel); color: var(--text); font-weight: 600; }
-    td { color: var(--muted); }
-
-    code { font-family: var(--mono); background: var(--panel); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-
-    .highlight-box { background: color-mix(in oklab, var(--accent), transparent 90%); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
-    .highlight-box p { margin: 0; color: var(--text); }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); text-decoration: none; margin-bottom: 24px; }
-    .back-link:hover { color: var(--text); }
-
-    figure { margin: 24px 0; }
-    figure img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; }
-    figcaption { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
-    .img-placeholder {
-      width: 100%;
-      min-height: 200px;
-      background: var(--panel);
-      border: 2px dashed var(--border);
-      border-radius: 8px;
+    .spec-strip-item {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
+      flex-direction: column;
+      padding: 10px 18px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 100px;
+    }
+    .spec-strip-item:last-child { border-right: none; }
+    .spec-strip-key {
+      color: var(--text-dim);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      margin-bottom: 3px;
+    }
+    .spec-strip-val {
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .spec-strip-val.complete { color: var(--turquoise); }
+    .doc-section h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 20px 0 10px;
+    }
+    .doc-section p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      margin: 0 0 14px;
+    }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section strong { color: var(--text); font-weight: 500; }
+    .doc-section ul, .doc-section ol {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      padding-left: 20px;
+      margin: 0 0 14px;
+      line-height: 1.7;
+    }
+    .doc-section li { margin-bottom: 6px; }
+
+    /* Callout — turquoise tint via zone-accent */
+    .callout {
+      background: var(--turquoise-dim);
+      border-left: 3px solid var(--turquoise);
+      padding: 14px 18px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin: 16px 0;
+    }
+    .callout p {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--mono);
       font-size: 0.9rem;
     }
 
-    footer { border-top: 1px solid var(--border); margin-top: 48px; }
-  </style>
-  <script>
-    const preferred = localStorage.getItem('theme');
-    if (preferred) {
-      document.documentElement.classList.toggle('light', preferred === 'light');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      document.documentElement.classList.add('light');
+    /* Figures */
+    figure { margin: 20px 0; }
+    figure img {
+      width: 100%;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      display: block;
     }
-    function toggleTheme(){
-      const isLight = document.documentElement.classList.toggle('light');
+    figcaption {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Two-column figure grid */
+    .fig-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 580px) { .fig-grid-2 { grid-template-columns: 1fr; } }
+
+    /* Two-column text grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Data table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; }
+    th {
+      background: var(--surface-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    td {
+      color: var(--text-dim);
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+    }
+    td:first-child { color: var(--text); }
+
+    code {
+      font-family: var(--mono);
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: var(--r-sm);
+      font-size: 0.85em;
+      color: var(--turquoise);
+    }
+  </style>
+
+  <script>
+    (function(){
+      var p = localStorage.getItem('theme');
+      if (p) { document.documentElement.classList.toggle('light', p === 'light'); }
+      else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.documentElement.classList.toggle('light');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     }
   </script>
 </head>
-<body>
-  <!-- Semiconductor circuit pattern background -->
-  <div class="circuit-bg">
+
+<body class="zone-bench">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Background Layer 1: Circuit Traces -->
+  <div class="bg-layer bg-circuit" aria-hidden="true">
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-      <!-- Main horizontal bus lines -->
-      <path class="trace-thick" d="M0,100 H400 L420,120 H800"/>
-      <path class="trace-thick" d="M0,300 H200 L240,340 H600 L640,300 H1920"/>
-      <path class="trace-thick" d="M0,600 H300 L340,640 H700"/>
-      <path class="trace-thick" d="M1920,200 H1500 L1460,240 H1100"/>
-      <path class="trace-thick" d="M1920,500 H1600 L1560,460 H1200"/>
-      <path class="trace-thick" d="M1920,800 H1400 L1360,840 H900"/>
-
-      <!-- Vertical traces -->
-      <path class="trace" d="M200,0 V200 L240,240 V400"/>
-      <path class="trace" d="M400,100 V300"/>
-      <path class="trace" d="M600,0 V150 L640,190 V340"/>
-      <path class="trace" d="M800,120 V280 L840,320 V500"/>
-      <path class="trace" d="M1200,460 V600 L1160,640 V800"/>
-      <path class="trace" d="M1400,0 V150 L1360,190 V350"/>
-      <path class="trace" d="M1600,200 V400 L1560,440 V600"/>
-      <path class="trace" d="M1100,240 V450"/>
-
-      <!-- Cross traces -->
-      <path class="trace" d="M300,200 L350,250 H500 L550,200"/>
-      <path class="trace" d="M700,340 L750,390 H900 L950,340"/>
-      <path class="trace" d="M1000,500 L1050,550 H1150 L1200,500"/>
-      <path class="trace" d="M1300,350 L1350,400 H1500 L1550,350"/>
-
-      <!-- Bottom section traces -->
-      <path class="trace-thick" d="M0,900 H250 L290,860 H550 L590,900 H850"/>
-      <path class="trace" d="M250,900 V1080"/>
-      <path class="trace" d="M550,860 V700 L590,660 H750"/>
-      <path class="trace" d="M850,900 L890,860 V750"/>
-      <path class="trace-thick" d="M1920,950 H1650 L1610,910 H1350 L1310,950 H1100"/>
-      <path class="trace" d="M1350,910 V780 L1310,740 H1150"/>
-
-      <!-- Vias (connection points) -->
-      <circle class="via" cx="200" cy="200" r="4"/>
-      <circle class="via" cx="400" cy="100" r="4"/>
-      <circle class="via" cx="400" cy="300" r="4"/>
-      <circle class="via" cx="600" cy="150" r="4"/>
-      <circle class="via" cx="800" cy="120" r="4"/>
-      <circle class="via" cx="800" cy="280" r="4"/>
-      <circle class="via" cx="240" cy="340" r="4"/>
-      <circle class="via" cx="640" cy="300" r="4"/>
-      <circle class="via" cx="1100" cy="240" r="4"/>
-      <circle class="via" cx="1200" cy="460" r="4"/>
-      <circle class="via" cx="1200" cy="600" r="4"/>
-      <circle class="via" cx="1400" cy="150" r="4"/>
-      <circle class="via" cx="1500" cy="200" r="4"/>
-      <circle class="via" cx="1600" cy="400" r="4"/>
-      <circle class="via" cx="1560" cy="460" r="4"/>
-      <circle class="via" cx="1360" cy="840" r="4"/>
-      <circle class="via" cx="250" cy="900" r="4"/>
-      <circle class="via" cx="550" cy="860" r="4"/>
-      <circle class="via" cx="850" cy="900" r="4"/>
-      <circle class="via" cx="1350" cy="910" r="4"/>
-      <circle class="via" cx="1650" cy="950" r="4"/>
-
-      <!-- Pads (larger connection squares) -->
-      <rect class="pad" x="180" y="380" width="20" height="20" rx="2"/>
-      <rect class="pad" x="620" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="820" y="300" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1080" y="430" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1380" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1580" y="580" width="20" height="20" rx="2"/>
-      <rect class="pad" x="340" y="620" width="20" height="20" rx="2"/>
-      <rect class="pad" x="730" y="640" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1130" y="780" width="20" height="20" rx="2"/>
-      <rect class="pad" x="870" y="730" width="20" height="20" rx="2"/>
-
-      <!-- Glow orbs for depth -->
-      <circle class="glow-orb" cx="300" cy="250" r="150"/>
-      <circle class="glow-orb" cx="1600" cy="350" r="180"/>
-      <circle class="glow-orb" cx="900" cy="700" r="200"/>
-      <circle class="glow-orb" cx="1200" cy="900" r="160"/>
-      <circle class="glow-orb" cx="500" cy="850" r="140"/>
+      <path class="trace-thick" d="M0,120 H350 L380,150 H760"/>
+      <path class="trace-thick" d="M0,320 H180 L220,360 H560 L600,320 H1920"/>
+      <path class="trace-thick" d="M0,620 H280 L320,660 H680"/>
+      <path class="trace-thick" d="M1920,220 H1480 L1440,260 H1080"/>
+      <path class="trace-thick" d="M1920,520 H1560 L1520,480 H1160"/>
+      <path class="trace-thick" d="M1920,820 H1360 L1320,860 H880"/>
+      <path class="trace" d="M180,0 V210 L220,250 V420"/>
+      <path class="trace" d="M380,120 V320"/>
+      <path class="trace" d="M580,0 V160 L620,200 V360"/>
+      <path class="trace" d="M760,150 V300 L800,340 V520"/>
+      <path class="trace" d="M1160,480 V620 L1120,660 V820"/>
+      <path class="trace" d="M1360,0 V160 L1320,200 V370"/>
+      <path class="trace" d="M1560,220 V420 L1520,460 V620"/>
+      <path class="trace" d="M1080,260 V470"/>
+      <path class="trace" d="M280,220 L330,270 H480 L530,220"/>
+      <path class="trace" d="M680,360 L730,410 H880 L930,360"/>
+      <path class="trace" d="M980,520 L1030,570 H1120 L1170,520"/>
+      <path class="trace" d="M1260,370 L1310,420 H1460 L1510,370"/>
+      <path class="trace-thick" d="M0,920 H240 L280,880 H520 L560,920 H820"/>
+      <path class="trace" d="M240,920 V1080"/>
+      <path class="trace" d="M520,880 V720 L560,680 H720"/>
+      <path class="trace" d="M820,920 L860,880 V760"/>
+      <path class="trace-thick" d="M1920,960 H1620 L1580,920 H1320 L1280,960 H1060"/>
+      <path class="trace" d="M1320,920 V800 L1280,760 H1120"/>
+      <circle class="via" cx="180" cy="210" r="3.5"/>
+      <circle class="via" cx="380" cy="120" r="3.5"/>
+      <circle class="via" cx="380" cy="320" r="3.5"/>
+      <circle class="via" cx="580" cy="160" r="3.5"/>
+      <circle class="via" cx="760" cy="150" r="3.5"/>
+      <circle class="via" cx="760" cy="300" r="3.5"/>
+      <circle class="via" cx="220" cy="360" r="3.5"/>
+      <circle class="via" cx="600" cy="320" r="3.5"/>
+      <circle class="via" cx="1080" cy="260" r="3.5"/>
+      <circle class="via" cx="1160" cy="480" r="3.5"/>
+      <circle class="via" cx="1160" cy="620" r="3.5"/>
+      <circle class="via" cx="1360" cy="160" r="3.5"/>
+      <circle class="via" cx="1480" cy="220" r="3.5"/>
+      <circle class="via" cx="1560" cy="420" r="3.5"/>
+      <circle class="via" cx="1520" cy="460" r="3.5"/>
+      <circle class="via" cx="1320" cy="860" r="3.5"/>
+      <circle class="via" cx="240"  cy="920" r="3.5"/>
+      <circle class="via" cx="520"  cy="880" r="3.5"/>
+      <circle class="via" cx="820"  cy="920" r="3.5"/>
+      <circle class="via" cx="1320" cy="920" r="3.5"/>
+      <circle class="via" cx="1620" cy="960" r="3.5"/>
+      <rect class="pad" x="163" y="395" width="18" height="18" rx="2"/>
+      <rect class="pad" x="603" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="802" y="318" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1062" y="448" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1342" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1542" y="598" width="18" height="18" rx="2"/>
+      <rect class="pad" x="318"  y="640" width="18" height="18" rx="2"/>
+      <rect class="pad" x="708"  y="658" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1102" y="798" width="18" height="18" rx="2"/>
+      <rect class="pad" x="848"  y="748" width="18" height="18" rx="2"/>
+      <circle class="glow-orb" cx="280"  cy="270"  r="160"/>
+      <circle class="glow-orb" cx="1580" cy="360"  r="190"/>
+      <circle class="glow-orb" cx="880"  cy="720"  r="210"/>
+      <circle class="glow-orb" cx="1180" cy="920"  r="170"/>
+      <circle class="glow-orb" cx="500"  cy="860"  r="150"/>
     </svg>
   </div>
 
+  <!-- Background Layer 2: Girih Geometry (canvas) -->
+  <canvas class="bg-layer bg-geo" id="geo-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 3: Signal Waves (canvas) -->
+  <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 4: Physical Scene — Workbench (one-point perspective, VP 960,400) -->
+  <div class="bg-layer bg-scene" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+
+      <!-- ── ROOM STRUCTURE ── -->
+      <!-- Wall-ceiling edges converging to VP -->
+      <line class="s-thick" x1="0"    y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="0"    x2="960" y2="400"/>
+      <!-- Wall-floor edges converging to VP -->
+      <line class="s-thick" x1="0"    y1="1080" x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="1080" x2="960" y2="400"/>
+      <!-- Intermediate floor perspective lines -->
+      <line class="s-line"  x1="480"  y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="1440" y1="1080" x2="960" y2="400"/>
+      <!-- Floor horizontal depth rings -->
+      <line class="s-line"  x1="226"  y1="954"  x2="1694" y2="954"/>
+      <line class="s-line"  x1="338"  y1="840"  x2="1582" y2="840"/>
+      <line class="s-line"  x1="451"  y1="760"  x2="1469" y2="760"/>
+
+      <!-- Back wall (faint fill around VP zone) -->
+      <rect class="s-fill" x="680" y="355" width="600" height="80" rx="0"/>
+      <!-- Back wall shelves -->
+      <line class="s-thick" x1="680"  y1="340" x2="1240" y2="340"/>
+      <line class="s-line"  x1="680"  y1="308" x2="1240" y2="308"/>
+      <line class="s-line"  x1="720"  y1="308" x2="720"  y2="435"/>
+      <line class="s-line"  x1="840"  y1="308" x2="840"  y2="435"/>
+      <line class="s-line"  x1="1080" y1="308" x2="1080" y2="435"/>
+      <line class="s-line"  x1="1200" y1="308" x2="1200" y2="435"/>
+
+      <!-- Component reels on back wall shelf (small — far depth) -->
+      <circle class="s-line" cx="748"  cy="284" r="18"/><circle class="s-line" cx="748"  cy="284" r="10"/><circle class="s-line" cx="748"  cy="284" r="3"/>
+      <circle class="s-line" cx="790"  cy="286" r="16"/><circle class="s-line" cx="790"  cy="286" r="9"/> <circle class="s-line" cx="790"  cy="286" r="3"/>
+      <circle class="s-line" cx="830"  cy="285" r="17"/><circle class="s-line" cx="830"  cy="285" r="10"/><circle class="s-line" cx="830"  cy="285" r="3"/>
+      <circle class="s-line" cx="1090" cy="284" r="18"/><circle class="s-line" cx="1090" cy="284" r="10"/><circle class="s-line" cx="1090" cy="284" r="3"/>
+      <circle class="s-line" cx="1132" cy="286" r="16"/><circle class="s-line" cx="1132" cy="286" r="9"/> <circle class="s-line" cx="1132" cy="286" r="3"/>
+      <circle class="s-line" cx="1172" cy="285" r="17"/><circle class="s-line" cx="1172" cy="285" r="10"/><circle class="s-line" cx="1172" cy="285" r="3"/>
+
+      <!-- ── OVERHEAD FLUORESCENT LIGHTS (receding in perspective) ── -->
+      <!-- Near tube: wide, near top -->
+      <rect class="s-fill" x="138" y="52"  width="1644" height="6"  rx="1"/>
+      <rect class="s-line" x="132" y="58"  width="1656" height="20" rx="2"/>
+      <line class="s-line" x1="280"  y1="58" x2="280"  y2="78"/>
+      <line class="s-line" x1="480"  y1="58" x2="480"  y2="78"/>
+      <line class="s-line" x1="680"  y1="58" x2="680"  y2="78"/>
+      <line class="s-line" x1="960"  y1="58" x2="960"  y2="78"/>
+      <line class="s-line" x1="1240" y1="58" x2="1240" y2="78"/>
+      <line class="s-line" x1="1440" y1="58" x2="1440" y2="78"/>
+      <line class="s-line" x1="1640" y1="58" x2="1640" y2="78"/>
+      <!-- Mid tube: narrower -->
+      <rect class="s-fill" x="282" y="114" width="1356" height="5"  rx="1"/>
+      <rect class="s-line" x="276" y="119" width="1368" height="16" rx="2"/>
+      <line class="s-line" x1="420"  y1="119" x2="420"  y2="135"/>
+      <line class="s-line" x1="600"  y1="119" x2="600"  y2="135"/>
+      <line class="s-line" x1="780"  y1="119" x2="780"  y2="135"/>
+      <line class="s-line" x1="960"  y1="119" x2="960"  y2="135"/>
+      <line class="s-line" x1="1140" y1="119" x2="1140" y2="135"/>
+      <line class="s-line" x1="1320" y1="119" x2="1320" y2="135"/>
+      <line class="s-line" x1="1500" y1="119" x2="1500" y2="135"/>
+      <!-- Far tube: narrow, close to ceiling perspective lines -->
+      <rect class="s-fill" x="426" y="174" width="1068" height="4"  rx="1"/>
+      <rect class="s-line" x="420" y="178" width="1080" height="12" rx="2"/>
+      <line class="s-line" x1="540"  y1="178" x2="540"  y2="190"/>
+      <line class="s-line" x1="680"  y1="178" x2="680"  y2="190"/>
+      <line class="s-line" x1="820"  y1="178" x2="820"  y2="190"/>
+      <line class="s-line" x1="960"  y1="178" x2="960"  y2="190"/>
+      <line class="s-line" x1="1100" y1="178" x2="1100" y2="190"/>
+      <line class="s-line" x1="1240" y1="178" x2="1240" y2="190"/>
+      <line class="s-line" x1="1380" y1="178" x2="1380" y2="190"/>
+
+      <!-- ── WORKBENCH SURFACE (trapezoid, recedes to back) ── -->
+      <!-- Front: (120,780)→(1800,780)  Back: (562,580)→(1358,580) -->
+      <g opacity="0.45">
+        <polygon class="s-fill" points="120,780 1800,780 1358,580 562,580"/>
+        <rect class="s-fill"  x="120"  y="780" width="1680" height="36"/>
+      </g>
+      <line class="s-thick" x1="120"  y1="780" x2="1800" y2="780"/>
+      <line class="s-thick" x1="562"  y1="580" x2="1358" y2="580"/>
+      <line class="s-line"  x1="120"  y1="780" x2="562"  y2="580"/>
+      <line class="s-line"  x1="1800" y1="780" x2="1358" y2="580"/>
+      <!-- Bench front face (fascia) -->
+      <line class="s-thick" x1="120"  y1="816" x2="1800" y2="816"/>
+      <!-- Bench legs front pair -->
+      <rect class="s-thick" x="146"  y="816" width="22"   height="264"/>
+      <rect class="s-line"  x="134"  y="1062" width="46"  height="14" rx="2"/>
+      <rect class="s-thick" x="1752" y="816" width="22"   height="264"/>
+      <rect class="s-line"  x="1740" y="1062" width="46"  height="14" rx="2"/>
+      <!-- Back legs (smaller, in perspective) -->
+      <line class="s-line"  x1="576" y1="580" x2="576"  y2="700"/>
+      <line class="s-line"  x1="1344" y1="580" x2="1344" y2="700"/>
+
+      <!-- ── MULTIMETER — left, foreground ── -->
+      <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
+      <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
+      <circle class="s-line" cx="251" cy="738" r="26"/>
+      <circle class="s-fill" cx="251" cy="738" r="7"/>
+      <line class="s-line" x1="251" y1="712" x2="251" y2="718"/>
+      <line class="s-line" x1="272" y1="720" x2="268" y2="724"/>
+      <line class="s-line" x1="230" y1="720" x2="234" y2="724"/>
+      <line class="s-line" x1="277" y1="738" x2="272" y2="738"/>
+      <line class="s-line" x1="230" y1="738" x2="225" y2="738"/>
+      <circle class="s-fill" cx="231" cy="766" r="5"/>
+      <circle class="s-fill" cx="251" cy="766" r="5"/>
+      <circle class="s-fill" cx="271" cy="766" r="5"/>
+      <!-- probe leads draping off bench -->
+      <path class="s-line" d="M231,771 Q210,815 182,862 L174,884"/>
+      <path class="s-line" d="M271,771 Q292,815 318,862 L326,884"/>
+      <line class="s-line" x1="170" y1="880" x2="178" y2="888"/>
+      <line class="s-line" x1="322" y1="880" x2="330" y2="888"/>
+
+      <!-- ── DESK LAMP — center-left ── -->
+      <rect class="s-fill"  x="568" y="770" width="24" height="14" rx="3"/>
+      <line class="s-thick" x1="580" y1="780" x2="580" y2="700"/>
+      <line class="s-thick" x1="580" y1="700" x2="634" y2="614"/>
+      <line class="s-thick" x1="634" y1="614" x2="672" y2="558"/>
+      <ellipse class="s-line" cx="686" cy="550" rx="28" ry="12"/>
+      <line   class="s-line"  x1="672" y1="558" x2="700" y2="543"/>
+      <line   class="s-line"  x1="684" y1="562" x2="684" y2="538"/>
+
+      <!-- ── BREADBOARD — bench center, mid-depth ── -->
+      <rect class="s-line" x="836" y="672" width="248" height="96" rx="3"/>
+      <line class="s-line" x1="852" y1="690" x2="1068" y2="690"/>
+      <line class="s-line" x1="852" y1="702" x2="1068" y2="702"/>
+      <line class="s-thick" x1="852" y1="720" x2="1068" y2="720"/>
+      <line class="s-line" x1="852" y1="738" x2="1068" y2="738"/>
+      <line class="s-line" x1="852" y1="750" x2="1068" y2="750"/>
+      <!-- IC on breadboard -->
+      <rect class="s-fill" x="936" y="696" width="48" height="42" rx="2"/>
+      <rect class="s-line" x="936" y="696" width="48" height="42" rx="2"/>
+      <path class="s-line" d="M957,696 A4,4 0 0,1 967,696"/>
+      <line class="s-line" x1="936" y1="704" x2="928" y2="704"/>
+      <line class="s-line" x1="936" y1="712" x2="928" y2="712"/>
+      <line class="s-line" x1="936" y1="720" x2="928" y2="720"/>
+      <line class="s-line" x1="936" y1="728" x2="928" y2="728"/>
+      <line class="s-line" x1="984" y1="704" x2="992" y2="704"/>
+      <line class="s-line" x1="984" y1="712" x2="992" y2="712"/>
+      <line class="s-line" x1="984" y1="720" x2="992" y2="720"/>
+      <line class="s-line" x1="984" y1="728" x2="992" y2="728"/>
+
+      <!-- ── OSCILLOSCOPE — right, foreground ── -->
+      <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
+      <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
+      <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
+      <!-- square wave on screen -->
+      <polyline class="s-thick" points="1398,692 1398,650 1420,650 1420,692 1443,692 1443,650 1466,650 1466,692 1489,692 1489,650 1512,650 1512,692 1554,692"/>
+      <line class="s-line" x1="1388" y1="679" x2="1562" y2="679"/>
+      <line class="s-line" x1="1475" y1="622" x2="1475" y2="736"/>
+      <!-- knobs right panel -->
+      <circle class="s-line" cx="1614" cy="642" r="14"/><circle class="s-fill" cx="1614" cy="642" r="4"/>
+      <line   class="s-line"  x1="1614" y1="628" x2="1614" y2="633"/>
+      <circle class="s-line" cx="1656" cy="642" r="14"/><circle class="s-fill" cx="1656" cy="642" r="4"/>
+      <line   class="s-line"  x1="1656" y1="628" x2="1656" y2="633"/>
+      <circle class="s-line" cx="1614" cy="684" r="12"/><circle class="s-fill" cx="1614" cy="684" r="4"/>
+      <circle class="s-line" cx="1656" cy="684" r="12"/><circle class="s-fill" cx="1656" cy="684" r="4"/>
+      <circle class="s-line" cx="1635" cy="726" r="16"/><circle class="s-fill" cx="1635" cy="726" r="5"/>
+      <!-- input jacks -->
+      <circle class="s-line" cx="1600" cy="768" r="7"/><circle class="s-fill" cx="1600" cy="768" r="3"/>
+      <circle class="s-line" cx="1624" cy="768" r="7"/><circle class="s-fill" cx="1624" cy="768" r="3"/>
+      <circle class="s-line" cx="1648" cy="768" r="7"/><circle class="s-fill" cx="1648" cy="768" r="3"/>
+      <circle class="s-line" cx="1672" cy="768" r="7"/><circle class="s-fill" cx="1672" cy="768" r="3"/>
+      <!-- probe leads -->
+      <path class="s-line" d="M1600,775 Q1578,814 1552,854 L1542,876"/>
+      <path class="s-line" d="M1624,775 Q1622,820 1602,860 L1596,878"/>
+      <line class="s-line" x1="1538" y1="872" x2="1546" y2="880"/>
+      <line class="s-line" x1="1592" y1="874" x2="1600" y2="882"/>
+
+      <!-- Glow orbs -->
+      <circle class="s-glow" cx="251"  cy="700" r="110"/>
+      <circle class="s-glow" cx="960"  cy="420" r="180"/>
+      <circle class="s-glow" cx="1514" cy="700" r="130"/>
+
+    </svg>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="container nav">
-      <a class="brand" href="porfolio.html" aria-label="Home">
-        <span class="logo" aria-hidden="true">SR</span>
-        <span>sami.dev</span>
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop — home">
+        <span class="monogram" aria-hidden="true">SR</span>
+        <span class="brand-text">
+          <span class="brand-label">Engineer</span>
+          <span class="brand-name">Sami's Workshop</span>
+        </span>
       </a>
-      <nav aria-label="Primary">
-        <a href="porfolio.html#projects">Projects</a>
-        <a href="porfolio.html#blog">Blog</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="porfolio.html">Workbench</a>
+        <a href="porfolio.html#projects" class="active">Build Bench</a>
+        <a href="blog.html">Sami's Log</a>
         <a href="porfolio.html#about">About</a>
         <a href="porfolio.html#contact">Contact</a>
       </nav>
-      <div class="right">
-        <a href="https://github.com/samisrana" target="_blank" aria-label="GitHub" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <div class="nav-right">
+        <a href="https://github.com/samisrana" target="_blank" rel="noopener"
+           aria-label="GitHub" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
         </a>
-        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" aria-label="LinkedIn" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" rel="noopener"
+           aria-label="LinkedIn" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
         </a>
-        <button class="btn secondary" onclick="toggleTheme()" aria-label="Toggle theme">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="container">
-    <a href="porfolio.html#projects" class="back-link">← Back to projects</a>
+  <main id="main">
+    <div class="container doc-container">
 
-    <section class="hero-section">
-      <p class="kicker">VLSI Design Project</p>
-      <h1>CMOS Logic Circuit Design & Layout</h1>
-      <figure>
+      <div style="padding-top: 40px;">
+        <a href="porfolio.html#projects" class="back-link">← Build Bench</a>
+      </div>
+
+      <header class="module-header">
+        <p class="module-kicker">VLSI / MODULE-01</p>
+        <h1>CMOS Logic Circuit Design &amp; Layout</h1>
+        <div class="tags">
+          <span class="tag">VLSI</span>
+          <span class="tag">CMOS</span>
+          <span class="tag">Cadence Virtuoso</span>
+          <span class="tag">Calibre DRC/LVS</span>
+          <span class="tag">Circuit Design</span>
+          <span class="tag">Layout</span>
+        </div>
+      </header>
+
+      <div class="spec-strip">
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Function</span>
+          <span class="spec-strip-val">F = B(A + C)</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Tool</span>
+          <span class="spec-strip-val">Cadence Virtuoso</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Process</span>
+          <span class="spec-strip-val">GF PDK · 60 nm</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Area</span>
+          <span class="spec-strip-val">12.748 µm²</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Status</span>
+          <span class="spec-strip-val complete">COMPLETE</span>
+        </div>
+      </div>
+
+      <figure class="hero-figure">
         <img src="images/cmos_layout.png" alt="Full layout of the implemented CMOS circuit" />
-        <figcaption>Figure: Full layout of the implemented CMOS circuit for F = B(A + C)</figcaption>
+        <figcaption>Full layout of the implemented CMOS circuit for F = B(A + C)</figcaption>
       </figure>
-      <p style="font-size: 1.1rem; color: var(--text);">Designed and implemented a complementary static CMOS circuit for the Boolean function F = AB + BC, including schematic capture, physical layout, DRC/LVS verification, and post-layout performance analysis using Cadence Virtuoso.</p>
-      <div class="tags">
-        <span class="tag">VLSI</span>
-        <span class="tag">CMOS</span>
-        <span class="tag">Cadence Virtuoso</span>
-        <span class="tag">Calibre DRC/LVS</span>
-        <span class="tag">Circuit Design</span>
-        <span class="tag">Layout</span>
-      </div>
-    </section>
 
-    <section class="section">
-      <h2>Project Overview</h2>
-      <div class="card pad">
-        <p>This project involved the complete design flow for implementing a Boolean logic function using complementary static CMOS technology. The goal was to implement <strong>F = AB + BC</strong> while minimizing transistor count and optimizing layout area.</p>
-        <p>The design was completed using <strong>Cadence Virtuoso</strong> for schematic capture and layout, with <strong>Calibre</strong> for design rule checking (DRC) and layout vs. schematic (LVS) verification.</p>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Function Analysis & Optimization</h2>
-      <div class="card pad">
-        <h3>Boolean Simplification</h3>
-        <p>Using K-map analysis, the original function was simplified to reduce transistor count:</p>
-        <div class="highlight-box">
-          <p><strong>F = AB + BC = B(A + C)</strong></p>
+      <!-- Overview -->
+      <section class="doc-section">
+        <h2>Overview</h2>
+        <div class="card card-pad">
+          <p>Full custom CMOS design flow for the Boolean function <strong>F = AB + BC</strong>,
+          implementing schematic capture, physical layout, DRC/LVS verification, and post-layout
+          performance analysis using <strong>Cadence Virtuoso</strong> and <strong>Calibre</strong>.</p>
+          <p>The design targets the <strong>GlobalFoundries PDK</strong>, with transistor sizing following
+          a 2:1 PMOS:NMOS ratio to balance rise/fall times. Total layout area: <strong>12.748 µm²</strong>.</p>
         </div>
-        <p>This simplified form allows direct implementation using CMOS pull-up network (PUN) and pull-down network (PDN), reducing the total transistor count to <strong>8 transistors</strong> (including the output inverter).</p>
+      </section>
 
-        <figure>
-          <img src="images/kmap.png" alt="K-map for F = AB + BC" />
-          <figcaption>Figure 1: K-map for F = AB + BC</figcaption>
-        </figure>
-
-        <h3>Network Design</h3>
-        <div class="grid-2">
-          <div>
-            <strong>Pull-Up Network (PUN):</strong>
-            <ul>
-              <li>1 pMOS controlled by B in parallel with</li>
-              <li>2 series pMOS controlled by A and C</li>
-              <li>Total: 3 pMOS transistors</li>
-            </ul>
+      <!-- Function analysis -->
+      <section class="doc-section">
+        <h2>Function Analysis &amp; Optimization</h2>
+        <div class="card card-pad">
+          <h3>Boolean Simplification</h3>
+          <p>K-map analysis reduced the transistor count by factoring the function:</p>
+          <div class="callout">
+            <p>F = AB + BC = B(A + C)</p>
           </div>
-          <div>
-            <strong>Pull-Down Network (PDN):</strong>
-            <ul>
-              <li>1 nMOS controlled by B in series with</li>
-              <li>2 parallel nMOS controlled by A and C</li>
-              <li>Total: 3 nMOS transistors</li>
-            </ul>
+          <p>This form enables direct complementary CMOS implementation with <strong>8 transistors total</strong>
+          (including the output inverter).</p>
+
+          <figure>
+            <img src="images/kmap.png" alt="K-map for F = AB + BC" />
+            <figcaption>K-map for F = AB + BC</figcaption>
+          </figure>
+
+          <h3>Network Design</h3>
+          <div class="grid-2">
+            <div>
+              <strong>Pull-Up Network (PUN):</strong>
+              <ul>
+                <li>1 pMOS (B) in parallel with</li>
+                <li>2 series pMOS (A and C)</li>
+                <li>Total: 3 pMOS transistors</li>
+              </ul>
+            </div>
+            <div>
+              <strong>Pull-Down Network (PDN):</strong>
+              <ul>
+                <li>1 nMOS (B) in series with</li>
+                <li>2 parallel nMOS (A and C)</li>
+                <li>Total: 3 nMOS transistors</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="section">
-      <h2>Transistor Sizing</h2>
-      <div class="card pad">
-        <p>Transistor sizing followed the standard 2:1 PMOS:NMOS ratio to compensate for the lower hole mobility compared to electrons, ensuring balanced rise and fall times.</p>
-        <table>
-          <thead>
-            <tr><th>Network</th><th>Transistor</th><th>Width</th><th>Length</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>PUN (pMOS)</td><td>A, B, C</td><td>480 nm</td><td>60 nm</td></tr>
-            <tr><td>PDN (nMOS)</td><td>A, B, C</td><td>240 nm</td><td>60 nm</td></tr>
-            <tr><td>Inverter</td><td>pMOS</td><td>480 nm</td><td>60 nm</td></tr>
-            <tr><td>Inverter</td><td>nMOS</td><td>240 nm</td><td>60 nm</td></tr>
-          </tbody>
-        </table>
-        <p>After equivalent resistance calculations, the PUN:PDN ratio maintains the desired 2:1 ratio (240nm:120nm effective widths) for balanced pull-up and pull-down strengths.</p>
-      </div>
-    </section>
+      <!-- Transistor sizing -->
+      <section class="doc-section">
+        <h2>Transistor Sizing</h2>
+        <div class="card card-pad">
+          <p>2:1 PMOS:NMOS ratio compensates for lower hole mobility, targeting balanced rise/fall times.</p>
+          <table>
+            <thead>
+              <tr><th>Network</th><th>Transistor</th><th>Width</th><th>Length</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>PUN (pMOS)</td><td>A, B, C</td><td>480 nm</td><td>60 nm</td></tr>
+              <tr><td>PDN (nMOS)</td><td>A, B, C</td><td>240 nm</td><td>60 nm</td></tr>
+              <tr><td>Inverter</td><td>pMOS</td><td>480 nm</td><td>60 nm</td></tr>
+              <tr><td>Inverter</td><td>nMOS</td><td>240 nm</td><td>60 nm</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-    <section class="section">
-      <h2>Schematic Design</h2>
-      <div class="card pad">
-        <figure>
-          <img src="images/schematic.png" alt="Detailed schematic of the implemented CMOS circuit" />
-          <figcaption>Figure 2: Detailed schematic of the implemented CMOS circuit for F = B(A + C)</figcaption>
-        </figure>
-        <figure>
-          <img src="images/testbench.png" alt="Test bench schematic with input pattern generators" />
-          <figcaption>Figure 3: Test bench schematic showing the function circuit with input pattern generators</figcaption>
-        </figure>
-      </div>
-    </section>
+      <!-- Schematic -->
+      <section class="doc-section">
+        <h2>Schematic Design</h2>
+        <div class="card card-pad">
+          <figure>
+            <img src="images/schematic.png" alt="Schematic of the implemented CMOS circuit" />
+            <figcaption>Schematic for F = B(A + C)</figcaption>
+          </figure>
+          <figure>
+            <img src="images/testbench.png" alt="Test bench schematic" />
+            <figcaption>Test bench with input pattern generators</figcaption>
+          </figure>
+        </div>
+      </section>
 
-    <section class="section">
-      <h2>Simulation Results</h2>
-      <div class="card pad">
-        <figure>
-          <img src="images/waveform.png" alt="Waveform showing inputs A, B, C, and output F" />
-          <figcaption>Figure 4: Waveform showing inputs A, B, C, and output F</figcaption>
-        </figure>
-        <p>The output F is high when either both A and B are high, or when both B and C are high, confirming correct functionality.</p>
-      </div>
-    </section>
+      <!-- Simulation -->
+      <section class="doc-section">
+        <h2>Simulation Results</h2>
+        <div class="card card-pad">
+          <figure>
+            <img src="images/waveform.png" alt="Waveform — inputs A, B, C and output F" />
+            <figcaption>Waveform: inputs A, B, C and output F — confirms correct Boolean function</figcaption>
+          </figure>
+        </div>
+      </section>
 
-    <section class="section">
-      <h2>Layout Design Strategy</h2>
-      <div class="card pad">
-        <h3>Source/Drain Sharing</h3>
-        <p>Strategic source/drain sharing was implemented to minimize area and reduce parasitic capacitances:</p>
-        <ul>
-          <li>pMOS transistors arranged to maximize diffusion sharing between adjacent devices</li>
-          <li>nMOS transistors placed to optimize diffusion continuity</li>
-          <li>Vias used for cross-layer connections (C's drain to A's drain)</li>
-        </ul>
+      <!-- Layout -->
+      <section class="doc-section">
+        <h2>Layout Design</h2>
+        <div class="card card-pad">
+          <h3>Strategy</h3>
+          <ul>
+            <li>pMOS transistors arranged for maximum diffusion sharing between adjacent devices</li>
+            <li>nMOS transistors placed to optimize diffusion continuity</li>
+            <li>Vias for cross-layer connections (C's drain to A's drain)</li>
+            <li>Metal1: horizontal tracks for VDD (top) and GND (bottom)</li>
+            <li>Polysilicon: vertical gate connections, minimal bends</li>
+          </ul>
 
-        <h3>Interconnect Optimization</h3>
-        <ul>
-          <li><strong>Metal1:</strong> Horizontal tracks for power distribution (VDD top, GND bottom)</li>
-          <li><strong>Polysilicon:</strong> Vertical gate connections with minimal bends</li>
-          <li>Input signals routed efficiently from the left; output taken from the right</li>
-          <li>Multiple contacts at critical junctions to reduce resistance</li>
-        </ul>
+          <figure>
+            <img src="images/stick_diagram.png" alt="Stick diagram" />
+            <figcaption>Stick diagram — transistors A, B, C with inverter</figcaption>
+          </figure>
 
-        <h3>Stick Diagram</h3>
-        <figure>
-          <img src="images/stick_diagram.png" alt="Drawn stick diagram of transistors" />
-          <figcaption>Figure 5: Drawn stick diagram of Transistors A, B, & C with the inverter</figcaption>
-        </figure>
+          <figure>
+            <img src="images/cmos_layout.png" alt="Full CMOS layout" />
+            <figcaption>Full layout for F = B(A + C)</figcaption>
+          </figure>
 
-        <h3>Full Layout</h3>
-        <figure>
-          <img src="images/cmos_layout.png" alt="Full layout of the implemented CMOS circuit" />
-          <figcaption>Figure 6: Full layout of the implemented CMOS circuit for F = B(A + C)</figcaption>
-        </figure>
+          <figure>
+            <img src="images/layout_size.png" alt="Layout size measurement" />
+            <figcaption>Layout area — 12.748 µm²</figcaption>
+          </figure>
+        </div>
+      </section>
 
-        <h3>Layout Area</h3>
-        <figure>
-          <img src="images/layout_size.png" alt="Layout size measurement" />
-          <figcaption>Figure 7: Layout size — Total area: 12.748 µm²</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Verification Results</h2>
-      <div class="card pad">
-        <div class="grid-2">
-          <div>
-            <h3>Design Rule Check (DRC)</h3>
-            <p>Layout verified against foundry design rules using <strong>Calibre DRC</strong>. All checks passed after resolving initial errors related to:</p>
-            <ul>
-              <li>Metal1 track misalignment (fixed with Align tool)</li>
-              <li>Minimum spacing violations (fixed by adjusting PDN position)</li>
-            </ul>
+      <!-- Verification -->
+      <section class="doc-section">
+        <h2>Verification</h2>
+        <div class="card card-pad">
+          <div class="grid-2">
+            <div>
+              <h3>DRC — Design Rule Check</h3>
+              <p>Verified against foundry rules with <strong>Calibre DRC</strong>. Resolved:</p>
+              <ul>
+                <li>Metal1 track misalignment</li>
+                <li>Minimum spacing violations</li>
+              </ul>
+            </div>
+            <div>
+              <h3>LVS — Layout vs. Schematic</h3>
+              <p>Netlists match via <strong>Calibre LVS</strong>. Resolved:</p>
+              <ul>
+                <li>Label settings configuration</li>
+                <li>Missing connection (via for cross-layer routing)</li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3>Layout vs. Schematic (LVS)</h3>
-            <p>Verified using <strong>Calibre LVS</strong> — netlists match, confirming correct implementation. Resolved issues with:</p>
-            <ul>
-              <li>Label settings configuration</li>
-              <li>Missing connection (fixed using via for cross-layer routing)</li>
-            </ul>
+
+          <div class="fig-grid-2" style="margin-top:16px;">
+            <figure>
+              <img src="images/drc_results.png" alt="DRC results — all rules cleared" />
+              <figcaption>DRC — all design rules cleared</figcaption>
+            </figure>
+            <figure>
+              <img src="images/lvs_results.png" alt="LVS results — netlists match" />
+              <figcaption>LVS — netlists match</figcaption>
+            </figure>
           </div>
-        </div>
-
-        <figure>
-          <img src="images/drc_results.png" alt="DRC dialogue box showing clearance of all design rules" />
-          <figcaption>Figure 8: DRC dialogue box showing clearance of all design rules</figcaption>
-        </figure>
-
-        <figure>
-          <img src="images/lvs_results.png" alt="LVS output log showing successful comparison" />
-          <figcaption>Figure 9: LVS output log showing successful comparison between layout and schematic</figcaption>
-        </figure>
-
-        <figure>
-          <img src="images/pex_results.png" alt="Calibre Interactive window showing xRC extraction" />
-          <figcaption>Figure 10: Calibre Interactive window showing xRC warnings and no errors</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Performance Analysis</h2>
-      <div class="card pad">
-        <h3>0.5 fF Load Capacitor</h3>
-        <table>
-          <thead>
-            <tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Change</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Rise Time</td><td>0.01355 ns</td><td>0.01872 ns</td><td>+38.2%</td></tr>
-            <tr><td>Fall Time</td><td>0.01346 ns</td><td>0.01903 ns</td><td>+41.4%</td></tr>
-          </tbody>
-        </table>
-
-        <div class="grid-2">
           <figure>
-            <img src="images/sim_schematic_0.5fF.png" alt="Schematic simulation with 0.5 fF load" />
-            <figcaption>Figure 11: Schematic simulation with 0.5 fF load capacitor</figcaption>
-          </figure>
-          <figure>
-            <img src="images/sim_postlayout_0.5fF.png" alt="Post-layout simulation with 0.5 fF load" />
-            <figcaption>Figure 12: Post-layout simulation with 0.5 fF load capacitor</figcaption>
+            <img src="images/pex_results.png" alt="Calibre xRC extraction" />
+            <figcaption>Calibre xRC — parasitic extraction, no errors</figcaption>
           </figure>
         </div>
+      </section>
 
-        <h3>15 fF Load Capacitor</h3>
-        <table>
-          <thead>
-            <tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Change</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Rise Time</td><td>0.10671 ns</td><td>0.14796 ns</td><td>+38.7%</td></tr>
-            <tr><td>Fall Time</td><td>0.14556 ns</td><td>0.13406 ns</td><td>-7.9%</td></tr>
-          </tbody>
-        </table>
+      <!-- Performance -->
+      <section class="doc-section">
+        <h2>Performance Analysis</h2>
+        <div class="card card-pad">
+          <h3>0.5 fF Load</h3>
+          <table>
+            <thead><tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Delta</th></tr></thead>
+            <tbody>
+              <tr><td>Rise Time</td><td>0.01355 ns</td><td>0.01872 ns</td><td>+38.2%</td></tr>
+              <tr><td>Fall Time</td><td>0.01346 ns</td><td>0.01903 ns</td><td>+41.4%</td></tr>
+            </tbody>
+          </table>
+          <div class="fig-grid-2">
+            <figure>
+              <img src="images/sim_schematic_0.5fF.png" alt="Schematic sim — 0.5 fF" />
+              <figcaption>Schematic — 0.5 fF load</figcaption>
+            </figure>
+            <figure>
+              <img src="images/sim_postlayout_0.5fF.png" alt="Post-layout sim — 0.5 fF" />
+              <figcaption>Post-layout — 0.5 fF load</figcaption>
+            </figure>
+          </div>
 
-        <div class="grid-2">
-          <figure>
-            <img src="images/sim_schematic_15fF.png" alt="Schematic simulation with 15 fF load" />
-            <figcaption>Figure 13: Schematic simulation with 15 fF load capacitor</figcaption>
-          </figure>
-          <figure>
-            <img src="images/sim_postlayout_15fF.png" alt="Post-layout simulation with 15 fF load" />
-            <figcaption>Figure 14: Post-layout simulation with 15 fF load capacitor</figcaption>
-          </figure>
+          <h3>15 fF Load</h3>
+          <table>
+            <thead><tr><th>Metric</th><th>Schematic</th><th>Post-Layout</th><th>Delta</th></tr></thead>
+            <tbody>
+              <tr><td>Rise Time</td><td>0.10671 ns</td><td>0.14796 ns</td><td>+38.7%</td></tr>
+              <tr><td>Fall Time</td><td>0.14556 ns</td><td>0.13406 ns</td><td>−7.9%</td></tr>
+            </tbody>
+          </table>
+          <div class="fig-grid-2">
+            <figure>
+              <img src="images/sim_schematic_15fF.png" alt="Schematic sim — 15 fF" />
+              <figcaption>Schematic — 15 fF load</figcaption>
+            </figure>
+            <figure>
+              <img src="images/sim_postlayout_15fF.png" alt="Post-layout sim — 15 fF" />
+              <figcaption>Post-layout — 15 fF load</figcaption>
+            </figure>
+          </div>
+
+          <h3>Analysis</h3>
+          <p>Post-layout delays increase due to parasitic junction capacitances, metal resistance,
+          contact/via resistance, and gate-to-diffusion coupling. The 30× load increase (0.5 → 15 fF)
+          produced ~8× longer delays, consistent with the RC time constant relationship.</p>
         </div>
+      </section>
 
-        <h3>Analysis</h3>
-        <p>The post-layout simulation shows increased propagation delays compared to schematic simulation due to parasitic elements not modeled in schematic:</p>
-        <ul>
-          <li>Junction capacitances at source/drain regions</li>
-          <li>Metal interconnect resistances and capacitances</li>
-          <li>Contact and via resistances</li>
-          <li>Gate-to-diffusion coupling capacitances</li>
-        </ul>
-        <p>The 30x increase in load capacitance (0.5 fF → 15 fF) resulted in approximately <strong>8x longer propagation delays</strong>, consistent with the RC time constant relationship.</p>
+      <!-- Truth table -->
+      <section class="doc-section">
+        <h2>Truth Table Verification</h2>
+        <div class="card card-pad">
+          <table>
+            <thead><tr><th>A</th><th>B</th><th>C</th><th>F = B(A+C)</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+              <tr><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tools -->
+      <section class="doc-section">
+        <h2>Tools</h2>
+        <div class="card card-pad">
+          <ul>
+            <li><strong>Cadence Virtuoso</strong> — Schematic Editor, Layout Suite XL, ADE Explorer</li>
+            <li><strong>Calibre</strong> — DRC, LVS, xRC (Parasitic Extraction)</li>
+            <li><strong>Process</strong> — GlobalFoundries PDK</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Takeaways -->
+      <section class="doc-section">
+        <h2>Takeaways</h2>
+        <div class="card card-pad">
+          <ul>
+            <li>Boolean simplification before layout reduces transistor count and area</li>
+            <li>Post-layout verification is essential — parasitics significantly impact timing</li>
+            <li>Source/drain sharing and interconnect optimization are critical for compact layouts</li>
+            <li>Iterative DRC/LVS debugging is standard in physical design flows</li>
+            <li>2:1 PMOS:NMOS sizing effectively balances rise/fall times</li>
+          </ul>
+        </div>
+      </section>
+
+      <div style="margin: 40px 0 16px;">
+        <a class="btn btn-secondary" href="porfolio.html#projects">← Back to Build Bench</a>
       </div>
-    </section>
 
-    <section class="section">
-      <h2>Truth Table Verification</h2>
-      <div class="card pad">
-        <p>Simulation verified correct functionality across all input combinations:</p>
-        <table>
-          <thead>
-            <tr><th>A</th><th>B</th><th>C</th><th>F = B(A+C)</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr><td>0</td><td>0</td><td>1</td><td>0</td></tr>
-            <tr><td>0</td><td>1</td><td>0</td><td>0</td></tr>
-            <tr><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-            <tr><td>1</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
-            <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
-            <tr><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Tools Used</h2>
-      <div class="card pad">
-        <ul>
-          <li><strong>Cadence Virtuoso:</strong> Schematic Editor, Layout Suite XL, ADE Explorer</li>
-          <li><strong>Calibre:</strong> DRC, LVS, xRC (Parasitic Extraction)</li>
-          <li><strong>Process:</strong> GlobalFoundries PDK</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Key Takeaways</h2>
-      <div class="card pad">
-        <ul>
-          <li>Boolean simplification before implementation reduces transistor count and area</li>
-          <li>Post-layout verification is essential — parasitic effects significantly impact timing</li>
-          <li>Source/drain sharing and interconnect optimization are critical for compact layouts</li>
-          <li>Iterative DRC/LVS debugging is a normal part of the physical design flow</li>
-          <li>The 2:1 PMOS:NMOS sizing ratio effectively balances rise/fall times</li>
-        </ul>
-      </div>
-    </section>
-
-    <div style="margin-top: 48px;">
-      <a class="btn" href="porfolio.html#projects">← Back to all projects</a>
     </div>
   </main>
 
   <footer>
-    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:20px 24px;">
-      <small>© <span id="year"></span> Sami Rana</small>
-      <div style="display:flex; gap:10px;">
-        <a href="https://github.com/samisrana" aria-label="GitHub">GitHub</a>
-        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" aria-label="LinkedIn">LinkedIn</a>
-        <a href="porfolio.html">Home</a>
-      </div>
+    <div class="container footer-inner">
+      <span class="copyright">© <span id="yr"></span> Sami Rana</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/samisrana">GitHub</a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/">LinkedIn</a>
+        <a href="porfolio.html">Workbench</a>
+        <a href="#top">↑ Top</a>
+      </nav>
     </div>
   </footer>
 
+  <script src="workshop-bg.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    WorkshopBG.init();
   </script>
 </body>
 </html>

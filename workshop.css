@@ -1,0 +1,788 @@
+/* ================================================================
+   Sami's Workshop — Global Design System
+   workshop.css  |  linked from all pages
+   ================================================================ */
+
+/* ── 1. DESIGN TOKENS ───────────────────────────────────────── */
+:root {
+  /* surfaces — deep navy-graphite */
+  --bg:         #0c0f14;
+  --surface:    #131820;
+  --surface-2:  #1b2333;
+
+  /* type — warm ivory */
+  --text:       #ddd6c8;
+  --text-dim:   #7a7060;
+
+  /* copper accent */
+  --copper:        #c47a3a;
+  --copper-dim:    rgba(196,122,58,0.10);
+  --copper-border: rgba(196,122,58,0.22);
+
+  /* gold accent */
+  --gold:          #c9983a;
+  --gold-dim:      rgba(201,152,58,0.09);
+  --gold-border:   rgba(201,152,58,0.22);
+
+  /* turquoise accent */
+  --turquoise:        #2ea89a;
+  --turquoise-dim:    rgba(46,168,154,0.09);
+  --turquoise-border: rgba(46,168,154,0.20);
+
+  /* ivory */
+  --ivory: #ede5d4;
+
+  /* borders — warm tint */
+  --border:   rgba(220,200,170,0.07);
+  --border-2: rgba(220,200,170,0.13);
+
+  /* bg layer tints */
+  --c-circuit: rgba(196,122,58,0.050);
+  --c-glow:    rgba(196,122,58,0.016);
+
+  /* zone system — default is copper (homepage) */
+  --zone-accent:  var(--copper);
+  --zone-dim:     var(--copper-dim);
+  --zone-border:  var(--copper-border);
+
+  /* girih geometry system — 36° line network, unit matches canvas UNIT */
+  --g:   68px;   /* girih unit  — perpendicular spacing of the ±36° network */
+  --g-h: 34px;   /* half unit   — secondary interval */
+
+  /* type stacks */
+  --mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, 'Liberation Mono', monospace;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* radii — precise, not bubbly */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r:    6px;
+  --r-lg: 10px;
+}
+
+/* Light mode — warm parchment, NOT white-and-blue */
+:root.light {
+  --bg:         #f0ece2;
+  --surface:    #faf5ec;
+  --surface-2:  #ede7d9;
+  --text:       #1e1a14;
+  --text-dim:   #6a5a45;
+
+  --copper:        #8b4a18;
+  --copper-dim:    rgba(139,74,24,0.08);
+  --copper-border: rgba(139,74,24,0.18);
+
+  --gold:          #7a5a15;
+  --gold-dim:      rgba(122,90,21,0.09);
+  --gold-border:   rgba(122,90,21,0.20);
+
+  --turquoise:        #166b60;
+  --turquoise-dim:    rgba(22,107,96,0.08);
+  --turquoise-border: rgba(22,107,96,0.18);
+
+  --ivory: #fdf8f0;
+
+  --border:   rgba(80,50,20,0.09);
+  --border-2: rgba(80,50,20,0.16);
+
+  --c-circuit: rgba(139,74,24,0.065);
+  --c-glow:    rgba(139,74,24,0.022);
+}
+
+/* ── 2. ZONE SYSTEM ─────────────────────────────────────────── */
+/* Default zone (copper) is set in :root above */
+
+body.zone-bench {
+  --zone-accent: var(--turquoise);
+  --zone-dim:    var(--turquoise-dim);
+  --zone-border: var(--turquoise-border);
+}
+
+body.zone-log {
+  --zone-accent: var(--gold);
+  --zone-dim:    var(--gold-dim);
+  --zone-border: var(--gold-border);
+}
+
+/* ── 3. RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html  { scroll-behavior: smooth; }
+body  {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* ── 4. BACKGROUND LAYERS ───────────────────────────────────── */
+/*
+  Three layers, all position:fixed, pointer-events:none
+  z-index: circuit(0) < geo canvas(1) < waves canvas(2) < vignette(3) < content(10+)
+*/
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-circuit { z-index: 0; }
+.bg-geo     { z-index: 1; display: block; width: 100%; height: 100%; }
+.bg-waves   { z-index: 2; display: block; width: 100%; height: 100%; }
+
+/* Circuit trace styles — copper tint */
+.bg-circuit svg         { width: 100%; height: 100%; }
+.bg-circuit .trace       { fill: none; stroke: var(--c-circuit); stroke-width: 0.8; }
+.bg-circuit .trace-thick { fill: none; stroke: var(--c-circuit); stroke-width: 1.4; }
+.bg-circuit .via         { fill: var(--c-circuit); }
+.bg-circuit .pad         { fill: none; stroke: var(--c-circuit); stroke-width: 1; }
+.bg-circuit .glow-orb    { fill: var(--c-glow); }
+
+/* Depth vignette — warm, above all bg layers, below content */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 0% 0%,    var(--c-glow), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 100% 100%, var(--c-glow), transparent 55%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── 5. LAYOUT ──────────────────────────────────────────────── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── 6. HEADER / NAV ────────────────────────────────────────── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 52px;
+}
+
+/* Brand / monogram — always copper, not zone-dependent */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+}
+.brand .monogram {
+  width: 34px; height: 34px;
+  border: 1px solid var(--copper-border);
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  color: var(--copper);
+  font-family: var(--mono);
+  font-size: 0.87rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.brand:hover .monogram { border-color: var(--copper); }
+.brand .brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+}
+.brand .brand-text .brand-label {
+  font-family: var(--mono);
+  font-size: 0.70rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.brand .brand-text .brand-name {
+  font-family: var(--mono);
+  font-size: 0.99rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Primary nav links — hover uses copper always */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: var(--r);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-links a:hover { color: var(--text); background: var(--copper-dim); }
+.nav-links a.active { color: var(--copper); }
+
+/* Nav right cluster */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: var(--r);
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.icon-btn:hover { color: var(--text); background: var(--copper-dim); }
+
+/* ── 7. BUTTONS ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 0.925rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--copper);
+  color: var(--bg);
+  border-color: var(--copper);
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--copper);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-2);
+}
+.btn-secondary:hover {
+  border-color: var(--zone-border);
+  color: var(--zone-accent);
+}
+
+/* ── 8. CARDS ───────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--zone-border); }
+.card-pad   { padding: 24px; }
+
+/* ── 9. TAGS ────────────────────────────────────────────────── */
+.tag {
+  display: inline-flex;
+  font-family: var(--mono);
+  font-size: 0.79rem;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  color: var(--zone-accent);
+  background: var(--zone-dim);
+  border: 1px solid var(--zone-border);
+  letter-spacing: 0.03em;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── 10. SECTION LABELS ─────────────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: var(--g-h);
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.section-label .area-code {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  color: var(--zone-accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.section-label h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+/* Geometric crossing divider — ±36° lines at girih intervals.
+   Same angles as the background canvas network; dividers read as
+   extensions of the underlying geometry rather than arbitrary rules. */
+.section-label::after {
+  content: '';
+  align-self: center;
+  flex: 1;
+  min-width: 40px;
+  height: 12px;
+  background-image:
+    repeating-linear-gradient(
+      36deg,
+      transparent 0,
+      transparent calc(var(--g) - 1px),
+      var(--zone-border) calc(var(--g) - 1px),
+      var(--zone-border) var(--g)
+    ),
+    repeating-linear-gradient(
+      -36deg,
+      transparent 0,
+      transparent calc(var(--g) - 1px),
+      var(--zone-border) calc(var(--g) - 1px),
+      var(--zone-border) var(--g)
+    );
+}
+
+/* ── 11. MODULE CARDS (datasheet style) ─────────────────────── */
+.module-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.module-card:hover { border-color: var(--zone-border); }
+
+.module-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+}
+.module-id {
+  color: var(--zone-accent);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.module-status {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.module-card-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+.module-thumb {
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+.module-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.module-specs {
+  padding: 16px;
+}
+.module-specs h3 {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+}
+.spec-grid dt {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  align-self: baseline;
+  white-space: nowrap;
+}
+.spec-grid dd {
+  font-size: 0.92rem;
+  color: var(--text);
+  margin: 0;
+  align-self: baseline;
+}
+
+.module-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.module-card.placeholder {
+  opacity: 0.4;
+}
+
+/* ── 12. LOG ENTRIES (engineering notebook style) ─────────── */
+.log-entries-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Volume grouping — e.g. "VOL.I · 2025–PRESENT" */
+.log-volume {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: var(--g-h) 0 10px;
+  border-bottom: 1px solid var(--zone-border);
+  margin-bottom: 0;
+}
+.log-volume-id {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--zone-accent);
+  letter-spacing: 0.14em;
+}
+.log-volume-label {
+  font-family: var(--mono);
+  font-size: 0.70rem;
+  color: var(--text-dim);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.log-volume-count {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  color: var(--text-dim);
+  margin-left: auto;
+  opacity: 0.50;
+  letter-spacing: 0.06em;
+}
+
+/* Each entry: wide margin column + ruled top line */
+.log-entry {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 0;
+  padding-top: var(--g-h);
+  padding-bottom: var(--g-h);
+  border-top: 1px solid var(--border);
+}
+.log-entry:last-child { border-bottom: 1px solid var(--border); }
+
+/* Left gutter — the notebook margin column */
+.entry-margin {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border-right: 1px solid var(--zone-border);
+  padding-right: 18px;
+  padding-top: 3px;
+  gap: 5px;
+}
+.entry-id {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--zone-accent);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.entry-date {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-align: right;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+}
+.entry-type {
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  color: var(--zone-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  text-align: right;
+  opacity: 0.58;
+  margin-top: auto;
+}
+
+/* Entry body */
+.entry-body { padding-left: 22px; }
+.entry-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px;
+  text-decoration: none;
+  display: block;
+  line-height: 1.35;
+  transition: color 0.15s;
+}
+a.entry-title:hover { color: var(--zone-accent); }
+
+/* Metadata row: author · category · type — mono, small, subdued */
+.entry-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.entry-meta-item {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+.entry-meta-item + .entry-meta-item::before {
+  content: ' · ';
+  white-space: pre;
+  opacity: 0.45;
+}
+
+.entry-excerpt {
+  font-size: 0.925rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+  margin: 0 0 14px;
+}
+
+/* Entry footer: tags left, read-link right */
+.entry-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.entry-read-link {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--zone-accent);
+  text-decoration: none;
+  letter-spacing: 0.09em;
+  margin-left: auto;
+  opacity: 0.72;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.entry-read-link:hover { opacity: 1; }
+
+/* ── 13. FOOTER ─────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 80px;
+  padding: 24px 0;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-links { display: flex; gap: 18px; }
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--zone-accent); }
+.copyright {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.87rem;
+}
+
+/* ── 14. STATUS INDICATOR ───────────────────────────────────── */
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--zone-accent);
+}
+.status-dot::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--zone-accent);
+  animation: status-pulse 2.8s ease-in-out infinite;
+}
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* ── 15. SKIP LINK ──────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: 16px; top: 16px;
+  background: var(--copper);
+  color: var(--bg);
+  padding: 8px 16px;
+  border-radius: var(--r);
+  z-index: 9999;
+  font-size: 0.85rem;
+}
+
+/* ── 16. RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .nav-links { display: none; }
+}
+@media (max-width: 480px) {
+  .brand .brand-text { display: none; }
+}
+
+/* ── 17. ZONE ENVIRONMENT OVERLAYS ──────────────────────────── */
+/*
+  Each zone gets its own ambient environment treatment on top of the
+  shared background layers. body::before is the existing depth vignette;
+  body::after is free for zone-specific surface character.
+
+  Zone CSS variable overrides shift the circuit traces + vignette tint
+  to match each surface. Canvas (workshop-bg.js) adjusts geometry + signals.
+*/
+
+/* — Circuit trace + vignette tint per zone — */
+body.zone-bench {
+  --c-circuit: rgba(46,168,154,0.038);
+  --c-glow:    rgba(46,168,154,0.014);
+}
+body.zone-log {
+  --c-circuit: rgba(201,152,58,0.040);
+  --c-glow:    rgba(201,152,58,0.018);
+}
+:root.light body.zone-bench {
+  --c-circuit: rgba(22,107,96,0.054);
+  --c-glow:    rgba(22,107,96,0.018);
+}
+:root.light body.zone-log {
+  --c-circuit: rgba(122,90,21,0.050);
+  --c-glow:    rgba(122,90,21,0.024);
+}
+
+/* — Assembly Bench: focused overhead-lamp vignette — */
+/* Darkens the periphery, focuses attention at the work surface center */
+body.zone-bench::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 72% 58% at 50% 32%,
+    transparent 30%,
+    rgba(12,15,20,0.32) 100%);
+  pointer-events: none;
+  z-index: 4;
+}
+:root.light body.zone-bench::after {
+  background: radial-gradient(ellipse 72% 58% at 50% 32%,
+    transparent 30%,
+    rgba(200,192,178,0.28) 100%);
+}
+
+/* — Physical scene layer — appears above waves, below vignette — */
+/* Each page adds a .bg-scene div with SVG depicting its physical environment */
+.bg-scene     { z-index: 2; }
+.bg-scene svg { width: 100%; height: 100%; }
+
+/* Scene element styles — faint but legible physical silhouettes */
+:root {
+  --c-scene: rgba(196,122,58,0.11);
+}
+body.zone-bench { --c-scene: rgba(46,168,154,0.09); }
+body.zone-log   { --c-scene: rgba(201,152,58,0.10); }
+:root.light { --c-scene: rgba(139,74,24,0.13); }
+:root.light body.zone-bench { --c-scene: rgba(22,107,96,0.11); }
+:root.light body.zone-log   { --c-scene: rgba(122,90,21,0.12); }
+
+.bg-scene .s-line  { fill: none; stroke: var(--c-scene); stroke-width: 0.9; }
+.bg-scene .s-thick { fill: none; stroke: var(--c-scene); stroke-width: 2; }
+.bg-scene .s-fill  { fill: var(--c-scene); opacity: 0.35; }
+.bg-scene .s-glow  { fill: var(--c-glow); }
+
+/* — Station markers — */
+/* Positional dividers between bench work-zones on the main workbench */
+.station-mark {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 8px 0;
+}
+.station-mark::before {
+  content: attr(data-station);
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  color: var(--zone-accent);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.station-mark::after {
+  content: '';
+  flex: 1;
+  height: 8px;
+  /* Horizontal centerline fading right, with vertical ticks at --g-h (34px) intervals.
+     The tick spacing is half the girih unit — the same module governing the canvas grid. */
+  background-image:
+    linear-gradient(to right, var(--zone-border), transparent 72%),
+    repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--g-h) - 1px),
+      var(--zone-border) calc(var(--g-h) - 1px),
+      var(--zone-border) var(--g-h)
+    );
+  background-size: 100% 1px, var(--g-h) 100%;
+  background-position: 0 50%, 0 0;
+  background-repeat: no-repeat, repeat-x;
+  opacity: 0.65;
+}

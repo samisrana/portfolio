@@ -3,576 +3,312 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sami Rana — Portfolio</title>
-  <meta name="description" content="Portfolio of Sami Rana: projects, skills, and contact information." />
-  <meta property="og:title" content="Sami Rana — Portfolio" />
-  <meta property="og:description" content="Projects, skills, and contact information." />
+  <title>Sami's Workshop — Embedded Systems Engineer</title>
+  <meta name="description" content="Sami Rana — Embedded Systems Engineer. Hardware design, VLSI, and systems engineering." />
+  <meta property="og:title" content="Sami's Workshop" />
+  <meta property="og:description" content="Embedded Systems Engineer — hardware, firmware, and silicon." />
   <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a0a0a'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%2300ffd5' font-family='monospace' font-weight='bold'>SR</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23c47a3a' font-family='monospace' font-weight='700'>SR</text></svg>">
+  <link rel="stylesheet" href="workshop.css" />
   <style>
-    :root {
-      --bg: #050508;
-      --panel: rgba(15, 17, 22, 0.8);
-      --panel-solid: #0f1116;
-      --text: #e8eaed;
-      --muted: #8b919e;
-      --accent: #00ffd5;
-      --accent-2: #7b61ff;
-      --accent-3: #ff6b9d;
-      --border: rgba(255,255,255,0.08);
-      --glow: 0 0 30px rgba(0,255,213,0.15);
-      --glow-strong: 0 0 60px rgba(0,255,213,0.3);
-      --radius: 20px;
-      --mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --trace-color: rgba(0,255,213,0.08);
-      --trace-glow: rgba(0,255,213,0.04);
-    }
-    :root.light {
-      --bg: #f0f2f8;
-      --panel: rgba(255,255,255,0.85);
-      --panel-solid: #ffffff;
-      --text: #0a0c10;
-      --muted: #5a6070;
-      --accent: #0891b2;
-      --accent-2: #6366f1;
-      --accent-3: #db2777;
-      --border: rgba(0,0,0,0.08);
-      --glow: 0 4px 30px rgba(8,145,178,0.25);
-      --glow-strong: 0 8px 50px rgba(8,145,178,0.35);
-      --trace-color: rgba(8,145,178,0.12);
-      --trace-glow: rgba(8,145,178,0.08);
-    }
+    /* ── Page-specific styles ── */
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(1deg); }
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 48px;
+      align-items: start;
+      padding: 72px 0 64px;
     }
-    @keyframes pulse-glow {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--copper);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    @keyframes gradient-shift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .hero-eyebrow::before {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--copper);
     }
-    @keyframes scan-line {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100vh); }
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: var(--sans);
+    .hero h1 {
+      font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+      line-height: 1.2;
+      margin: 0 0 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
-      overflow-x: hidden;
     }
+    .hero h1 span {
+      color: var(--copper);
+    }
+    .hero-lede {
+      color: var(--text-dim);
+      font-size: 0.975rem;
+      line-height: 1.75;
+      margin: 0 0 28px;
+      max-width: 480px;
+    }
+    .hero-lede strong { color: var(--text); font-weight: 500; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    /* Semiconductor circuit pattern background */
-    .circuit-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 0;
+    /* Portrait module */
+    .portrait-module {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
       overflow: hidden;
     }
-    .circuit-bg svg {
-      width: 100%;
-      height: 100%;
-      opacity: 1;
-    }
-    .circuit-bg .trace {
-      fill: none;
-      stroke: var(--trace-color);
-      stroke-width: 1;
-    }
-    .circuit-bg .trace-thick {
-      fill: none;
-      stroke: var(--trace-color);
-      stroke-width: 2;
-    }
-    .circuit-bg .via {
-      fill: var(--trace-color);
-    }
-    .circuit-bg .pad {
-      fill: none;
-      stroke: var(--trace-color);
-      stroke-width: 1.5;
-    }
-    .circuit-bg .glow-orb {
-      fill: var(--trace-glow);
-    }
-
-    /* Gradient overlays */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(ellipse 100% 60% at 0% 0%, var(--trace-glow), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 100% 100%, var(--trace-glow), transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
-
-    /* Header */
-    header {
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: saturate(1.5) blur(20px);
-      background: color-mix(in oklab, var(--bg), transparent 40%);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .brand {
-      display: inline-flex; align-items: center; gap: 12px;
-      text-decoration: none; color: var(--text); font-weight: 700;
-      font-family: var(--mono);
-    }
-    .brand .logo {
-      width: 42px; height: 42px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: grid; place-items: center; color: var(--bg);
-      font-weight: 800; font-size: 0.9rem;
-      box-shadow: var(--glow);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .brand:hover .logo { transform: scale(1.05); box-shadow: var(--glow-strong); }
-
-    nav a {
-      color: var(--muted); text-decoration: none;
-      padding: 10px 16px; border-radius: 10px;
-      font-weight: 500; transition: all 0.2s;
-    }
-    nav a:hover { color: var(--accent); background: rgba(0,255,213,0.05); }
-    .right { display: flex; align-items: center; gap: 12px; }
-    .social-link {
-      color: var(--muted);
-      transition: all 0.2s;
+    .portrait-header {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    .social-link:hover {
-      color: var(--accent);
-      background: rgba(0,255,213,0.05);
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-      padding: 12px 20px; border-radius: 12px; font-weight: 600;
-      transition: all 0.3s; cursor: pointer; font-size: 0.95rem;
-      border: none;
-    }
-    .btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: var(--bg);
-      box-shadow: 0 4px 20px rgba(0,255,213,0.3);
-    }
-    .btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,255,213,0.4);
-    }
-    .btn.secondary {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(10px);
-    }
-    .btn.secondary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      box-shadow: var(--glow);
-    }
-
-    /* Hero Section */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 40px;
-      align-items: center;
-      padding: 80px 0 60px;
-      min-height: 80vh;
-    }
-
-    .hero-content h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      line-height: 1.1;
-      margin: 0 0 24px;
-      font-weight: 800;
-    }
-    .hero-content .greeting {
-      font-family: var(--mono);
-      color: var(--accent);
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
       gap: 8px;
-    }
-    .hero-content .greeting::before {
-      content: '>';
-      opacity: 0.5;
-    }
-    .gradient-text {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      animation: gradient-shift 5s ease infinite;
-    }
-    .hero-content .lede {
-      color: var(--muted);
-      font-size: 1.15rem;
-      line-height: 1.7;
-      margin-bottom: 32px;
-    }
-    .hero-content .lede strong { color: var(--text); }
-    .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    /* Portrait Card */
-    .portrait-card {
-      position: relative;
-      animation: float 6s ease-in-out infinite;
-    }
-    .portrait-wrapper {
-      position: relative;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--glow-strong);
-    }
-    .portrait-wrapper::before {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
-      background-size: 300% 300%;
-      animation: gradient-shift 4s ease infinite;
-      border-radius: 26px;
-      z-index: -1;
-    }
-    .portrait-wrapper img {
-      width: 100%;
-      height: 480px;
-      object-fit: cover;
-      display: block;
-      border-radius: 24px;
-    }
-    .portrait-stats {
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-    }
-    .stat-chip {
-      background: var(--panel);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      padding: 12px 20px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: var(--glow);
-    }
-    .stat-chip .value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
       font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
     }
-    .stat-chip .label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Cards */
-    .card {
-      background: var(--panel);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .card:hover::before { opacity: 1; }
-    .card:hover {
-      border-color: rgba(0,255,213,0.2);
-      box-shadow: var(--glow);
-      transform: translateY(-4px);
-    }
-    .pad { padding: 28px; }
-
-    /* Section Headers */
-    .section { margin: 80px 0; }
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    .section-header h2 {
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
-      margin: 0;
-      font-weight: 700;
-    }
-    .section-header::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--border), transparent);
-    }
-    .section-number {
-      font-family: var(--mono);
-      color: var(--accent);
-      font-size: 0.9rem;
+    .portrait-header .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--copper);
       opacity: 0.7;
     }
+    .portrait-module img {
+      width: 185px;
+      height: 185px;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      border-radius: 50%;
+      margin: 16px auto;
+    }
+    .portrait-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .portrait-stat {
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .portrait-stat + .portrait-stat {
+      border-left: 1px solid var(--border);
+    }
+    .portrait-stat .val {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--copper);
+    }
+    .portrait-stat .lbl {
+      font-size: 0.84rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
 
-    /* Project Grid */
+    /* Section spacing */
+    .section { margin: var(--g) 0; }
+
+    /* Projects grid */
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 24px;
+      gap: var(--g-h);
     }
-    .project {
-      overflow: hidden;
-    }
-    .project .image-wrapper {
-      position: relative;
-      overflow: hidden;
-    }
-    .project img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s;
-    }
-    .project:hover img { transform: scale(1.05); }
-    .project .image-wrapper::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, var(--panel-solid), transparent 50%);
-      pointer-events: none;
-    }
-    .project h3 { margin: 12px 0 8px; font-size: 1.2rem; }
-    .project h3 a { color: inherit; text-decoration: none; transition: color 0.2s; }
-    .project h3 a:hover { color: var(--accent); }
-    .project p { color: var(--muted); font-size: 0.95rem; margin: 0 0 16px; }
 
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .tag {
+    /* Placeholder module card */
+    .placeholder-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 24px;
+      opacity: 0.4;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+      min-height: 180px;
+    }
+    .placeholder-card .ph-label {
       font-family: var(--mono);
-      font-size: 0.75rem;
-      padding: 6px 12px;
-      border-radius: 20px;
-      color: var(--accent);
-      background: rgba(0,255,213,0.08);
-      border: 1px solid rgba(0,255,213,0.2);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+    }
+    .placeholder-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    .placeholder-card p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.6;
     }
 
-    /* About Section */
+    /* About / Skills */
     .about-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: var(--g-h);
     }
-    .about-grid .card.full { grid-column: 1 / -1; }
-    .skill-category {
-      margin-bottom: 20px;
+    .about-bio { grid-column: 1 / -1; }
+    .about-bio p {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      margin: 0 0 14px;
     }
-    .skill-category:last-child { margin-bottom: 0; }
-    .skill-category h4 {
+    .about-bio p:last-child { margin-bottom: 0; }
+    .about-bio strong { color: var(--text); font-weight: 500; }
+    .skill-group { margin-bottom: 20px; }
+    .skill-group:last-child { margin-bottom: 0; }
+    .skill-group-label {
       font-family: var(--mono);
-      color: var(--accent);
-      font-size: 0.85rem;
-      margin: 0 0 12px;
+      font-size: 0.82rem;
+      color: var(--copper);
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      margin: 0 0 10px;
     }
-    .skill-list {
+    .skill-rack {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 7px;
     }
     .skill-item {
-      background: rgba(255,255,255,0.03);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      background: var(--surface-2);
       border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: var(--muted);
-      transition: all 0.2s;
+      padding: 5px 11px;
+      border-radius: var(--r-sm);
+      transition: all 0.15s;
     }
     .skill-item:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: var(--copper-border);
+      color: var(--copper);
     }
 
-    /* Contact Section */
+    /* Contact */
     .contact-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: var(--g-h);
     }
-    .contact-info h3 {
-      font-size: 1.4rem;
-      margin: 0 0 16px;
-    }
-    .contact-links {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .contact-links { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
     .contact-link {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: var(--muted);
+      gap: 10px;
+      color: var(--text-dim);
       text-decoration: none;
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 11px 14px;
+      border-radius: var(--r);
       border: 1px solid var(--border);
-      transition: all 0.2s;
+      font-size: 0.875rem;
+      transition: all 0.15s;
     }
     .contact-link:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(0,255,213,0.05);
+      border-color: var(--copper-border);
+      color: var(--copper);
     }
-    .contact-link svg { width: 20px; height: 20px; }
-
-    form label { display: block; margin-bottom: 16px; }
-    form label span {
+    .contact-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+    form label { display: block; margin-bottom: 14px; }
+    form label .field-label {
       display: block;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 6px;
       font-family: var(--mono);
+      font-size: 0.84rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
     }
     form input, form textarea {
       width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
+      padding: 10px 12px;
+      border-radius: var(--r);
+      border: 1px solid var(--border-2);
+      background: var(--surface-2);
       color: var(--text);
-      font-family: inherit;
-      font-size: 1rem;
-      transition: all 0.2s;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      transition: border-color 0.15s;
     }
     form input:focus, form textarea:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,255,213,0.1);
+      border-color: var(--copper-border);
     }
+    form textarea { resize: vertical; }
 
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--border);
-      margin-top: 80px;
-      padding: 40px 0;
-    }
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-links {
-      display: flex;
-      gap: 24px;
-    }
-    .footer-links a {
-      color: var(--muted);
+    /* Blog section log entries on homepage */
+    .log-entry-link {
       text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
+      color: inherit;
+      display: block;
     }
-    .footer-links a:hover { color: var(--accent); }
-    .copyright {
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-family: var(--mono);
+    .log-entry-link:hover .entry-title {
+      color: var(--gold);
     }
 
-    /* Responsive */
-    @media (max-width: 900px) {
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
       .hero {
         grid-template-columns: 1fr;
-        text-align: center;
-        padding: 40px 0;
+        padding: 40px 0 48px;
       }
-      .hero-content .greeting { justify-content: center; }
-      .hero-buttons { justify-content: center; }
-      .portrait-card { order: -1; }
-      .portrait-wrapper img { height: 350px; }
-      .portrait-stats { position: static; transform: none; justify-content: center; margin-top: 20px; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .about-grid { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
+      .portrait-module { order: -1; }
+      .about-grid, .contact-grid { grid-template-columns: 1fr; }
+      .about-bio { grid-column: auto; }
     }
-
-    /* Skip link */
-    .skip { position: absolute; left: -9999px; }
-    .skip:focus { left: 16px; top: 16px; background: var(--accent); color: var(--bg); padding: 12px 16px; border-radius: 10px; z-index: 1000; }
-
-    /* Status indicator */
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: var(--accent);
-      margin-top: 16px;
-    }
-    .status::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse-glow 2s ease-in-out infinite;
+    @media (max-width: 600px) {
+      .module-card-body {
+        grid-template-columns: 1fr;
+      }
+      .module-thumb {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        height: 160px;
+      }
     }
   </style>
+
+  <!-- Theme: runs before paint to prevent flash -->
   <script>
-    const preferred = localStorage.getItem('theme');
-    if (preferred) {
-      document.documentElement.classList.toggle('light', preferred === 'light');
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      document.documentElement.classList.add('light');
-    }
-    function toggleTheme(){
-      const isLight = document.documentElement.classList.toggle('light');
+    (function(){
+      var p = localStorage.getItem('theme');
+      if (p) { document.documentElement.classList.toggle('light', p === 'light'); }
+      else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.documentElement.classList.toggle('light');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     }
+    document.addEventListener('keydown', function(e) {
+      if (e.shiftKey && e.key === 'T') toggleTheme();
+    });
   </script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -585,256 +321,440 @@
   }
   </script>
 </head>
+
 <body>
-  <a class="skip" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- Semiconductor circuit pattern background -->
-  <div class="circuit-bg">
+  <!-- Background Layer 1: Circuit Traces -->
+  <div class="bg-layer bg-circuit" aria-hidden="true">
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-      <!-- Main horizontal bus lines -->
-      <path class="trace-thick" d="M0,100 H400 L420,120 H800"/>
-      <path class="trace-thick" d="M0,300 H200 L240,340 H600 L640,300 H1920"/>
-      <path class="trace-thick" d="M0,600 H300 L340,640 H700"/>
-      <path class="trace-thick" d="M1920,200 H1500 L1460,240 H1100"/>
-      <path class="trace-thick" d="M1920,500 H1600 L1560,460 H1200"/>
-      <path class="trace-thick" d="M1920,800 H1400 L1360,840 H900"/>
-
-      <!-- Vertical traces -->
-      <path class="trace" d="M200,0 V200 L240,240 V400"/>
-      <path class="trace" d="M400,100 V300"/>
-      <path class="trace" d="M600,0 V150 L640,190 V340"/>
-      <path class="trace" d="M800,120 V280 L840,320 V500"/>
-      <path class="trace" d="M1200,460 V600 L1160,640 V800"/>
-      <path class="trace" d="M1400,0 V150 L1360,190 V350"/>
-      <path class="trace" d="M1600,200 V400 L1560,440 V600"/>
-      <path class="trace" d="M1100,240 V450"/>
-
-      <!-- Cross traces -->
-      <path class="trace" d="M300,200 L350,250 H500 L550,200"/>
-      <path class="trace" d="M700,340 L750,390 H900 L950,340"/>
-      <path class="trace" d="M1000,500 L1050,550 H1150 L1200,500"/>
-      <path class="trace" d="M1300,350 L1350,400 H1500 L1550,350"/>
-
-      <!-- Bottom section traces -->
-      <path class="trace-thick" d="M0,900 H250 L290,860 H550 L590,900 H850"/>
-      <path class="trace" d="M250,900 V1080"/>
-      <path class="trace" d="M550,860 V700 L590,660 H750"/>
-      <path class="trace" d="M850,900 L890,860 V750"/>
-      <path class="trace-thick" d="M1920,950 H1650 L1610,910 H1350 L1310,950 H1100"/>
-      <path class="trace" d="M1350,910 V780 L1310,740 H1150"/>
-
-      <!-- Vias (connection points) -->
-      <circle class="via" cx="200" cy="200" r="4"/>
-      <circle class="via" cx="400" cy="100" r="4"/>
-      <circle class="via" cx="400" cy="300" r="4"/>
-      <circle class="via" cx="600" cy="150" r="4"/>
-      <circle class="via" cx="800" cy="120" r="4"/>
-      <circle class="via" cx="800" cy="280" r="4"/>
-      <circle class="via" cx="240" cy="340" r="4"/>
-      <circle class="via" cx="640" cy="300" r="4"/>
-      <circle class="via" cx="1100" cy="240" r="4"/>
-      <circle class="via" cx="1200" cy="460" r="4"/>
-      <circle class="via" cx="1200" cy="600" r="4"/>
-      <circle class="via" cx="1400" cy="150" r="4"/>
-      <circle class="via" cx="1500" cy="200" r="4"/>
-      <circle class="via" cx="1600" cy="400" r="4"/>
-      <circle class="via" cx="1560" cy="460" r="4"/>
-      <circle class="via" cx="1360" cy="840" r="4"/>
-      <circle class="via" cx="250" cy="900" r="4"/>
-      <circle class="via" cx="550" cy="860" r="4"/>
-      <circle class="via" cx="850" cy="900" r="4"/>
-      <circle class="via" cx="1350" cy="910" r="4"/>
-      <circle class="via" cx="1650" cy="950" r="4"/>
-
-      <!-- Pads (larger connection squares) -->
-      <rect class="pad" x="180" y="380" width="20" height="20" rx="2"/>
-      <rect class="pad" x="620" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="820" y="300" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1080" y="430" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1380" y="170" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1580" y="580" width="20" height="20" rx="2"/>
-      <rect class="pad" x="340" y="620" width="20" height="20" rx="2"/>
-      <rect class="pad" x="730" y="640" width="20" height="20" rx="2"/>
-      <rect class="pad" x="1130" y="780" width="20" height="20" rx="2"/>
-      <rect class="pad" x="870" y="730" width="20" height="20" rx="2"/>
-
-      <!-- Glow orbs for depth -->
-      <circle class="glow-orb" cx="300" cy="250" r="150"/>
-      <circle class="glow-orb" cx="1600" cy="350" r="180"/>
-      <circle class="glow-orb" cx="900" cy="700" r="200"/>
-      <circle class="glow-orb" cx="1200" cy="900" r="160"/>
-      <circle class="glow-orb" cx="500" cy="850" r="140"/>
+      <path class="trace-thick" d="M0,120 H350 L380,150 H760"/>
+      <path class="trace-thick" d="M0,320 H180 L220,360 H560 L600,320 H1920"/>
+      <path class="trace-thick" d="M0,620 H280 L320,660 H680"/>
+      <path class="trace-thick" d="M1920,220 H1480 L1440,260 H1080"/>
+      <path class="trace-thick" d="M1920,520 H1560 L1520,480 H1160"/>
+      <path class="trace-thick" d="M1920,820 H1360 L1320,860 H880"/>
+      <path class="trace" d="M180,0 V210 L220,250 V420"/>
+      <path class="trace" d="M380,120 V320"/>
+      <path class="trace" d="M580,0 V160 L620,200 V360"/>
+      <path class="trace" d="M760,150 V300 L800,340 V520"/>
+      <path class="trace" d="M1160,480 V620 L1120,660 V820"/>
+      <path class="trace" d="M1360,0 V160 L1320,200 V370"/>
+      <path class="trace" d="M1560,220 V420 L1520,460 V620"/>
+      <path class="trace" d="M1080,260 V470"/>
+      <path class="trace" d="M280,220 L330,270 H480 L530,220"/>
+      <path class="trace" d="M680,360 L730,410 H880 L930,360"/>
+      <path class="trace" d="M980,520 L1030,570 H1120 L1170,520"/>
+      <path class="trace" d="M1260,370 L1310,420 H1460 L1510,370"/>
+      <path class="trace-thick" d="M0,920 H240 L280,880 H520 L560,920 H820"/>
+      <path class="trace" d="M240,920 V1080"/>
+      <path class="trace" d="M520,880 V720 L560,680 H720"/>
+      <path class="trace" d="M820,920 L860,880 V760"/>
+      <path class="trace-thick" d="M1920,960 H1620 L1580,920 H1320 L1280,960 H1060"/>
+      <path class="trace" d="M1320,920 V800 L1280,760 H1120"/>
+      <circle class="via" cx="180" cy="210" r="3.5"/>
+      <circle class="via" cx="380" cy="120" r="3.5"/>
+      <circle class="via" cx="380" cy="320" r="3.5"/>
+      <circle class="via" cx="580" cy="160" r="3.5"/>
+      <circle class="via" cx="760" cy="150" r="3.5"/>
+      <circle class="via" cx="760" cy="300" r="3.5"/>
+      <circle class="via" cx="220" cy="360" r="3.5"/>
+      <circle class="via" cx="600" cy="320" r="3.5"/>
+      <circle class="via" cx="1080" cy="260" r="3.5"/>
+      <circle class="via" cx="1160" cy="480" r="3.5"/>
+      <circle class="via" cx="1160" cy="620" r="3.5"/>
+      <circle class="via" cx="1360" cy="160" r="3.5"/>
+      <circle class="via" cx="1480" cy="220" r="3.5"/>
+      <circle class="via" cx="1560" cy="420" r="3.5"/>
+      <circle class="via" cx="1520" cy="460" r="3.5"/>
+      <circle class="via" cx="1320" cy="860" r="3.5"/>
+      <circle class="via" cx="240"  cy="920" r="3.5"/>
+      <circle class="via" cx="520"  cy="880" r="3.5"/>
+      <circle class="via" cx="820"  cy="920" r="3.5"/>
+      <circle class="via" cx="1320" cy="920" r="3.5"/>
+      <circle class="via" cx="1620" cy="960" r="3.5"/>
+      <rect class="pad" x="163" y="395" width="18" height="18" rx="2"/>
+      <rect class="pad" x="603" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="802" y="318" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1062" y="448" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1342" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1542" y="598" width="18" height="18" rx="2"/>
+      <rect class="pad" x="318"  y="640" width="18" height="18" rx="2"/>
+      <rect class="pad" x="708"  y="658" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1102" y="798" width="18" height="18" rx="2"/>
+      <rect class="pad" x="848"  y="748" width="18" height="18" rx="2"/>
+      <circle class="glow-orb" cx="280"  cy="270"  r="160"/>
+      <circle class="glow-orb" cx="1580" cy="360"  r="190"/>
+      <circle class="glow-orb" cx="880"  cy="720"  r="210"/>
+      <circle class="glow-orb" cx="1180" cy="920"  r="170"/>
+      <circle class="glow-orb" cx="500"  cy="860"  r="150"/>
     </svg>
   </div>
 
+  <!-- Background Layer 2: Girih Geometry (canvas) -->
+  <canvas class="bg-layer bg-geo" id="geo-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 3: Signal Waves (canvas) -->
+  <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 4: Physical Scene — Workshop (one-point perspective, VP 960,400) -->
+  <div class="bg-layer bg-scene" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+
+      <!-- ── ROOM STRUCTURE ── -->
+      <line class="s-thick" x1="0"    y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="0"    y1="1080" x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="480"  y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="1440" y1="1080" x2="960" y2="400"/>
+      <!-- Floor horizontal depth rings -->
+      <line class="s-line"  x1="226"  y1="954"  x2="1694" y2="954"/>
+      <line class="s-line"  x1="338"  y1="840"  x2="1582" y2="840"/>
+      <line class="s-line"  x1="451"  y1="760"  x2="1469" y2="760"/>
+
+      <!-- Back wall and shelves -->
+      <rect class="s-fill" x="680" y="355" width="600" height="80"/>
+      <line class="s-thick" x1="680"  y1="340" x2="1240" y2="340"/>
+      <line class="s-line"  x1="680"  y1="308" x2="1240" y2="308"/>
+      <line class="s-line"  x1="720"  y1="308" x2="720"  y2="435"/>
+      <line class="s-line"  x1="840"  y1="308" x2="840"  y2="435"/>
+      <line class="s-line"  x1="1080" y1="308" x2="1080" y2="435"/>
+      <line class="s-line"  x1="1200" y1="308" x2="1200" y2="435"/>
+      <!-- Pegboard texture on back wall -->
+      <line class="s-line"  x1="680" y1="360" x2="1240" y2="360"/>
+      <line class="s-line"  x1="680" y1="380" x2="1240" y2="380"/>
+      <line class="s-line"  x1="740" y1="340" x2="740"  y2="435"/>
+      <line class="s-line"  x1="800" y1="340" x2="800"  y2="435"/>
+      <line class="s-line"  x1="880" y1="340" x2="880"  y2="435"/>
+      <line class="s-line"  x1="960" y1="340" x2="960"  y2="435"/>
+      <line class="s-line"  x1="1040" y1="340" x2="1040" y2="435"/>
+      <line class="s-line"  x1="1120" y1="340" x2="1120" y2="435"/>
+      <line class="s-line"  x1="1160" y1="340" x2="1160" y2="435"/>
+
+      <!-- Component reels on shelf -->
+      <circle class="s-line" cx="748"  cy="284" r="18"/><circle class="s-line" cx="748"  cy="284" r="10"/><circle class="s-line" cx="748"  cy="284" r="3"/>
+      <circle class="s-line" cx="790"  cy="286" r="16"/><circle class="s-line" cx="790"  cy="286" r="9"/> <circle class="s-line" cx="790"  cy="286" r="3"/>
+      <circle class="s-line" cx="830"  cy="285" r="17"/><circle class="s-line" cx="830"  cy="285" r="10"/><circle class="s-line" cx="830"  cy="285" r="3"/>
+      <circle class="s-line" cx="1090" cy="284" r="18"/><circle class="s-line" cx="1090" cy="284" r="10"/><circle class="s-line" cx="1090" cy="284" r="3"/>
+      <circle class="s-line" cx="1132" cy="286" r="16"/><circle class="s-line" cx="1132" cy="286" r="9"/> <circle class="s-line" cx="1132" cy="286" r="3"/>
+      <circle class="s-line" cx="1172" cy="285" r="17"/><circle class="s-line" cx="1172" cy="285" r="10"/><circle class="s-line" cx="1172" cy="285" r="3"/>
+
+      <!-- ── OVERHEAD FLUORESCENT LIGHTS ── -->
+      <rect class="s-fill" x="138" y="52"  width="1644" height="6"  rx="1"/>
+      <rect class="s-line" x="132" y="58"  width="1656" height="20" rx="2"/>
+      <line class="s-line" x1="280"  y1="58" x2="280"  y2="78"/>
+      <line class="s-line" x1="480"  y1="58" x2="480"  y2="78"/>
+      <line class="s-line" x1="680"  y1="58" x2="680"  y2="78"/>
+      <line class="s-line" x1="960"  y1="58" x2="960"  y2="78"/>
+      <line class="s-line" x1="1240" y1="58" x2="1240" y2="78"/>
+      <line class="s-line" x1="1440" y1="58" x2="1440" y2="78"/>
+      <line class="s-line" x1="1640" y1="58" x2="1640" y2="78"/>
+      <rect class="s-fill" x="282" y="114" width="1356" height="5"  rx="1"/>
+      <rect class="s-line" x="276" y="119" width="1368" height="16" rx="2"/>
+      <line class="s-line" x1="420"  y1="119" x2="420"  y2="135"/>
+      <line class="s-line" x1="600"  y1="119" x2="600"  y2="135"/>
+      <line class="s-line" x1="780"  y1="119" x2="780"  y2="135"/>
+      <line class="s-line" x1="960"  y1="119" x2="960"  y2="135"/>
+      <line class="s-line" x1="1140" y1="119" x2="1140" y2="135"/>
+      <line class="s-line" x1="1320" y1="119" x2="1320" y2="135"/>
+      <line class="s-line" x1="1500" y1="119" x2="1500" y2="135"/>
+
+      <!-- ── WORKBENCH SURFACE ── -->
+      <polygon class="s-fill" points="120,780 1800,780 1358,580 562,580"/>
+      <line class="s-thick" x1="120"  y1="780" x2="1800" y2="780"/>
+      <line class="s-thick" x1="562"  y1="580" x2="1358" y2="580"/>
+      <line class="s-line"  x1="120"  y1="780" x2="562"  y2="580"/>
+      <line class="s-line"  x1="1800" y1="780" x2="1358" y2="580"/>
+      <rect class="s-fill"  x="120"  y="780" width="1680" height="36"/>
+      <line class="s-thick" x1="120"  y1="816" x2="1800" y2="816"/>
+      <rect class="s-thick" x="146"  y="816" width="22"   height="264"/>
+      <rect class="s-line"  x="134"  y="1062" width="46"  height="14" rx="2"/>
+      <rect class="s-thick" x="1752" y="816" width="22"   height="264"/>
+      <rect class="s-line"  x="1740" y="1062" width="46"  height="14" rx="2"/>
+      <line class="s-line"  x1="576" y1="580" x2="576"  y2="700"/>
+      <line class="s-line"  x1="1344" y1="580" x2="1344" y2="700"/>
+
+      <!-- ── COMPUTER MONITOR — back-center of bench ── -->
+      <!-- Monitor base -->
+      <rect class="s-fill" x="860" y="546" width="200" height="10" rx="2"/>
+      <rect class="s-line" x="855" y="546" width="210" height="12" rx="2"/>
+      <!-- Monitor stand -->
+      <line class="s-thick" x1="960" y1="558" x2="960" y2="578"/>
+      <!-- Monitor screen -->
+      <rect class="s-line" x="840" y="462" width="240" height="150" rx="4"/>
+      <rect class="s-fill" x="844" y="466" width="232" height="142" rx="2"/>
+      <!-- Code on screen (horizontal lines) -->
+      <line class="s-line" x1="858" y1="484" x2="950" y2="484"/>
+      <line class="s-line" x1="858" y1="496" x2="1012" y2="496"/>
+      <line class="s-line" x1="872" y1="508" x2="980" y2="508"/>
+      <line class="s-line" x1="872" y1="520" x2="1040" y2="520"/>
+      <line class="s-line" x1="858" y1="532" x2="960" y2="532"/>
+      <line class="s-line" x1="858" y1="544" x2="1020" y2="544"/>
+      <line class="s-line" x1="872" y1="556" x2="990" y2="556"/>
+      <line class="s-line" x1="872" y1="568" x2="1050" y2="568"/>
+      <line class="s-line" x1="858" y1="580" x2="920" y2="580"/>
+      <line class="s-line" x1="858" y1="592" x2="1000" y2="592"/>
+
+      <!-- ── OSCILLOSCOPE — right ── -->
+      <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
+      <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
+      <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
+      <polyline class="s-thick" points="1398,692 1398,650 1420,650 1420,692 1443,692 1443,650 1466,650 1466,692 1489,692 1489,650 1512,650 1512,692 1554,692"/>
+      <line class="s-line" x1="1388" y1="679" x2="1562" y2="679"/>
+      <line class="s-line" x1="1475" y1="622" x2="1475" y2="736"/>
+      <circle class="s-line" cx="1614" cy="642" r="14"/><circle class="s-fill" cx="1614" cy="642" r="4"/>
+      <circle class="s-line" cx="1656" cy="642" r="14"/><circle class="s-fill" cx="1656" cy="642" r="4"/>
+      <circle class="s-line" cx="1614" cy="684" r="12"/><circle class="s-fill" cx="1614" cy="684" r="4"/>
+      <circle class="s-line" cx="1656" cy="684" r="12"/><circle class="s-fill" cx="1656" cy="684" r="4"/>
+      <circle class="s-line" cx="1635" cy="726" r="16"/><circle class="s-fill" cx="1635" cy="726" r="5"/>
+      <circle class="s-line" cx="1600" cy="768" r="7"/><circle class="s-fill" cx="1600" cy="768" r="3"/>
+      <circle class="s-line" cx="1624" cy="768" r="7"/><circle class="s-fill" cx="1624" cy="768" r="3"/>
+      <circle class="s-line" cx="1648" cy="768" r="7"/><circle class="s-fill" cx="1648" cy="768" r="3"/>
+      <circle class="s-line" cx="1672" cy="768" r="7"/><circle class="s-fill" cx="1672" cy="768" r="3"/>
+
+      <!-- ── MULTIMETER — left ── -->
+      <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
+      <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
+      <circle class="s-line" cx="251" cy="738" r="26"/>
+      <circle class="s-fill" cx="251" cy="738" r="7"/>
+      <line class="s-line" x1="251" y1="712" x2="251" y2="718"/>
+      <line class="s-line" x1="273" y1="720" x2="268" y2="725"/>
+      <line class="s-line" x1="229" y1="720" x2="234" y2="725"/>
+      <line class="s-line" x1="277" y1="738" x2="272" y2="738"/>
+      <line class="s-line" x1="230" y1="738" x2="225" y2="738"/>
+      <circle class="s-fill" cx="231" cy="766" r="5"/>
+      <circle class="s-fill" cx="251" cy="766" r="5"/>
+      <circle class="s-fill" cx="271" cy="766" r="5"/>
+      <path class="s-line" d="M231,771 Q210,815 182,862 L174,884"/>
+      <path class="s-line" d="M271,771 Q292,815 318,862 L326,884"/>
+      <line class="s-line" x1="170" y1="880" x2="178" y2="888"/>
+      <line class="s-line" x1="322" y1="880" x2="330" y2="888"/>
+
+      <!-- Glow orbs -->
+      <circle class="s-glow" cx="251"  cy="700" r="100"/>
+      <circle class="s-glow" cx="960"  cy="500" r="200"/>
+      <circle class="s-glow" cx="1514" cy="700" r="130"/>
+
+    </svg>
+  </div>
+
+  <!-- Header -->
   <header>
     <div class="container nav">
-      <a class="brand" href="#top" aria-label="Home">
-        <span class="logo" aria-hidden="true">SR</span>
-        <span>sami.dev</span>
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop — home">
+        <span class="monogram" aria-hidden="true">SR</span>
+        <span class="brand-text">
+          <span class="brand-label">Engineer</span>
+          <span class="brand-name">Sami's Workshop</span>
+        </span>
       </a>
-      <nav aria-label="Primary">
-        <a href="#projects">Projects</a>
-        <a href="#blog">Blog</a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="porfolio.html" class="active">Workbench</a>
+        <a href="#projects">Build Bench</a>
+        <a href="blog.html">Sami's Log</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
-      <div class="right">
-        <a href="https://github.com/samisrana" target="_blank" aria-label="GitHub" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+
+      <div class="nav-right">
+        <a href="https://github.com/samisrana" target="_blank"
+           rel="noopener" aria-label="GitHub" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
         </a>
-        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" aria-label="LinkedIn" class="social-link">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank"
+           rel="noopener" aria-label="LinkedIn" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
         </a>
-        <button class="btn secondary" onclick="toggleTheme()" aria-label="Toggle theme">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
         </button>
-        <a class="btn primary" href="#contact">Let's talk</a>
+        <a class="btn btn-primary" href="#contact">Let's talk</a>
       </div>
     </div>
   </header>
 
+  <!-- Main -->
   <main id="main" class="container">
-    <!-- HERO -->
+
+    <!-- Hero -->
     <section class="hero" id="top">
       <div class="hero-content">
-        <p class="greeting">Hello, world!</p>
-        <h1>I'm <span class="gradient-text">Sami Rana</span>, an Embedded Systems Engineer</h1>
-        <p class="lede">I build things at the intersection of <strong>hardware and software</strong>, from silicon to systems. Specializing in embedded development, electronic design, and computer architecture.</p>
-        <div class="hero-buttons">
-          <a class="btn primary" href="#projects">View Projects</a>
-          <a class="btn secondary" href="Sami_Rana_Jan26 (2).pdf" target="_blank">Download CV</a>
+        <p class="hero-eyebrow">Embedded Systems Engineer</p>
+        <h1>
+          I'm <span>Sami Rana</span>,<br>
+          Embedded Systems<br>
+          Engineer.
+        </h1>
+        <p class="hero-lede">
+          From <strong>silicon to systems</strong>: VLSI design, embedded firmware,
+          electronic hardware, and computer architecture. Currently based at
+          <strong>Rensselaer Polytechnic Institute</strong>, looking for what's next.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects">View Build Bench</a>
+          <a class="btn btn-secondary" href="Sami_Rana_Jan26 (2).pdf" target="_blank">Download CV</a>
         </div>
-        <p class="status">Available for opportunities</p>
+        <p class="status-dot" style="margin-top: 22px;">Available for opportunities</p>
       </div>
 
-      <div class="portrait-card">
-        <div class="portrait-wrapper">
-          <img src="images/SelfPortrait.jpg" alt="Sami Rana" />
+      <div class="portrait-module">
+        <div class="portrait-header">
+          <span class="dot"></span>
+          <span>engineer.profile</span>
         </div>
-        <div class="portrait-stats">
-          <div class="stat-chip">
-            <div class="value">1+</div>
-            <div class="label">Years Exp</div>
+        <img src="DFD1ADBA-3904-4411-97EB-FE0BF49C8CB9.png" alt="Sami Rana" />
+        <div class="portrait-footer">
+          <div class="portrait-stat">
+            <div class="val">1+</div>
+            <div class="lbl">Years Exp</div>
           </div>
-          <div class="stat-chip">
-            <div class="value">RPI</div>
-            <div class="label">BS '25</div>
+          <div class="portrait-stat">
+            <div class="val">RPI</div>
+            <div class="lbl">BS '25</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PROJECTS -->
+    <div class="station-mark" data-station="ST-02 · BUILD BENCH"></div>
+
+    <!-- Build Bench (Projects) -->
     <section id="projects" class="section">
-      <div class="section-header">
-        <span class="section-number">01</span>
-        <h2>Selected Projects</h2>
+      <div class="section-label">
+        <span class="area-code">BUILD BENCH</span>
       </div>
+
       <div class="projects-grid">
-        <!-- Project 1: VLSI -->
-        <article class="project card">
-          <div class="image-wrapper">
-            <a href="vlsi-cmos-design.html">
-              <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
-            </a>
+        <!-- VLSI Module Card -->
+        <article class="module-card">
+          <div class="module-card-header">
+            <span class="module-id">MODULE-01</span>
+            <span class="module-status">COMPLETE</span>
           </div>
-          <div class="pad">
+          <div class="module-card-body">
+            <div class="module-thumb">
+              <a href="vlsi-cmos-design.html">
+                <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
+              </a>
+            </div>
+            <div class="module-specs">
+              <h3>CMOS Logic Circuit Design</h3>
+              <dl class="spec-grid">
+                <dt>Function</dt>
+                <dd>F = B(A+C)</dd>
+                <dt>Tool</dt>
+                <dd>Cadence Virtuoso</dd>
+                <dt>Process</dt>
+                <dd>GlobalFoundries PDK</dd>
+                <dt>Area</dt>
+                <dd>12.748 µm²</dd>
+              </dl>
+            </div>
+          </div>
+          <div class="module-card-footer">
             <div class="tags">
               <span class="tag">VLSI</span>
               <span class="tag">Cadence</span>
               <span class="tag">CMOS</span>
             </div>
-            <h3><a href="vlsi-cmos-design.html">CMOS Logic Circuit Design</a></h3>
-            <p>Full custom CMOS implementation of F = B(A+C) with layout, DRC/LVS verification, and performance analysis.</p>
-            <a class="btn secondary" href="vlsi-cmos-design.html">View Project</a>
+            <a class="btn btn-secondary" href="vlsi-cmos-design.html">Open Module →</a>
           </div>
         </article>
 
-        <!-- Project 2: Placeholder -->
-        <article class="project card" style="opacity: 0.5;">
-          <div class="image-wrapper">
-            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80" alt="Coming soon" style="filter: grayscale(1);" />
+        <!-- Next module — queued -->
+        <div class="placeholder-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="ph-label">MODULE-02</span>
+            <span class="ph-label">QUEUED</span>
           </div>
-          <div class="pad">
-            <div class="tags">
-              <span class="tag">Coming Soon</span>
-            </div>
-            <h3>More Projects</h3>
-            <p>Additional projects from embedded systems, robotics, and hardware design coming soon.</p>
+          <h3>Embedded Firmware Project</h3>
+          <p>Next build from firmware, PCB design, or computer architecture work — in progress.</p>
+          <div class="tags" style="margin-top: 4px;">
+            <span class="tag">Firmware</span>
+            <span class="tag">STM32</span>
+            <span class="tag">PCB</span>
           </div>
-        </article>
+        </div>
       </div>
     </section>
 
-    <!-- BLOG -->
+    <div class="station-mark" data-station="ST-03 · SAMI'S LOG"></div>
+
+    <!-- Sami's Log (Blog) -->
     <section id="blog" class="section">
-      <div class="section-header">
-        <span class="section-number">02</span>
-        <h2>Blog</h2>
+      <div class="section-label">
+        <span class="area-code">SAMI'S LOG</span>
       </div>
-      <div class="projects-grid">
-        <!-- Blog Post: Meeting Lisa Su -->
-        <article class="project card">
-          <div class="image-wrapper">
-            <a href="posts/meeting-lisa-su.html">
-              <img src="images/amd.jpg" alt="Meeting Lisa Su at RPI" />
-            </a>
-          </div>
-          <div class="pad">
-            <div class="tags">
-              <span class="tag">AMD</span>
-              <span class="tag">Semiconductors</span>
-              <span class="tag">RPI</span>
-            </div>
-            <h3><a href="posts/meeting-lisa-su.html">Meeting Lisa Su at RPI's Fireside Chat</a></h3>
-            <p>Attending AMD CEO Lisa Su's fireside chat at RPI and getting to meet one of the most influential people in semiconductors.</p>
-            <a class="btn secondary" href="posts/meeting-lisa-su.html">Read Post</a>
-          </div>
-        </article>
 
-        <!-- Blog Post 2: Placeholder -->
-        <article class="project card" style="opacity: 0.5;">
-          <div class="image-wrapper">
-            <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&q=80" alt="Blog post coming soon" style="filter: grayscale(1);" />
+      <div class="log-entries-list" style="--zone-accent: var(--gold); --zone-dim: var(--gold-dim); --zone-border: var(--gold-border);">
+        <article class="log-entry">
+          <div class="entry-margin">
+            <span class="entry-id">LOG-001</span>
+            <span class="entry-date">2025<br>MAY 14</span>
+            <span class="entry-type">Field Note</span>
           </div>
-          <div class="pad">
-            <div class="tags">
-              <span class="tag">Coming Soon</span>
+          <div class="entry-body">
+            <a class="entry-title" href="posts/meeting-lisa-su.html">Meeting Lisa Su at RPI's Fireside Chat</a>
+            <div class="entry-meta">
+              <span class="entry-meta-item">S. Rana</span>
+              <span class="entry-meta-item">Event</span>
+              <span class="entry-meta-item">Semiconductors</span>
             </div>
-            <h3>More Posts</h3>
-            <p>Stay tuned for more content on technology, projects, and learning experiences.</p>
+            <p class="entry-excerpt">Attending AMD CEO Lisa Su's fireside chat at RPI — and getting to meet one of the most influential people in semiconductors.</p>
+            <div class="entry-footer">
+              <div class="tags">
+                <span class="tag">AMD</span>
+                <span class="tag">Semiconductors</span>
+                <span class="tag">RPI</span>
+              </div>
+              <a class="entry-read-link" href="posts/meeting-lisa-su.html">→ Read entry</a>
+            </div>
           </div>
         </article>
       </div>
-      <div style="text-align: center; margin-top: 32px;">
-        <a class="btn secondary" href="blog.html">View All Posts →</a>
+
+      <div style="margin-top: 20px;">
+        <a class="btn btn-secondary" href="blog.html">All log entries →</a>
       </div>
     </section>
 
-    <!-- ABOUT -->
+    <div class="station-mark" data-station="ST-04 · BACKGROUND"></div>
+
+    <!-- About -->
     <section id="about" class="section">
-      <div class="section-header">
-        <span class="section-number">03</span>
-        <h2>About Me</h2>
+      <div class="section-label">
+        <span class="area-code">BACKGROUND</span>
       </div>
+
       <div class="about-grid">
-        <div class="card pad full">
-          <p style="font-size: 1.1rem; color: var(--text); margin: 0 0 20px;">
-            Recent graduate from <strong>Rensselaer Polytechnic Institute</strong> with dual degrees in Electrical and Computer Systems Engineering. I'm passionate about the intersection of hardware architecture and software.
+        <div class="card card-pad about-bio">
+          <p>
+            Recent graduate from <strong>Rensselaer Polytechnic Institute</strong> with dual degrees in
+            Electrical and Computer Systems Engineering. I work at the boundary of hardware and software —
+            where design decisions at the silicon level ripple through to running systems.
           </p>
-          <p style="color: var(--muted); margin: 0;">
-            During my internship at <strong>Kulicke & Soffa</strong>, I gained experience in the semiconductor industry working on backend assembly tools for advanced chip packaging. At RPI, I contributed to undergraduate research in robotics and computer hardware.
+          <p>
+            During my internship at <strong>Kulicke &amp; Soffa</strong>, I gained industry experience
+            in semiconductor back-end assembly and advanced chip packaging. At RPI I contributed to
+            undergraduate research in robotics and computer hardware.
           </p>
         </div>
 
-        <div class="card pad">
-          <div class="skill-category">
-            <h4>Languages & Systems</h4>
-            <div class="skill-list">
-              <span class="skill-item">C/C++</span>
+        <div class="card card-pad">
+          <div class="skill-group">
+            <p class="skill-group-label">Languages &amp; Systems</p>
+            <div class="skill-rack">
+              <span class="skill-item">C / C++</span>
               <span class="skill-item">Python</span>
               <span class="skill-item">Bash</span>
               <span class="skill-item">RTOS</span>
@@ -842,9 +762,9 @@
               <span class="skill-item">SystemVerilog</span>
             </div>
           </div>
-          <div class="skill-category">
-            <h4>Hardware</h4>
-            <div class="skill-list">
+          <div class="skill-group">
+            <p class="skill-group-label">Hardware</p>
+            <div class="skill-rack">
               <span class="skill-item">PCB Design</span>
               <span class="skill-item">VLSI</span>
               <span class="skill-item">STM32</span>
@@ -853,10 +773,10 @@
           </div>
         </div>
 
-        <div class="card pad">
-          <div class="skill-category">
-            <h4>Tools</h4>
-            <div class="skill-list">
+        <div class="card card-pad">
+          <div class="skill-group">
+            <p class="skill-group-label">Tools</p>
+            <div class="skill-rack">
               <span class="skill-item">Cadence</span>
               <span class="skill-item">Altium</span>
               <span class="skill-item">Vivado</span>
@@ -865,9 +785,9 @@
               <span class="skill-item">Yocto</span>
             </div>
           </div>
-          <div class="skill-category">
-            <h4>Domains</h4>
-            <div class="skill-list">
+          <div class="skill-group">
+            <p class="skill-group-label">Domains</p>
+            <div class="skill-rack">
               <span class="skill-item">Robotics</span>
               <span class="skill-item">Computer Vision</span>
               <span class="skill-item">Motor Controls</span>
@@ -878,64 +798,77 @@
       </div>
     </section>
 
-    <!-- CONTACT -->
+    <div class="station-mark" data-station="ST-05 · CONNECT"></div>
+
+    <!-- Contact -->
     <section id="contact" class="section">
-      <div class="section-header">
-        <span class="section-number">04</span>
-        <h2>Get In Touch</h2>
+      <div class="section-label">
+        <span class="area-code">CONNECT</span>
       </div>
+
       <div class="contact-grid">
-        <div class="card pad contact-info">
-          <h3>Let's build something together</h3>
-          <p style="color: var(--muted); margin: 0 0 24px;">
-            I'm currently open to full-time opportunities in embedded systems, hardware design, and robotics. Feel free to reach out!
+        <div class="card card-pad">
+          <p style="font-size:0.9rem; color:var(--text-dim); margin:0 0 6px;">
+            Open to full-time roles in embedded systems, hardware design, and robotics.
           </p>
           <div class="contact-links">
-            <a href="https://github.com/samisrana" class="contact-link" target="_blank">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              GitHub
+            <a href="https://github.com/samisrana" class="contact-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              GitHub — samisrana
             </a>
-            <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" class="contact-link" target="_blank">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              LinkedIn
+            <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" class="contact-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              LinkedIn — Sami Rana
             </a>
           </div>
         </div>
 
-        <div class="card pad">
+        <div class="card card-pad">
           <form name="contact" method="POST" action="https://formspree.io/f/yourid">
             <label>
-              <span>Name</span>
+              <span class="field-label">Name</span>
               <input required name="name" autocomplete="name" placeholder="Your name" />
             </label>
             <label>
-              <span>Email</span>
+              <span class="field-label">Email</span>
               <input required type="email" name="email" autocomplete="email" placeholder="you@example.com" />
             </label>
             <label>
-              <span>Message</span>
-              <textarea required name="message" rows="4" placeholder="Tell me about your project..."></textarea>
+              <span class="field-label">Message</span>
+              <textarea required name="message" rows="4" placeholder="What are you building?"></textarea>
             </label>
-            <button class="btn primary" type="submit" style="width: 100%;">Send Message</button>
+            <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">
+              Send Message
+            </button>
           </form>
         </div>
       </div>
     </section>
+
   </main>
 
+  <!-- Footer -->
   <footer>
-    <div class="container footer-content">
-      <span class="copyright">© <span id="year"></span> Sami Rana. Built with care.</span>
-      <div class="footer-links">
+    <div class="container footer-inner">
+      <span class="copyright">© <span id="yr"></span> Sami Rana</span>
+      <nav class="footer-links" aria-label="Footer navigation">
         <a href="https://github.com/samisrana">GitHub</a>
         <a href="https://www.linkedin.com/in/sami-rana-aa722a210/">LinkedIn</a>
-        <a href="#top">Back to top</a>
-      </div>
+        <a href="blog.html">Sami's Log</a>
+        <a href="#top">↑ Top</a>
+      </nav>
     </div>
   </footer>
 
+  <!-- Scripts -->
+  <script src="workshop-bg.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    WorkshopBG.init();
   </script>
 </body>
 </html>
