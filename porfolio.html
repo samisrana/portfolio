@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sami's Workshop — Embedded Systems Engineer</title>
-  <meta name="description" content="Sami Rana — Embedded Systems Engineer. Hardware design, VLSI, and systems engineering." />
+  <title>Sami's Workshop | Embedded Systems Engineer</title>
+  <meta name="description" content="Sami Rana, Embedded Systems Engineer. Hardware design, VLSI, and systems engineering." />
   <meta property="og:title" content="Sami's Workshop" />
-  <meta property="og:description" content="Embedded Systems Engineer — hardware, firmware, and silicon." />
+  <meta property="og:description" content="Embedded Systems Engineer. Hardware, firmware, and silicon." />
   <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23c47a3a' font-family='monospace' font-weight='700'>SR</text></svg>">
@@ -65,7 +65,99 @@
       border: 1px solid var(--border);
       border-radius: var(--r);
       overflow: hidden;
+      position: relative;
+      transition:
+        border-color 0.4s ease,
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.4s ease;
     }
+
+    /* Signal highlight sweep */
+    .portrait-module::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        transparent 42%,
+        rgba(196, 122, 58, 0.05) 46%,
+        rgba(196, 122, 58, 0.10) 50%,
+        rgba(196, 122, 58, 0.05) 54%,
+        transparent 58%,
+        transparent 100%
+      );
+      transform: translateX(-100%);
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Copper outline glow layer */
+    .portrait-module::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--r);
+      box-shadow:
+        inset 0 0 0 1px transparent,
+        0 0 0 0 transparent;
+      transition: box-shadow 0.4s ease;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .portrait-module:hover {
+      border-color: var(--copper-border);
+      transform: translateY(-4px);
+      box-shadow:
+        0 12px 28px -8px rgba(196, 122, 58, 0.12),
+        0 4px 12px -4px rgba(0, 0, 0, 0.10);
+    }
+
+    /* Signal sweep on hover */
+    .portrait-module:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* Pulsing copper outline */
+    .portrait-module:hover::after {
+      box-shadow:
+        inset 0 0 0 1px rgba(196, 122, 58, 0.20),
+        0 0 16px -3px rgba(196, 122, 58, 0.25);
+      animation: portrait-outline-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes portrait-outline-pulse {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 1px rgba(196, 122, 58, 0.18),
+          0 0 14px -3px rgba(196, 122, 58, 0.20);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 1px rgba(196, 122, 58, 0.30),
+          0 0 22px -3px rgba(196, 122, 58, 0.32);
+      }
+    }
+
+    /* Header dot pulse on hover */
+    .portrait-module:hover .portrait-header .dot {
+      opacity: 1;
+      animation: dot-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes dot-pulse {
+      0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 4px rgba(196, 122, 58, 0.6);
+      }
+      50% {
+        opacity: 0.6;
+        box-shadow: 0 0 8px rgba(196, 122, 58, 0.9);
+      }
+    }
+
     .portrait-header {
       display: flex;
       align-items: center;
@@ -78,12 +170,15 @@
       font-size: 1rem;
       color: var(--text-dim);
       letter-spacing: 0.06em;
+      position: relative;
+      z-index: 2;
     }
     .portrait-header .dot {
       width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--copper);
       opacity: 0.7;
+      transition: opacity 0.3s ease, box-shadow 0.3s ease;
     }
     .portrait-module img {
       width: 185px;
@@ -93,12 +188,20 @@
       display: block;
       border-radius: 50%;
       margin: 16px auto;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.4s ease;
+    }
+    .portrait-module:hover img {
+      transform: scale(1.02);
     }
     .portrait-footer {
       display: grid;
       grid-template-columns: 1fr 1fr;
       border-top: 1px solid var(--border);
       background: var(--surface);
+      position: relative;
+      z-index: 2;
     }
     .portrait-stat {
       padding: 12px 16px;
@@ -112,6 +215,10 @@
       font-size: 1rem;
       font-weight: 700;
       color: var(--copper);
+      transition: text-shadow 0.3s ease;
+    }
+    .portrait-module:hover .portrait-stat .val {
+      text-shadow: 0 0 8px rgba(196, 122, 58, 0.4);
     }
     .portrait-stat .lbl {
       font-size: 0.84rem;
@@ -119,6 +226,62 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       margin-top: 2px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .portrait-module {
+        transition: border-color 0.15s ease;
+      }
+      .portrait-module::before {
+        display: none;
+      }
+      .portrait-module:hover {
+        transform: none;
+      }
+      .portrait-module:hover::after {
+        animation: none;
+      }
+      .portrait-module:hover .portrait-header .dot {
+        animation: none;
+      }
+    }
+
+    /* Light mode adjustments for portrait module */
+    :root.light .portrait-module::before {
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        transparent 42%,
+        rgba(139, 74, 24, 0.06) 46%,
+        rgba(139, 74, 24, 0.12) 50%,
+        rgba(139, 74, 24, 0.06) 54%,
+        transparent 58%,
+        transparent 100%
+      );
+    }
+    :root.light .portrait-module:hover {
+      box-shadow:
+        0 12px 28px -8px rgba(139, 74, 24, 0.15),
+        0 4px 12px -4px rgba(0, 0, 0, 0.08);
+    }
+    :root.light .portrait-module:hover::after {
+      box-shadow:
+        inset 0 0 0 1px rgba(139, 74, 24, 0.25),
+        0 0 16px -3px rgba(139, 74, 24, 0.28);
+      animation: portrait-outline-pulse-light 2.4s ease-in-out infinite;
+    }
+    @keyframes portrait-outline-pulse-light {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 1px rgba(139, 74, 24, 0.22),
+          0 0 14px -3px rgba(139, 74, 24, 0.24);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 1px rgba(139, 74, 24, 0.35),
+          0 0 22px -3px rgba(139, 74, 24, 0.38);
+      }
     }
 
     /* Section spacing */
@@ -397,7 +560,7 @@
   <!-- Background Layer 3: Signal Waves (canvas) -->
   <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
 
-  <!-- Background Layer 4: Physical Scene — Workshop (one-point perspective, VP 960,400) -->
+  <!-- Background Layer 4: Physical Scene - Workshop (one-point perspective, VP 960,400) -->
   <div class="bg-layer bg-scene" aria-hidden="true">
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
 
@@ -475,7 +638,7 @@
       <line class="s-line"  x1="576" y1="580" x2="576"  y2="700"/>
       <line class="s-line"  x1="1344" y1="580" x2="1344" y2="700"/>
 
-      <!-- ── COMPUTER MONITOR — back-center of bench ── -->
+      <!-- ── COMPUTER MONITOR - back-center of bench ── -->
       <!-- Monitor base -->
       <rect class="s-fill" x="860" y="546" width="200" height="10" rx="2"/>
       <rect class="s-line" x="855" y="546" width="210" height="12" rx="2"/>
@@ -496,7 +659,7 @@
       <line class="s-line" x1="858" y1="580" x2="920" y2="580"/>
       <line class="s-line" x1="858" y1="592" x2="1000" y2="592"/>
 
-      <!-- ── OSCILLOSCOPE — right ── -->
+      <!-- ── OSCILLOSCOPE - right ── -->
       <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
       <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
       <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
@@ -513,7 +676,7 @@
       <circle class="s-line" cx="1648" cy="768" r="7"/><circle class="s-fill" cx="1648" cy="768" r="3"/>
       <circle class="s-line" cx="1672" cy="768" r="7"/><circle class="s-fill" cx="1672" cy="768" r="3"/>
 
-      <!-- ── MULTIMETER — left ── -->
+      <!-- ── MULTIMETER - left ── -->
       <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
       <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
       <circle class="s-line" cx="251" cy="738" r="26"/>
@@ -542,7 +705,7 @@
   <!-- Header -->
   <header>
     <div class="container nav">
-      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop — home">
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop, home">
         <span class="monogram" aria-hidden="true">SR</span>
         <span class="brand-text">
           <span class="brand-label">Engineer</span>
@@ -597,8 +760,8 @@
         </h1>
         <p class="hero-lede">
           From <strong>silicon to systems</strong>: VLSI design, embedded firmware,
-          electronic hardware, and computer architecture. Currently based at
-          <strong>Rensselaer Polytechnic Institute</strong>, looking for what's next.
+          electronic hardware, computer architecture, and robotics. Based in the
+          <strong>Greater Philadelphia Area</strong>, looking for what's next.
         </p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#projects">View Build Bench</a>
@@ -619,12 +782,81 @@
             <div class="lbl">Years Exp</div>
           </div>
           <div class="portrait-stat">
-            <div class="val">RPI</div>
-            <div class="lbl">BS '25</div>
+            <div class="val">RPI '25</div>
+            <div class="lbl">BS ECSE</div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- System Status Console -->
+    <div class="sys-console" style="margin-bottom: var(--g);">
+      <div class="sys-console-header">
+        <svg class="console-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <span class="console-title">Workshop Console</span>
+        <span class="console-ver">v1.0.0</span>
+      </div>
+
+      <div class="sys-console-body">
+        <div class="console-row">
+          <span class="console-label">Status</span>
+          <span class="console-value">
+            <span class="console-status">
+              <span class="led on"></span>
+              <span>ONLINE | Available for opportunities</span>
+            </span>
+          </span>
+        </div>
+
+        <div class="console-row">
+          <span class="console-label">Focus</span>
+          <span class="console-value accent">Embedded Systems · VLSI · Hardware Design</span>
+        </div>
+
+        <div class="console-row">
+          <span class="console-label">Modules</span>
+          <span class="console-value">
+            <span class="console-modules">
+              <span class="console-module">
+                <span class="mod-led"></span>
+                VLSI-01
+              </span>
+              <span class="console-module queued">
+                <span class="mod-led"></span>
+                FW-02
+              </span>
+              <span class="console-module queued">
+                <span class="mod-led"></span>
+                PCB-03
+              </span>
+            </span>
+          </span>
+        </div>
+
+        <div class="console-row">
+          <span class="console-label">Latest Log</span>
+          <span class="console-value">
+            <a href="posts/meeting-lisa-su.html" class="console-log-entry" style="text-decoration: none;">
+              <span class="log-id">LOG-001</span>
+              <span class="log-title">Meeting Lisa Su at RPI's Fireside Chat</span>
+              <span class="log-date">2025.05.14</span>
+            </a>
+          </span>
+        </div>
+      </div>
+
+      <div class="sys-console-footer">
+        <span class="console-uptime">
+          <span class="uptime-led"></span>
+          SYS.ACTIVE
+        </span>
+        <span>Philadelphia, PA</span>
+      </div>
+    </div>
 
     <div class="station-mark" data-station="ST-02 · BUILD BENCH"></div>
 
@@ -671,14 +903,14 @@
           </div>
         </article>
 
-        <!-- Next module — queued -->
+        <!-- Next module - queued -->
         <div class="placeholder-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="ph-label">MODULE-02</span>
             <span class="ph-label">QUEUED</span>
           </div>
           <h3>Embedded Firmware Project</h3>
-          <p>Next build from firmware, PCB design, or computer architecture work — in progress.</p>
+          <p>Next build from firmware, PCB design, or computer architecture work. In progress.</p>
           <div class="tags" style="margin-top: 4px;">
             <span class="tag">Firmware</span>
             <span class="tag">STM32</span>
@@ -710,7 +942,7 @@
               <span class="entry-meta-item">Event</span>
               <span class="entry-meta-item">Semiconductors</span>
             </div>
-            <p class="entry-excerpt">Attending AMD CEO Lisa Su's fireside chat at RPI — and getting to meet one of the most influential people in semiconductors.</p>
+            <p class="entry-excerpt">Attending AMD CEO Lisa Su's fireside chat at RPI and getting to meet one of the most influential people in semiconductors.</p>
             <div class="entry-footer">
               <div class="tags">
                 <span class="tag">AMD</span>
@@ -740,7 +972,7 @@
         <div class="card card-pad about-bio">
           <p>
             Recent graduate from <strong>Rensselaer Polytechnic Institute</strong> with dual degrees in
-            Electrical and Computer Systems Engineering. I work at the boundary of hardware and software —
+            Electrical and Computer Systems Engineering. I work at the boundary of hardware and software,
             where design decisions at the silicon level ripple through to running systems.
           </p>
           <p>
@@ -816,19 +1048,19 @@
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
               </svg>
-              GitHub — samisrana
+              GitHub: samisrana
             </a>
             <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" class="contact-link" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
-              LinkedIn — Sami Rana
+              LinkedIn: Sami Rana
             </a>
           </div>
         </div>
 
         <div class="card card-pad">
-          <form name="contact" method="POST" action="https://formspree.io/f/yourid">
+          <form name="contact" method="POST" action="https://formspree.io/f/mlgppvgp">
             <label>
               <span class="field-label">Name</span>
               <input required name="name" autocomplete="name" placeholder="Your name" />

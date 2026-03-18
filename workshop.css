@@ -379,9 +379,169 @@ header {
   border: 1px solid var(--border);
   border-radius: var(--r);
   overflow: hidden;
-  transition: border-color 0.2s;
+  position: relative;
+  transition:
+    border-color 0.4s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.4s ease,
+    box-shadow 0.4s ease;
 }
-.module-card:hover { border-color: var(--zone-border); }
+
+/* Copper trace highlight overlay */
+.module-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 40%,
+    var(--module-trace-dim) 45%,
+    var(--module-trace) 50%,
+    var(--module-trace-dim) 55%,
+    transparent 60%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Signal glow border effect */
+.module-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--r);
+  background: transparent;
+  box-shadow:
+    inset 0 0 0 1px transparent,
+    0 0 0 0 transparent;
+  transition: box-shadow 0.5s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.module-card:hover {
+  border-color: var(--zone-border);
+  transform: translateY(-3px);
+  filter: brightness(1.04);
+  box-shadow:
+    0 8px 24px -8px var(--module-shadow),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12);
+}
+
+/* Animate copper trace across card on hover */
+.module-card:hover::before {
+  transform: translateX(100%);
+}
+
+/* Signal glow pulse on border */
+.module-card:hover::after {
+  box-shadow:
+    inset 0 0 0 1px var(--module-glow-dim),
+    0 0 12px -2px var(--module-glow);
+  animation: signal-pulse 2s ease-in-out infinite;
+}
+
+@keyframes signal-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 0 1px var(--module-glow-dim),
+      0 0 12px -2px var(--module-glow);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px var(--module-glow-bright),
+      0 0 20px -2px var(--module-glow-pulse);
+  }
+}
+
+/* Module hover color tokens — default copper */
+.module-card {
+  --module-trace: rgba(196, 122, 58, 0.12);
+  --module-trace-dim: rgba(196, 122, 58, 0.06);
+  --module-glow: rgba(196, 122, 58, 0.18);
+  --module-glow-dim: rgba(196, 122, 58, 0.15);
+  --module-glow-bright: rgba(196, 122, 58, 0.25);
+  --module-glow-pulse: rgba(196, 122, 58, 0.28);
+  --module-shadow: rgba(196, 122, 58, 0.08);
+}
+
+/* Zone-bench (turquoise) variant */
+body.zone-bench .module-card,
+.projects-grid .module-card {
+  --module-trace: rgba(46, 168, 154, 0.14);
+  --module-trace-dim: rgba(46, 168, 154, 0.07);
+  --module-glow: rgba(46, 168, 154, 0.20);
+  --module-glow-dim: rgba(46, 168, 154, 0.15);
+  --module-glow-bright: rgba(46, 168, 154, 0.28);
+  --module-glow-pulse: rgba(46, 168, 154, 0.32);
+  --module-shadow: rgba(46, 168, 154, 0.10);
+}
+
+/* Zone-log (gold) variant */
+body.zone-log .module-card {
+  --module-trace: rgba(201, 152, 58, 0.12);
+  --module-trace-dim: rgba(201, 152, 58, 0.06);
+  --module-glow: rgba(201, 152, 58, 0.18);
+  --module-glow-dim: rgba(201, 152, 58, 0.15);
+  --module-glow-bright: rgba(201, 152, 58, 0.25);
+  --module-glow-pulse: rgba(201, 152, 58, 0.28);
+  --module-shadow: rgba(201, 152, 58, 0.08);
+}
+
+/* Light mode adjustments — slightly stronger for visibility */
+:root.light .module-card {
+  --module-trace: rgba(139, 74, 24, 0.14);
+  --module-trace-dim: rgba(139, 74, 24, 0.08);
+  --module-glow: rgba(139, 74, 24, 0.22);
+  --module-glow-dim: rgba(139, 74, 24, 0.18);
+  --module-glow-bright: rgba(139, 74, 24, 0.30);
+  --module-glow-pulse: rgba(139, 74, 24, 0.35);
+  --module-shadow: rgba(139, 74, 24, 0.12);
+}
+
+:root.light body.zone-bench .module-card,
+:root.light .projects-grid .module-card {
+  --module-trace: rgba(22, 107, 96, 0.16);
+  --module-trace-dim: rgba(22, 107, 96, 0.09);
+  --module-glow: rgba(22, 107, 96, 0.24);
+  --module-glow-dim: rgba(22, 107, 96, 0.18);
+  --module-glow-bright: rgba(22, 107, 96, 0.32);
+  --module-glow-pulse: rgba(22, 107, 96, 0.38);
+  --module-shadow: rgba(22, 107, 96, 0.14);
+}
+
+:root.light body.zone-log .module-card {
+  --module-trace: rgba(122, 90, 21, 0.14);
+  --module-trace-dim: rgba(122, 90, 21, 0.08);
+  --module-glow: rgba(122, 90, 21, 0.22);
+  --module-glow-dim: rgba(122, 90, 21, 0.18);
+  --module-glow-bright: rgba(122, 90, 21, 0.30);
+  --module-glow-pulse: rgba(122, 90, 21, 0.35);
+  --module-shadow: rgba(122, 90, 21, 0.12);
+}
+
+/* Reduced motion — disable trace sweep and pulse, keep subtle lift */
+@media (prefers-reduced-motion: reduce) {
+  .module-card {
+    transition:
+      border-color 0.15s ease,
+      filter 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .module-card::before {
+    display: none;
+  }
+  .module-card:hover {
+    transform: none;
+  }
+  .module-card:hover::after {
+    animation: none;
+  }
+}
 
 .module-card-header {
   display: flex;
@@ -785,4 +945,1305 @@ body.zone-log   { --c-scene: rgba(201,152,58,0.10); }
   background-position: 0 50%, 0 0;
   background-repeat: no-repeat, repeat-x;
   opacity: 0.65;
+}
+
+/* ── 18. TECH NOTES — Collapsible Documentation Panels ────────── */
+/*
+   Engineering documentation accordion styled as technical reference panels.
+   Each section expands to reveal deeper implementation details.
+   Design: datasheet/reference manual aesthetic, not FAQ-style.
+*/
+
+.tech-notes {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.tech-notes-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.tech-notes-header .notes-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--zone-accent);
+  flex-shrink: 0;
+}
+
+.tech-notes-header .notes-title {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--zone-accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tech-notes-header .notes-count {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-left: auto;
+  letter-spacing: 0.06em;
+}
+
+/* Individual note section */
+.tech-note {
+  border-bottom: 1px solid var(--border);
+}
+
+.tech-note:last-child {
+  border-bottom: none;
+}
+
+/* Note trigger button */
+.tech-note-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.tech-note-trigger:hover {
+  background: var(--surface-2);
+}
+
+.tech-note-trigger:focus {
+  outline: none;
+  background: var(--surface-2);
+}
+
+.tech-note-trigger:focus-visible {
+  outline: 2px solid var(--zone-accent);
+  outline-offset: -2px;
+}
+
+/* Section number badge */
+.note-section-id {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--zone-accent);
+  background: var(--zone-dim);
+  border: 1px solid var(--zone-border);
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+/* Note title and summary */
+.note-header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 2px;
+  line-height: 1.3;
+}
+
+.note-summary {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+/* Expand indicator */
+.note-expand-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: transform 0.25s ease, color 0.15s ease;
+}
+
+.tech-note[open] .note-expand-icon {
+  transform: rotate(180deg);
+  color: var(--zone-accent);
+}
+
+.tech-note-trigger:hover .note-expand-icon {
+  color: var(--zone-accent);
+}
+
+/* Note content panel */
+.tech-note-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.tech-note[open] .tech-note-content {
+  grid-template-rows: 1fr;
+}
+
+.tech-note-inner {
+  overflow: hidden;
+}
+
+.tech-note-body {
+  padding: 18px 18px 18px 54px;
+}
+
+/* Content styling within notes */
+.tech-note-body p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+
+.tech-note-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tech-note-body strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.tech-note-body ul,
+.tech-note-body ol {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  padding-left: 18px;
+  margin: 0 0 12px;
+  line-height: 1.65;
+}
+
+.tech-note-body li {
+  margin-bottom: 6px;
+}
+
+.tech-note-body li:last-child {
+  margin-bottom: 0;
+}
+
+.tech-note-body code {
+  font-family: var(--mono);
+  font-size: 0.84em;
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  color: var(--zone-accent);
+}
+
+/* Subsection within a note */
+.note-subsection {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.note-subsection:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.note-subsection-title {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+/* Key-value pairs for specs/constraints */
+.note-specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 12px 0;
+}
+
+.note-specs dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.note-specs dd {
+  font-size: 0.86rem;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Callout within notes */
+.note-callout {
+  background: var(--zone-dim);
+  border-left: 3px solid var(--zone-accent);
+  padding: 12px 14px;
+  border-radius: 0 var(--r-xs) var(--r-xs) 0;
+  margin: 12px 0;
+}
+
+.note-callout p {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+/* Status indicator for notes */
+.note-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--r-xs);
+  margin-left: 10px;
+}
+
+.note-status.resolved {
+  background: rgba(46, 168, 154, 0.12);
+  color: var(--turquoise);
+  border: 1px solid rgba(46, 168, 154, 0.25);
+}
+
+.note-status.open {
+  background: rgba(201, 152, 58, 0.12);
+  color: var(--gold);
+  border: 1px solid rgba(201, 152, 58, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 580px) {
+  .tech-note-body {
+    padding-left: 18px;
+  }
+
+  .note-summary {
+    display: none;
+  }
+}
+
+/* ── 19. SYSTEM TABS — Engineering Interface Tabs ─────────────── */
+/*
+   Tab component styled as engineering system interface.
+   Resembles test equipment panels, terminal interfaces, or
+   embedded system dashboards.
+*/
+
+.sys-tabs {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* Tab bar — resembles equipment panel selector */
+.sys-tabs-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+/* System label on left side */
+.sys-tabs-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.sys-tabs-label .sys-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--zone-accent);
+}
+
+.sys-tabs-label span {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--zone-accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Tab list */
+.sys-tabs-list {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Individual tab button */
+.sys-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.sys-tab:last-child {
+  border-right: none;
+}
+
+.sys-tab:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sys-tab:focus {
+  outline: none;
+}
+
+.sys-tab:focus-visible {
+  outline: 2px solid var(--zone-accent);
+  outline-offset: -2px;
+}
+
+/* Active tab state */
+.sys-tab[aria-selected="true"] {
+  background: var(--bg);
+  color: var(--zone-accent);
+}
+
+/* LED indicator dot */
+.sys-tab::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.sys-tab:hover::before {
+  background: var(--text);
+  opacity: 0.6;
+}
+
+.sys-tab[aria-selected="true"]::before {
+  background: var(--zone-accent);
+  opacity: 1;
+  box-shadow: 0 0 6px var(--zone-accent);
+}
+
+/* Active indicator line */
+.sys-tab[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--zone-accent);
+}
+
+/* Tab number badge */
+.sys-tab .tab-num {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: var(--r-xs);
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+.sys-tab[aria-selected="true"] .tab-num {
+  color: var(--zone-accent);
+  border-color: var(--zone-border);
+  background: var(--zone-dim);
+  opacity: 1;
+}
+
+/* Status indicator (optional) */
+.sys-tabs-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.sys-tabs-status .status-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--turquoise);
+  animation: led-pulse 2s ease-in-out infinite;
+}
+
+@keyframes led-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Tab panels container */
+.sys-tabs-panels {
+  position: relative;
+  background: var(--bg);
+}
+
+/* Individual panel */
+.sys-tab-panel {
+  display: none;
+  padding: 24px;
+}
+
+.sys-tab-panel[data-active="true"] {
+  display: block;
+  animation: panel-fade-in 0.2s ease;
+}
+
+@keyframes panel-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Panel header */
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header .panel-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--zone-accent);
+}
+
+.panel-header h3 {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.panel-header .panel-id {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  margin-left: auto;
+}
+
+/* Panel content styling */
+.sys-tab-panel p {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin: 0 0 14px;
+}
+
+.sys-tab-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.sys-tab-panel strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sys-tab-panel ul,
+.sys-tab-panel ol {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  padding-left: 20px;
+  margin: 0 0 14px;
+  line-height: 1.65;
+}
+
+.sys-tab-panel li {
+  margin-bottom: 6px;
+}
+
+.sys-tab-panel code {
+  font-family: var(--mono);
+  font-size: 0.84em;
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  color: var(--zone-accent);
+}
+
+/* Data readout block — like instrument display */
+.data-readout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+
+.data-readout-title {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.data-readout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.data-readout-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.data-readout-item .label {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.data-readout-item .value {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--zone-accent);
+  letter-spacing: 0.02em;
+}
+
+.data-readout-item .unit {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+/* Signal path diagram placeholder */
+.signal-path {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 20px;
+  margin: 14px 0;
+  text-align: center;
+}
+
+.signal-path-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.signal-node {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: var(--r-xs);
+}
+
+.signal-node.active {
+  color: var(--zone-accent);
+  border-color: var(--zone-border);
+  background: var(--zone-dim);
+}
+
+.signal-arrow {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* Responsive tabs */
+@media (max-width: 680px) {
+  .sys-tabs-bar {
+    flex-wrap: wrap;
+  }
+
+  .sys-tabs-label {
+    width: 100%;
+    padding: 10px 14px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sys-tabs-list {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sys-tab {
+    padding: 10px 14px;
+    white-space: nowrap;
+  }
+
+  .sys-tabs-status {
+    display: none;
+  }
+
+  .sys-tab .tab-num {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .sys-tab-panel {
+    padding: 16px;
+  }
+
+  .data-readout-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── 20. TECH TOOLTIPS — Engineering Term Definitions ─────────── */
+/*
+   Subtle tooltips for technical acronyms and engineering terms.
+   Dotted underline indicates definition available on hover.
+   Styled as technical reference popups, not generic web tooltips.
+*/
+
+.term {
+  position: relative;
+  display: inline;
+  border-bottom: 1px dotted var(--zone-accent);
+  cursor: help;
+  transition: border-color 0.15s ease;
+}
+
+.term:hover {
+  border-bottom-style: solid;
+}
+
+/* Tooltip popup */
+.term::after {
+  content: attr(data-def);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+
+  /* Styling */
+  background: var(--surface);
+  border: 1px solid var(--zone-border);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+
+  /* Typography */
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  width: max-content;
+  max-width: 260px;
+
+  /* Initial state — hidden */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+
+  z-index: 1000;
+}
+
+/* Tooltip arrow */
+.term::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  border: 5px solid transparent;
+  border-top-color: var(--zone-border);
+
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+
+  z-index: 1001;
+}
+
+/* Show tooltip on hover */
+.term:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.term:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Focus state for keyboard users */
+.term:focus {
+  outline: none;
+  border-bottom-color: var(--zone-accent);
+  border-bottom-style: solid;
+}
+
+.term:focus::after,
+.term:focus::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.term:focus::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Term category badge (optional) */
+.term[data-cat]::after {
+  content: attr(data-cat) ": " attr(data-def);
+}
+
+.term[data-cat]::after {
+  padding-top: 6px;
+}
+
+/* Tooltip with category label styling */
+.term[data-cat] {
+  --cat-color: var(--zone-accent);
+}
+
+/* Position variants for edge cases */
+.term.tip-left::after {
+  left: 0;
+  transform: translateX(0) translateY(4px);
+}
+
+.term.tip-left:hover::after,
+.term.tip-left:focus::after {
+  transform: translateX(0) translateY(0);
+}
+
+.term.tip-left::before {
+  left: 16px;
+}
+
+.term.tip-right::after {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(4px);
+}
+
+.term.tip-right:hover::after,
+.term.tip-right:focus::after {
+  transform: translateX(0) translateY(0);
+}
+
+.term.tip-right::before {
+  left: auto;
+  right: 16px;
+}
+
+/* Bottom position variant */
+.term.tip-bottom::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.term.tip-bottom:hover::after,
+.term.tip-bottom:focus::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+.term.tip-bottom::before {
+  bottom: auto;
+  top: calc(100% + 3px);
+  border-top-color: transparent;
+  border-bottom-color: var(--zone-border);
+}
+
+/* Light mode adjustments */
+:root.light .term::after {
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Touch devices — show on tap via .tip-active class */
+@media (hover: none) {
+  .term::after,
+  .term::before {
+    /* Don't disable, just don't show on hover */
+  }
+
+  .term.tip-active::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .term.tip-active::before {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .term::after {
+    transition: opacity 0.1s ease, visibility 0.1s ease;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .term:hover::after {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ── 21. SYSTEM CONSOLE — Embedded Status Panel ───────────────── */
+/*
+   Minimal engineering console resembling embedded system diagnostics.
+   Clean, structured display — not a hacker terminal aesthetic.
+   Think: microcontroller debug output, industrial HMI, or BIOS screen.
+*/
+
+.sys-console {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+}
+
+/* Console header bar */
+.sys-console-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.sys-console-header .console-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--zone-accent);
+  flex-shrink: 0;
+}
+
+.sys-console-header .console-title {
+  font-weight: 600;
+  color: var(--zone-accent);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+.sys-console-header .console-ver {
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+}
+
+/* Console body */
+.sys-console-body {
+  padding: 12px 14px;
+  background: var(--bg);
+}
+
+/* Status row — key: value pairs */
+.console-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.console-row:last-child {
+  border-bottom: none;
+}
+
+.console-row:first-child {
+  padding-top: 0;
+}
+
+/* Row label */
+.console-label {
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.64rem;
+  min-width: 85px;
+  flex-shrink: 0;
+}
+
+/* Row value */
+.console-value {
+  color: var(--text);
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+
+.console-value.accent {
+  color: var(--zone-accent);
+}
+
+.console-value.dim {
+  color: var(--text-dim);
+}
+
+/* Status indicator inline */
+.console-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.console-status .led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.console-status .led.on {
+  background: var(--turquoise);
+  box-shadow: 0 0 4px var(--turquoise);
+}
+
+.console-status .led.idle {
+  background: var(--gold);
+  box-shadow: 0 0 3px var(--gold);
+  animation: led-idle-pulse 2.5s ease-in-out infinite;
+}
+
+.console-status .led.off {
+  background: var(--text-dim);
+  opacity: 0.4;
+}
+
+@keyframes led-idle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Separator line */
+.console-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+/* Module list display */
+.console-modules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.console-module {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.console-module .mod-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--turquoise);
+}
+
+.console-module.queued .mod-led {
+  background: var(--gold);
+}
+
+.console-module.queued {
+  opacity: 0.6;
+}
+
+/* Log entry preview */
+.console-log-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  margin-top: 4px;
+}
+
+.console-log-entry .log-id {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.console-log-entry .log-title {
+  color: var(--text);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.console-log-entry .log-date {
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Log entry hover */
+a.console-log-entry {
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+a.console-log-entry:hover {
+  border-color: var(--gold-border);
+  background: var(--gold-dim);
+}
+
+a.console-log-entry:hover .log-title {
+  color: var(--gold);
+}
+
+/* Module hover */
+.console-module {
+  transition: border-color 0.15s ease, color 0.15s ease;
+  cursor: default;
+}
+
+.console-module:not(.queued):hover {
+  border-color: var(--turquoise-border);
+  color: var(--turquoise);
+}
+
+/* Progress/activity indicator */
+.console-activity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.console-activity .activity-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.console-activity .activity-fill {
+  height: 100%;
+  background: var(--zone-accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.console-activity .activity-pct {
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* Timestamp footer */
+.sys-console-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.sys-console-footer .console-uptime {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sys-console-footer .uptime-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--turquoise);
+  animation: uptime-blink 1s steps(1) infinite;
+}
+
+@keyframes uptime-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Compact variant */
+.sys-console.compact .sys-console-body {
+  padding: 10px 12px;
+}
+
+.sys-console.compact .console-row {
+  padding: 3px 0;
+}
+
+.sys-console.compact .console-label {
+  min-width: 70px;
+  font-size: 0.62rem;
+}
+
+/* Inline console — horizontal layout for tight spaces */
+.sys-console.inline {
+  display: flex;
+  align-items: stretch;
+}
+
+.sys-console.inline .sys-console-header {
+  border-bottom: none;
+  border-right: 1px solid var(--border);
+  padding: 10px 14px;
+}
+
+.sys-console.inline .sys-console-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 16px;
+}
+
+.sys-console.inline .console-row {
+  border-bottom: none;
+  padding: 0;
+}
+
+.sys-console.inline .sys-console-footer {
+  border-top: none;
+  border-left: 1px solid var(--border);
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 14px;
+}
+
+/* Responsive */
+@media (max-width: 580px) {
+  .sys-console.inline {
+    flex-direction: column;
+  }
+
+  .sys-console.inline .sys-console-header {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sys-console.inline .sys-console-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .sys-console.inline .console-row {
+    border-bottom: 1px solid var(--border);
+    padding: 4px 0;
+  }
+
+  .sys-console.inline .console-row:last-child {
+    border-bottom: none;
+  }
+
+  .sys-console.inline .sys-console-footer {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    flex-direction: row;
+  }
 }

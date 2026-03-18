@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CMOS Logic Circuit Design — Build Bench — Sami's Workshop</title>
+  <title>CMOS Logic Circuit Design - Build Bench - Sami's Workshop</title>
   <meta name="description" content="CMOS circuit design implementing F = B(A+C) with full layout, verification, and performance analysis using Cadence Virtuoso." />
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%232ea89a' font-family='monospace' font-weight='700'>SR</text></svg>">
   <link rel="stylesheet" href="workshop.css" />
   <style>
-    /* ── Project detail — page-specific styles ── */
+    /* ── Project detail - page-specific styles ── */
 
     .doc-container { max-width: 860px; }
 
@@ -81,7 +81,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* Spec strip — quick-reference row under module header */
+    /* Spec strip - quick-reference row under module header */
     .spec-strip {
       display: flex;
       flex-wrap: wrap;
@@ -138,7 +138,7 @@
     }
     .doc-section li { margin-bottom: 6px; }
 
-    /* Callout — turquoise tint via zone-accent */
+    /* Callout - turquoise tint via zone-accent */
     .callout {
       background: var(--turquoise-dim);
       border-left: 3px solid var(--turquoise);
@@ -307,7 +307,7 @@
   <!-- Background Layer 3: Signal Waves (canvas) -->
   <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
 
-  <!-- Background Layer 4: Physical Scene — Workbench (one-point perspective, VP 960,400) -->
+  <!-- Background Layer 4: Physical Scene - Workbench (one-point perspective, VP 960,400) -->
   <div class="bg-layer bg-scene" aria-hidden="true">
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
 
@@ -336,7 +336,7 @@
       <line class="s-line"  x1="1080" y1="308" x2="1080" y2="435"/>
       <line class="s-line"  x1="1200" y1="308" x2="1200" y2="435"/>
 
-      <!-- Component reels on back wall shelf (small — far depth) -->
+      <!-- Component reels on back wall shelf (small - far depth) -->
       <circle class="s-line" cx="748"  cy="284" r="18"/><circle class="s-line" cx="748"  cy="284" r="10"/><circle class="s-line" cx="748"  cy="284" r="3"/>
       <circle class="s-line" cx="790"  cy="286" r="16"/><circle class="s-line" cx="790"  cy="286" r="9"/> <circle class="s-line" cx="790"  cy="286" r="3"/>
       <circle class="s-line" cx="830"  cy="285" r="17"/><circle class="s-line" cx="830"  cy="285" r="10"/><circle class="s-line" cx="830"  cy="285" r="3"/>
@@ -397,7 +397,7 @@
       <line class="s-line"  x1="576" y1="580" x2="576"  y2="700"/>
       <line class="s-line"  x1="1344" y1="580" x2="1344" y2="700"/>
 
-      <!-- ── MULTIMETER — left, foreground ── -->
+      <!-- ── MULTIMETER - left, foreground ── -->
       <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
       <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
       <circle class="s-line" cx="251" cy="738" r="26"/>
@@ -416,7 +416,7 @@
       <line class="s-line" x1="170" y1="880" x2="178" y2="888"/>
       <line class="s-line" x1="322" y1="880" x2="330" y2="888"/>
 
-      <!-- ── DESK LAMP — center-left ── -->
+      <!-- ── DESK LAMP - center-left ── -->
       <rect class="s-fill"  x="568" y="770" width="24" height="14" rx="3"/>
       <line class="s-thick" x1="580" y1="780" x2="580" y2="700"/>
       <line class="s-thick" x1="580" y1="700" x2="634" y2="614"/>
@@ -425,7 +425,7 @@
       <line   class="s-line"  x1="672" y1="558" x2="700" y2="543"/>
       <line   class="s-line"  x1="684" y1="562" x2="684" y2="538"/>
 
-      <!-- ── BREADBOARD — bench center, mid-depth ── -->
+      <!-- ── BREADBOARD - bench center, mid-depth ── -->
       <rect class="s-line" x="836" y="672" width="248" height="96" rx="3"/>
       <line class="s-line" x1="852" y1="690" x2="1068" y2="690"/>
       <line class="s-line" x1="852" y1="702" x2="1068" y2="702"/>
@@ -445,7 +445,7 @@
       <line class="s-line" x1="984" y1="720" x2="992" y2="720"/>
       <line class="s-line" x1="984" y1="728" x2="992" y2="728"/>
 
-      <!-- ── OSCILLOSCOPE — right, foreground ── -->
+      <!-- ── OSCILLOSCOPE - right, foreground ── -->
       <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
       <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
       <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
@@ -483,7 +483,7 @@
   <!-- Header -->
   <header>
     <div class="container nav">
-      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop — home">
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop - home">
         <span class="monogram" aria-hidden="true">SR</span>
         <span class="brand-text">
           <span class="brand-label">Engineer</span>
@@ -572,11 +572,310 @@
       <section class="doc-section">
         <h2>Overview</h2>
         <div class="card card-pad">
-          <p>Full custom CMOS design flow for the Boolean function <strong>F = AB + BC</strong>,
-          implementing schematic capture, physical layout, DRC/LVS verification, and post-layout
+          <p>Full custom <span class="term" data-def="Complementary Metal-Oxide-Semiconductor - uses paired NMOS and PMOS transistors for low static power consumption">CMOS</span> design flow for the Boolean function <strong>F = AB + BC</strong>,
+          implementing schematic capture, physical layout, <span class="term" data-def="Design Rule Check - verifies layout meets manufacturing constraints">DRC</span>/<span class="term" data-def="Layout vs. Schematic - confirms physical layout matches circuit schematic">LVS</span> verification, and post-layout
           performance analysis using <strong>Cadence Virtuoso</strong> and <strong>Calibre</strong>.</p>
-          <p>The design targets the <strong>GlobalFoundries PDK</strong>, with transistor sizing following
-          a 2:1 PMOS:NMOS ratio to balance rise/fall times. Total layout area: <strong>12.748 µm²</strong>.</p>
+          <p>The design targets the <strong>GlobalFoundries <span class="term" data-def="Process Design Kit - foundry-provided files containing device models, design rules, and layer definitions">PDK</span></strong>, with transistor sizing following
+          a 2:1 <span class="term" data-def="P-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is LOW">PMOS</span>:<span class="term" data-def="N-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is HIGH">NMOS</span> ratio to balance rise/fall times. Total layout area: <strong>12.748 µm²</strong>.</p>
+        </div>
+      </section>
+
+      <!-- System Analysis Tabs -->
+      <section class="doc-section">
+        <h2>System Analysis</h2>
+
+        <div class="sys-tabs">
+          <div class="sys-tabs-bar" role="tablist" aria-label="Project analysis sections">
+            <div class="sys-tabs-label">
+              <svg class="sys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span>Analysis</span>
+            </div>
+
+            <button class="sys-tab" role="tab" aria-selected="true" aria-controls="panel-arch" id="tab-arch" tabindex="0">
+              Architecture
+              <span class="tab-num">01</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-impl" id="tab-impl" tabindex="-1">
+              Implementation
+              <span class="tab-num">02</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-sim" id="tab-sim" tabindex="-1">
+              Simulation
+              <span class="tab-num">03</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-results" id="tab-results" tabindex="-1">
+              Results
+              <span class="tab-num">04</span>
+            </button>
+
+            <div class="sys-tabs-status">
+              <span class="status-led"></span>
+              READY
+            </div>
+          </div>
+
+          <div class="sys-tabs-panels">
+            <!-- Architecture Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-arch" aria-labelledby="tab-arch" data-active="true">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                  <polyline points="2 17 12 22 22 17"/>
+                  <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                <h3>Circuit Architecture</h3>
+                <span class="panel-id">ARCH-001</span>
+              </div>
+
+              <p>The circuit implements <strong>F = B(A + C)</strong> using complementary CMOS logic with symmetric pull-up and pull-down networks.</p>
+
+              <div class="signal-path">
+                <div class="signal-path-row">
+                  <span class="signal-node">A</span>
+                  <span class="signal-arrow">─┬─</span>
+                  <span class="signal-node active">PUN</span>
+                  <span class="signal-arrow">──→</span>
+                  <span class="signal-node">F̄</span>
+                  <span class="signal-arrow">──→</span>
+                  <span class="signal-node active">INV</span>
+                  <span class="signal-arrow">──→</span>
+                  <span class="signal-node">F</span>
+                </div>
+                <div class="signal-path-row" style="margin-top: 8px;">
+                  <span class="signal-node">B</span>
+                  <span class="signal-arrow">─┼─</span>
+                  <span class="signal-node active">PDN</span>
+                  <span class="signal-arrow">──↗</span>
+                </div>
+                <div class="signal-path-row" style="margin-top: 8px;">
+                  <span class="signal-node">C</span>
+                  <span class="signal-arrow">─┴─</span>
+                </div>
+              </div>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Architecture Specifications</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Topology</span>
+                    <span class="value">CMOS</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Transistors</span>
+                    <span class="value">8<span class="unit">total</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Stages</span>
+                    <span class="value">2</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Fan-in</span>
+                    <span class="value">3</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li><strong>Pull-Up Network:</strong> B̄ in parallel with series (Ā · C̄)</li>
+                <li><strong>Pull-Down Network:</strong> B in series with parallel (A + C)</li>
+                <li><strong>Output Stage:</strong> CMOS inverter for rail-to-rail output</li>
+              </ul>
+            </div>
+
+            <!-- Implementation Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-impl" aria-labelledby="tab-impl" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+                <h3>Physical Implementation</h3>
+                <span class="panel-id">IMPL-001</span>
+              </div>
+
+              <p>Layout designed in <strong>Cadence Virtuoso</strong> targeting GlobalFoundries 60nm process with optimized transistor placement for minimum area.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Layout Metrics</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Total Area</span>
+                    <span class="value">12.748<span class="unit">µm²</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Width</span>
+                    <span class="value">4.18<span class="unit">µm</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Height</span>
+                    <span class="value">3.05<span class="unit">µm</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Metal Layers</span>
+                    <span class="value">1</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Transistor Sizing</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">PMOS W/L</span>
+                    <span class="value">480/60<span class="unit">nm</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">NMOS W/L</span>
+                    <span class="value">240/60<span class="unit">nm</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">P:N Ratio</span>
+                    <span class="value">2:1</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Min Feature</span>
+                    <span class="value">60<span class="unit">nm</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>Diffusion sharing between adjacent transistors (25% area reduction)</li>
+                <li>Horizontal VDD/GND rails with vertical poly gates</li>
+                <li>Single via for cross-layer drain connection</li>
+              </ul>
+            </div>
+
+            <!-- Simulation Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-sim" aria-labelledby="tab-sim" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <h3>Simulation Environment</h3>
+                <span class="panel-id">SIM-001</span>
+              </div>
+
+              <p>Transient analysis performed in <strong>ADE Explorer</strong> with extracted parasitics from Calibre xRC for post-layout accuracy.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Test Conditions</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">VDD</span>
+                    <span class="value">1.0<span class="unit">V</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Temperature</span>
+                    <span class="value">25<span class="unit">°C</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Process</span>
+                    <span class="value">TT</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Load Cap</span>
+                    <span class="value">0.5–15<span class="unit">fF</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Input Stimulus</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Signal Type</span>
+                    <span class="value">Pulse</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Rise/Fall</span>
+                    <span class="value">10<span class="unit">ps</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Period A</span>
+                    <span class="value">8<span class="unit">ns</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Period B</span>
+                    <span class="value">4<span class="unit">ns</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>8 input combinations verified against truth table</li>
+                <li>Rise/fall time measurement at 10%–90% thresholds</li>
+                <li>Schematic vs. post-layout comparison for parasitic impact</li>
+              </ul>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-results" aria-labelledby="tab-results" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <h3>Verification Results</h3>
+                <span class="panel-id">RES-001</span>
+              </div>
+
+              <p>All verification checks passed. Post-layout timing shows expected parasitic degradation within acceptable limits.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Timing @ 0.5 fF Load</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Rise (Schem)</span>
+                    <span class="value">13.55<span class="unit">ps</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Rise (Layout)</span>
+                    <span class="value">18.72<span class="unit">ps</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Fall (Schem)</span>
+                    <span class="value">13.46<span class="unit">ps</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Fall (Layout)</span>
+                    <span class="value">19.03<span class="unit">ps</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Verification Status</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">DRC</span>
+                    <span class="value" style="color: var(--turquoise);">PASS</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">LVS</span>
+                    <span class="value" style="color: var(--turquoise);">PASS</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">xRC</span>
+                    <span class="value" style="color: var(--turquoise);">PASS</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Functional</span>
+                    <span class="value" style="color: var(--turquoise);">PASS</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li><strong>Parasitic Impact:</strong> +38% rise time, +41% fall time at 0.5 fF</li>
+                <li><strong>Load Scaling:</strong> 8× delay increase for 30× capacitance (RC behavior)</li>
+                <li><strong>Symmetry:</strong> Rise/fall balance maintained across load range</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -600,7 +899,7 @@
           <h3>Network Design</h3>
           <div class="grid-2">
             <div>
-              <strong>Pull-Up Network (PUN):</strong>
+              <strong><span class="term" data-def="Pull-Up Network - PMOS transistors that connect output to VDD (logic HIGH)">Pull-Up Network (PUN)</span>:</strong>
               <ul>
                 <li>1 pMOS (B) in parallel with</li>
                 <li>2 series pMOS (A and C)</li>
@@ -608,7 +907,7 @@
               </ul>
             </div>
             <div>
-              <strong>Pull-Down Network (PDN):</strong>
+              <strong><span class="term" data-def="Pull-Down Network - NMOS transistors that connect output to GND (logic LOW)">Pull-Down Network (PDN)</span>:</strong>
               <ul>
                 <li>1 nMOS (B) in series with</li>
                 <li>2 parallel nMOS (A and C)</li>
@@ -658,8 +957,8 @@
         <h2>Simulation Results</h2>
         <div class="card card-pad">
           <figure>
-            <img src="images/waveform.png" alt="Waveform — inputs A, B, C and output F" />
-            <figcaption>Waveform: inputs A, B, C and output F — confirms correct Boolean function</figcaption>
+            <img src="images/waveform.png" alt="Waveform - inputs A, B, C and output F" />
+            <figcaption>Waveform: inputs A, B, C and output F - confirms correct Boolean function</figcaption>
           </figure>
         </div>
       </section>
@@ -679,7 +978,7 @@
 
           <figure>
             <img src="images/stick_diagram.png" alt="Stick diagram" />
-            <figcaption>Stick diagram — transistors A, B, C with inverter</figcaption>
+            <figcaption>Stick diagram - transistors A, B, C with inverter</figcaption>
           </figure>
 
           <figure>
@@ -689,7 +988,7 @@
 
           <figure>
             <img src="images/layout_size.png" alt="Layout size measurement" />
-            <figcaption>Layout area — 12.748 µm²</figcaption>
+            <figcaption>Layout area - 12.748 µm²</figcaption>
           </figure>
         </div>
       </section>
@@ -700,36 +999,36 @@
         <div class="card card-pad">
           <div class="grid-2">
             <div>
-              <h3>DRC — Design Rule Check</h3>
+              <h3><span class="term" data-def="Design Rule Check - automated verification that layout meets foundry manufacturing constraints">DRC</span> - Design Rule Check</h3>
               <p>Verified against foundry rules with <strong>Calibre DRC</strong>. Resolved:</p>
               <ul>
-                <li>Metal1 track misalignment</li>
+                <li><span class="term" data-def="First metal interconnect layer, typically used for local routing">Metal1</span> track misalignment</li>
                 <li>Minimum spacing violations</li>
               </ul>
             </div>
             <div>
-              <h3>LVS — Layout vs. Schematic</h3>
-              <p>Netlists match via <strong>Calibre LVS</strong>. Resolved:</p>
+              <h3><span class="term" data-def="Layout vs. Schematic - verifies physical layout matches intended circuit connectivity">LVS</span> - Layout vs. Schematic</h3>
+              <p><span class="term" data-def="Circuit connectivity description listing components and their connections">Netlists</span> match via <strong>Calibre LVS</strong>. Resolved:</p>
               <ul>
                 <li>Label settings configuration</li>
-                <li>Missing connection (via for cross-layer routing)</li>
+                <li>Missing connection (<span class="term" data-def="Vertical metal connection between different routing layers">via</span> for cross-layer routing)</li>
               </ul>
             </div>
           </div>
 
           <div class="fig-grid-2" style="margin-top:16px;">
             <figure>
-              <img src="images/drc_results.png" alt="DRC results — all rules cleared" />
-              <figcaption>DRC — all design rules cleared</figcaption>
+              <img src="images/drc_results.png" alt="DRC results - all rules cleared" />
+              <figcaption>DRC - all design rules cleared</figcaption>
             </figure>
             <figure>
-              <img src="images/lvs_results.png" alt="LVS results — netlists match" />
-              <figcaption>LVS — netlists match</figcaption>
+              <img src="images/lvs_results.png" alt="LVS results - netlists match" />
+              <figcaption>LVS - netlists match</figcaption>
             </figure>
           </div>
           <figure>
             <img src="images/pex_results.png" alt="Calibre xRC extraction" />
-            <figcaption>Calibre xRC — parasitic extraction, no errors</figcaption>
+            <figcaption>Calibre xRC - parasitic extraction, no errors</figcaption>
           </figure>
         </div>
       </section>
@@ -748,12 +1047,12 @@
           </table>
           <div class="fig-grid-2">
             <figure>
-              <img src="images/sim_schematic_0.5fF.png" alt="Schematic sim — 0.5 fF" />
-              <figcaption>Schematic — 0.5 fF load</figcaption>
+              <img src="images/sim_schematic_0.5fF.png" alt="Schematic sim - 0.5 fF" />
+              <figcaption>Schematic - 0.5 fF load</figcaption>
             </figure>
             <figure>
-              <img src="images/sim_postlayout_0.5fF.png" alt="Post-layout sim — 0.5 fF" />
-              <figcaption>Post-layout — 0.5 fF load</figcaption>
+              <img src="images/sim_postlayout_0.5fF.png" alt="Post-layout sim - 0.5 fF" />
+              <figcaption>Post-layout - 0.5 fF load</figcaption>
             </figure>
           </div>
 
@@ -767,19 +1066,19 @@
           </table>
           <div class="fig-grid-2">
             <figure>
-              <img src="images/sim_schematic_15fF.png" alt="Schematic sim — 15 fF" />
-              <figcaption>Schematic — 15 fF load</figcaption>
+              <img src="images/sim_schematic_15fF.png" alt="Schematic sim - 15 fF" />
+              <figcaption>Schematic - 15 fF load</figcaption>
             </figure>
             <figure>
-              <img src="images/sim_postlayout_15fF.png" alt="Post-layout sim — 15 fF" />
-              <figcaption>Post-layout — 15 fF load</figcaption>
+              <img src="images/sim_postlayout_15fF.png" alt="Post-layout sim - 15 fF" />
+              <figcaption>Post-layout - 15 fF load</figcaption>
             </figure>
           </div>
 
           <h3>Analysis</h3>
-          <p>Post-layout delays increase due to parasitic junction capacitances, metal resistance,
-          contact/via resistance, and gate-to-diffusion coupling. The 30× load increase (0.5 → 15 fF)
-          produced ~8× longer delays, consistent with the RC time constant relationship.</p>
+          <p>Post-layout delays increase due to <span class="term" data-def="Unintended capacitances from physical layout - junction, overlap, and fringing capacitances">parasitic</span> junction capacitances, metal resistance,
+          contact/via resistance, and gate-to-diffusion coupling. The 30× load increase (0.5 → 15 <span class="term" data-def="Femtofarad - 10⁻¹⁵ farads, typical on-chip capacitance unit">fF</span>)
+          produced ~8× longer delays, consistent with the <span class="term" data-def="Resistance × Capacitance - determines signal propagation delay in interconnects">RC time constant</span> relationship.</p>
         </div>
       </section>
 
@@ -808,9 +1107,9 @@
         <h2>Tools</h2>
         <div class="card card-pad">
           <ul>
-            <li><strong>Cadence Virtuoso</strong> — Schematic Editor, Layout Suite XL, ADE Explorer</li>
-            <li><strong>Calibre</strong> — DRC, LVS, xRC (Parasitic Extraction)</li>
-            <li><strong>Process</strong> — GlobalFoundries PDK</li>
+            <li><strong>Cadence Virtuoso</strong> - Schematic Editor, Layout Suite XL, <span class="term" data-def="Analog Design Environment - Cadence's simulation and analysis framework">ADE</span> Explorer</li>
+            <li><strong>Calibre</strong> - DRC, LVS, <span class="term" data-def="Parasitic Extraction - extracts resistance and capacitance from physical layout for accurate simulation">xRC</span> (Parasitic Extraction)</li>
+            <li><strong>Process</strong> - GlobalFoundries <span class="term" data-def="Process Design Kit - complete set of files for designing in a specific fabrication process">PDK</span></li>
           </ul>
         </div>
       </section>
@@ -821,11 +1120,198 @@
         <div class="card card-pad">
           <ul>
             <li>Boolean simplification before layout reduces transistor count and area</li>
-            <li>Post-layout verification is essential — parasitics significantly impact timing</li>
+            <li>Post-layout verification is essential - parasitics significantly impact timing</li>
             <li>Source/drain sharing and interconnect optimization are critical for compact layouts</li>
             <li>Iterative DRC/LVS debugging is standard in physical design flows</li>
             <li>2:1 PMOS:NMOS sizing effectively balances rise/fall times</li>
           </ul>
+        </div>
+      </section>
+
+      <!-- Engineering Notes -->
+      <section class="doc-section">
+        <h2>Engineering Notes</h2>
+
+        <div class="tech-notes">
+          <div class="tech-notes-header">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <span class="notes-title">Technical Reference</span>
+            <span class="notes-count"></span>
+          </div>
+
+          <!-- Design Decisions -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§1</span>
+              <div class="note-header-content">
+                <p class="note-title">Design Decisions</p>
+                <p class="note-summary">Architecture choices and trade-offs</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Function Form Selection</p>
+                    <p>Chose <strong>F = B(A + C)</strong> over the sum-of-products form <code>F = AB + BC</code> to minimize series transistor stacks. The factored form requires only one series connection in PDN (B with parallel A/C) versus two separate paths.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Sizing Strategy</p>
+                    <p>Selected 2:1 PMOS:NMOS ratio based on typical hole/electron mobility ratio in the GF process. This is a conservative choice - more aggressive ratios (2.5:1) could further balance timing but increase area.</p>
+                    <dl class="note-specs">
+                      <dt>PMOS Width</dt>
+                      <dd>480 nm (8× minimum)</dd>
+                      <dt>NMOS Width</dt>
+                      <dd>240 nm (4× minimum)</dd>
+                      <dt>Gate Length</dt>
+                      <dd>60 nm (minimum feature size)</dd>
+                    </dl>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Inverter Placement</p>
+                    <p>Output inverter sized identically to main stage transistors. In a production design, this would be sized based on fanout requirements and load capacitance.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Implementation Details -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§2</span>
+              <div class="note-header-content">
+                <p class="note-title">Implementation Details</p>
+                <p class="note-summary">Layout techniques and routing approach</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Diffusion Sharing</p>
+                    <p>Adjacent transistors share source/drain diffusions where possible, reducing total active area by approximately <strong>25%</strong> compared to isolated devices.</p>
+                    <ul>
+                      <li>PMOS A and B share drain diffusion</li>
+                      <li>PMOS B and C share source diffusion</li>
+                      <li>NMOS devices share common source to GND</li>
+                    </ul>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Metal Routing</p>
+                    <p>Single Metal1 layer used for all interconnects. VDD and GND rails run horizontally at top and bottom edges. Internal signal routing uses vertical poly connections where possible to minimize metal crossings.</p>
+                    <div class="note-callout">
+                      <p>Cross-layer via required for C drain to A drain connection - this was a late addition to resolve LVS mismatch.</p>
+                    </div>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Guard Ring</p>
+                    <p>No explicit guard ring in this design. Production version would include substrate/well ties for latch-up protection.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Constraints -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§3</span>
+              <div class="note-header-content">
+                <p class="note-title">Constraints &amp; Limitations</p>
+                <p class="note-summary">Process rules and design boundaries</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">DRC Constraints</p>
+                    <dl class="note-specs">
+                      <dt>Min Metal Width</dt>
+                      <dd>70 nm</dd>
+                      <dt>Min Metal Spacing</dt>
+                      <dd>70 nm</dd>
+                      <dt>Min Poly Spacing</dt>
+                      <dd>80 nm</dd>
+                      <dt>Contact Size</dt>
+                      <dd>65 × 65 nm</dd>
+                      <dt>Via Size</dt>
+                      <dd>70 × 70 nm</dd>
+                    </dl>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Operating Limits</p>
+                    <p>Design validated for nominal conditions only. Full characterization would require corner analysis (FF/SS/TT) and temperature sweep (-40°C to 125°C).</p>
+                    <dl class="note-specs">
+                      <dt>VDD</dt>
+                      <dd>1.0 V (nominal)</dd>
+                      <dt>Temperature</dt>
+                      <dd>25°C (nominal)</dd>
+                      <dt>Process Corner</dt>
+                      <dd>TT (typical-typical)</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lessons Learned -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§4</span>
+              <div class="note-header-content">
+                <p class="note-title">Lessons Learned</p>
+                <p class="note-summary">Debugging insights and process improvements</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">LVS Debugging</p>
+                    <p>Initial LVS failures were caused by <strong>missing label attachments</strong>. Virtuoso requires explicit net labels on layout pins - schematic net names don't automatically propagate.</p>
+                    <ul>
+                      <li>Always verify pin labels after layout completion</li>
+                      <li>Use Calibre's "discrepancy" view to trace net mismatches</li>
+                      <li>Check that label layer matches PDK specification</li>
+                    </ul>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">DRC Iteration</p>
+                    <p>First layout attempt had <strong>12 DRC violations</strong>, primarily metal spacing errors near the output node where multiple traces converged. Resolved by widening the routing channel and using jogs instead of diagonal routes.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Simulation Setup</p>
+                    <p>Post-layout simulation requires extracted view selection in ADE. Initial simulations used schematic view accidentally, producing optimistic timing results.</p>
+                    <div class="note-callout">
+                      <p>Always verify "config view" setting shows "av_extracted" before running post-layout sims.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
