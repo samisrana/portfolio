@@ -1,6 +1,6 @@
 # portfolio
 
-Personal website for Sami Rana. VLSI design, embedded firmware, electronic hardware, and robotics.
+My personal website. VLSI design, embedded firmware, electronic hardware, and robotics.
 
 Built with vanilla HTML/CSS/JS. No frameworks.
 
