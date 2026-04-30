@@ -750,7 +750,6 @@
     <!-- Hero -->
     <section class="hero" id="top">
       <div class="hero-content">
-        <p class="hero-eyebrow">Embedded Systems Engineer</p>
         <h1>
           I'm <span>Sami Rana</span>,<br>
           Embedded Systems<br>
@@ -985,48 +984,65 @@
           </p>
         </div>
 
-        <div class="card card-pad">
-          <div class="skill-group">
-            <p class="skill-group-label">Languages &amp; Systems</p>
-            <div class="skill-rack">
-              <span class="skill-item">C / C++</span>
-              <span class="skill-item">Python</span>
-              <span class="skill-item">Bash</span>
-              <span class="skill-item">RTOS</span>
-              <span class="skill-item">Embedded Linux</span>
-              <span class="skill-item">SystemVerilog</span>
+        <div class="sys-tabs" style="grid-column: 1 / -1;">
+          <div class="sys-tabs-bar">
+            <div class="sys-tabs-label">
+              <svg class="sys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+              </svg>
+              <span>Tool Rack</span>
             </div>
+            <ul class="sys-tabs-list" role="tablist">
+              <li role="presentation">
+                <button class="sys-tab" role="tab" aria-selected="true" id="tab-lang" aria-controls="panel-lang">Languages</button>
+              </li>
+              <li role="presentation">
+                <button class="sys-tab" role="tab" aria-selected="false" id="tab-hw" aria-controls="panel-hw">Hardware</button>
+              </li>
+              <li role="presentation">
+                <button class="sys-tab" role="tab" aria-selected="false" id="tab-tools" aria-controls="panel-tools">Tools</button>
+              </li>
+              <li role="presentation">
+                <button class="sys-tab" role="tab" aria-selected="false" id="tab-domains" aria-controls="panel-domains">Domains</button>
+              </li>
+            </ul>
           </div>
-          <div class="skill-group">
-            <p class="skill-group-label">Hardware</p>
-            <div class="skill-rack">
-              <span class="skill-item">PCB Design</span>
-              <span class="skill-item">VLSI</span>
-              <span class="skill-item">STM32</span>
-              <span class="skill-item">Computer Architecture</span>
+          <div class="sys-tabs-panels">
+            <div class="sys-tab-panel" id="panel-lang" role="tabpanel" aria-labelledby="tab-lang" data-active="true">
+              <div class="skill-rack">
+                <span class="skill-item">C / C++</span>
+                <span class="skill-item">Python</span>
+                <span class="skill-item">Bash</span>
+                <span class="skill-item">RTOS</span>
+                <span class="skill-item">Embedded Linux</span>
+                <span class="skill-item">SystemVerilog</span>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="card card-pad">
-          <div class="skill-group">
-            <p class="skill-group-label">Tools</p>
-            <div class="skill-rack">
-              <span class="skill-item">Cadence</span>
-              <span class="skill-item">Altium</span>
-              <span class="skill-item">Vivado</span>
-              <span class="skill-item">Quartus</span>
-              <span class="skill-item">MATLAB</span>
-              <span class="skill-item">Yocto</span>
+            <div class="sys-tab-panel" id="panel-hw" role="tabpanel" aria-labelledby="tab-hw">
+              <div class="skill-rack">
+                <span class="skill-item">PCB Design</span>
+                <span class="skill-item">VLSI</span>
+                <span class="skill-item">STM32</span>
+                <span class="skill-item">Computer Architecture</span>
+              </div>
             </div>
-          </div>
-          <div class="skill-group">
-            <p class="skill-group-label">Domains</p>
-            <div class="skill-rack">
-              <span class="skill-item">Robotics</span>
-              <span class="skill-item">Computer Vision</span>
-              <span class="skill-item">Motor Controls</span>
-              <span class="skill-item">ROS</span>
+            <div class="sys-tab-panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools">
+              <div class="skill-rack">
+                <span class="skill-item">Cadence</span>
+                <span class="skill-item">Altium</span>
+                <span class="skill-item">Vivado</span>
+                <span class="skill-item">Quartus</span>
+                <span class="skill-item">MATLAB</span>
+                <span class="skill-item">Yocto</span>
+              </div>
+            </div>
+            <div class="sys-tab-panel" id="panel-domains" role="tabpanel" aria-labelledby="tab-domains">
+              <div class="skill-rack">
+                <span class="skill-item">Robotics</span>
+                <span class="skill-item">Computer Vision</span>
+                <span class="skill-item">Motor Controls</span>
+                <span class="skill-item">ROS</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1104,6 +1120,20 @@
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
     WorkshopBG.init();
+
+    // Sys-tabs: wire up all tab groups on the page
+    document.querySelectorAll('.sys-tabs').forEach(function(tabGroup) {
+      var tabs = tabGroup.querySelectorAll('.sys-tab[role="tab"]');
+      var panels = tabGroup.querySelectorAll('.sys-tab-panel[role="tabpanel"]');
+      tabs.forEach(function(tab, i) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.setAttribute('aria-selected', 'false'); });
+          panels.forEach(function(p) { delete p.dataset.active; });
+          tab.setAttribute('aria-selected', 'true');
+          if (panels[i]) panels[i].dataset.active = 'true';
+        });
+      });
+    });
   </script>
 </body>
 </html>
