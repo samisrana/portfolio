@@ -11,6 +11,7 @@
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%23c47a3a' font-family='monospace' font-weight='700'>SR</text></svg>">
   <link rel="stylesheet" href="workshop.css" />
+  <link rel="stylesheet" href="workshop-anim.css" />
   <style>
     /* ── Page-specific styles ── */
 
@@ -292,6 +293,9 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: var(--g-h);
+    }
+    .projects-grid > .module-card--featured {
+      grid-column: 1 / -1;
     }
 
     /* Placeholder module card */
@@ -790,75 +794,6 @@
       </div>
     </section>
 
-    <!-- System Status Console -->
-    <div class="sys-console" style="margin-bottom: var(--g);">
-      <div class="sys-console-header">
-        <svg class="console-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-          <line x1="8" y1="21" x2="16" y2="21"/>
-          <line x1="12" y1="17" x2="12" y2="21"/>
-        </svg>
-        <span class="console-title">Workshop Console</span>
-        <span class="console-ver">v1.0.0</span>
-      </div>
-
-      <div class="sys-console-body">
-        <div class="console-row">
-          <span class="console-label">Status</span>
-          <span class="console-value">
-            <span class="console-status">
-              <span class="led on"></span>
-              <span>ONLINE | Available for opportunities</span>
-            </span>
-          </span>
-        </div>
-
-        <div class="console-row">
-          <span class="console-label">Focus</span>
-          <span class="console-value accent">Embedded Systems · VLSI · Hardware Design</span>
-        </div>
-
-        <div class="console-row">
-          <span class="console-label">Modules</span>
-          <span class="console-value">
-            <span class="console-modules">
-              <span class="console-module">
-                <span class="mod-led"></span>
-                VLSI-01
-              </span>
-              <span class="console-module queued">
-                <span class="mod-led"></span>
-                FW-02
-              </span>
-              <span class="console-module queued">
-                <span class="mod-led"></span>
-                PCB-03
-              </span>
-            </span>
-          </span>
-        </div>
-
-        <div class="console-row">
-          <span class="console-label">Latest Log</span>
-          <span class="console-value">
-            <a href="posts/meeting-lisa-su.html" class="console-log-entry" style="text-decoration: none;">
-              <span class="log-id">LOG-001</span>
-              <span class="log-title">Meeting Lisa Su at RPI's Fireside Chat</span>
-              <span class="log-date">2025.05.14</span>
-            </a>
-          </span>
-        </div>
-      </div>
-
-      <div class="sys-console-footer">
-        <span class="console-uptime">
-          <span class="uptime-led"></span>
-          SYS.ACTIVE
-        </span>
-        <span>Philadelphia, PA</span>
-      </div>
-    </div>
-
     <div class="station-mark" data-station="ST-02 · BUILD BENCH"></div>
 
     <!-- Build Bench (Projects) -->
@@ -868,39 +803,38 @@
       </div>
 
       <div class="projects-grid">
-        <!-- VLSI Module Card -->
-        <article class="module-card">
-          <div class="module-card-header">
-            <span class="module-id">MODULE-01</span>
-            <span class="module-status">COMPLETE</span>
-          </div>
-          <div class="module-card-body">
-            <div class="module-thumb">
-              <a href="vlsi-cmos-design.html">
-                <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
-              </a>
-            </div>
-            <div class="module-specs">
-              <h3>CMOS Logic Circuit Design</h3>
-              <dl class="spec-grid">
-                <dt>Function</dt>
-                <dd>F = B(A+C)</dd>
-                <dt>Tool</dt>
-                <dd>Cadence Virtuoso</dd>
-                <dt>Process</dt>
-                <dd>GlobalFoundries PDK</dd>
-                <dt>Area</dt>
-                <dd>12.748 µm²</dd>
-              </dl>
+        <!-- VLSI Module Card — featured -->
+        <article class="module-card module-card--featured">
+          <div class="module-thumb-hero">
+            <a href="vlsi-cmos-design.html" aria-label="Open CMOS Logic Circuit Design module">
+              <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
+            </a>
+            <div class="module-thumb-meta">
+              <span class="module-id">MODULE-01</span>
+              <span class="module-status">COMPLETE</span>
             </div>
           </div>
-          <div class="module-card-footer">
-            <div class="tags">
-              <span class="tag">VLSI</span>
-              <span class="tag">Cadence</span>
-              <span class="tag">CMOS</span>
+          <div class="module-feature-body">
+            <h3>CMOS Logic Circuit Design</h3>
+            <p class="module-feature-lede">
+              A full-custom CMOS implementation of the boolean function
+              <code>F = B(A&nbsp;+&nbsp;C)</code> — schematic capture, transistor sizing, and physical
+              layout in Cadence Virtuoso against the GlobalFoundries 180nm PDK. Verified with
+              DRC/LVS, then characterized for delay and area.
+            </p>
+            <ul class="module-spec-chips">
+              <li><span>Tool</span><b>Cadence Virtuoso</b></li>
+              <li><span>Process</span><b>GF 180nm</b></li>
+              <li><span>Area</span><b>12.748&nbsp;µm²</b></li>
+            </ul>
+            <div class="module-card-footer">
+              <div class="tags">
+                <span class="tag">VLSI</span>
+                <span class="tag">Cadence</span>
+                <span class="tag">CMOS</span>
+              </div>
+              <a class="btn btn-secondary" href="vlsi-cmos-design.html">Open Module →</a>
             </div>
-            <a class="btn btn-secondary" href="vlsi-cmos-design.html">Open Module →</a>
           </div>
         </article>
 
@@ -1117,9 +1051,15 @@
 
   <!-- Scripts -->
   <script src="workshop-bg.js"></script>
+  <script src="workshop-anim.js"></script>
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
     WorkshopBG.init();
+    WorkshopAnim.init({
+      boot: true, type: true,
+      acq: true, station: true, reels: true,
+      signal: true, parallax: true, sectionLabel: true
+    });
 
     // Sys-tabs: wire up all tab groups on the page
     document.querySelectorAll('.sys-tabs').forEach(function(tabGroup) {

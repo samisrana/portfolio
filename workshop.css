@@ -622,6 +622,141 @@ body.zone-log .module-card {
   opacity: 0.4;
 }
 
+/* ── 11b. FEATURED MODULE CARD (single-up hero) ─────────────── */
+.module-card--featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-rows: 1fr;
+  /* Override the base card's rows */
+}
+.module-card--featured > .module-thumb-hero {
+  position: relative;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+  min-height: 360px;
+}
+.module-card--featured .module-thumb-hero a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.module-card--featured .module-thumb-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(.2,.7,.2,1);
+}
+.module-card--featured:hover .module-thumb-hero img {
+  transform: scale(1.03);
+}
+.module-thumb-meta {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.module-thumb-meta .module-id,
+.module-thumb-meta .module-status {
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 3px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.module-thumb-meta .module-status {
+  color: var(--zone-accent, var(--copper));
+  border-color: color-mix(in oklab, var(--zone-accent, var(--copper)) 40%, var(--border));
+}
+
+.module-feature-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 26px;
+}
+.module-feature-body h3 {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text);
+}
+.module-feature-lede {
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--text-dim);
+  margin: 0;
+  text-wrap: pretty;
+}
+.module-feature-lede code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: color-mix(in oklab, var(--zone-accent, var(--copper)) 12%, transparent);
+  color: var(--text);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid color-mix(in oklab, var(--zone-accent, var(--copper)) 22%, transparent);
+}
+.module-spec-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.module-spec-chips li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 5px 9px;
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+}
+.module-spec-chips li span {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.module-spec-chips li b {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-family: var(--mono);
+}
+.module-card--featured .module-card-footer {
+  margin-top: auto;
+  padding: 0;
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .module-card--featured {
+    grid-template-columns: 1fr;
+  }
+  .module-card--featured > .module-thumb-hero {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    min-height: 240px;
+  }
+}
+
 /* ── 12. LOG ENTRIES (engineering notebook style) ─────────── */
 .log-entries-list {
   display: flex;
@@ -894,13 +1029,13 @@ body.zone-bench::after {
 
 /* Scene element styles — faint but legible physical silhouettes */
 :root {
-  --c-scene: rgba(196,122,58,0.11);
+  --c-scene: rgba(196,122,58,0.055);
 }
-body.zone-bench { --c-scene: rgba(46,168,154,0.09); }
-body.zone-log   { --c-scene: rgba(201,152,58,0.10); }
-:root.light { --c-scene: rgba(139,74,24,0.13); }
-:root.light body.zone-bench { --c-scene: rgba(22,107,96,0.11); }
-:root.light body.zone-log   { --c-scene: rgba(122,90,21,0.12); }
+body.zone-bench { --c-scene: rgba(46,168,154,0.045); }
+body.zone-log   { --c-scene: rgba(201,152,58,0.05); }
+:root.light { --c-scene: rgba(139,74,24,0.065); }
+:root.light body.zone-bench { --c-scene: rgba(22,107,96,0.055); }
+:root.light body.zone-log   { --c-scene: rgba(122,90,21,0.06); }
 
 .bg-scene .s-line  { fill: none; stroke: var(--c-scene); stroke-width: 0.9; }
 .bg-scene .s-thick { fill: none; stroke: var(--c-scene); stroke-width: 2; }
