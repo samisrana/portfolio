@@ -37,16 +37,38 @@
      - Boot console prints status lines one by one
      - Overlay fades, content fades in
      ============================================================ */
+  var VISIT_KEY = 'workshop_last_visit';
+
+  function fmtLastLogin(ts) {
+    var d = new Date(parseInt(ts, 10));
+    var days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+    return days[d.getDay()] + ' ' + months[d.getMonth()] + ' ' + d.getDate() + ' ' +
+           pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
   var Boot = {
     sequence: [
-      { lbl: 'POWER',        val: '12V · 3.3V',     d: 80  },
-      { lbl: 'CLOCK',        val: '48.000 MHz',     d: 110 },
-      { lbl: 'OSCILLOSCOPE', val: 'CALIBRATED',     d: 120 },
-      { lbl: 'BACKGROUND',   val: 'GIRIH · SIGNAL', d: 110 },
-      { lbl: 'WORKSHOP',     val: 'ONLINE',         d: 130 }
+      { lbl: 'POWER',       val: '12V · 3.3V',   d: 80  },
+      { lbl: 'CLOCK',       val: '48.000 MHz',   d: 110 },
+      { lbl: 'BUILD BENCH', val: 'MODULES LOADED', d: 120 },
+      { lbl: 'IDENTITY',    val: 'AUTH OK',       d: 110 },
+      { lbl: 'WORKSHOP',    val: 'ONLINE',        d: 130 }
     ],
 
     run: function(done) {
+      // Read last visit then immediately record current visit
+      var lastVisit = null;
+      try { lastVisit = localStorage.getItem(VISIT_KEY); } catch(_) {}
+      try { localStorage.setItem(VISIT_KEY, Date.now()); } catch(_) {}
+
+      // Build sequence, appending last-login line if a previous visit exists
+      var seq = Boot.sequence.slice();
+      if (lastVisit) {
+        seq.push({ lbl: 'LAST LOGIN', val: fmtLastLogin(lastVisit), d: 90 });
+      }
+
       // Build overlay
       var overlay = document.createElement('div');
       overlay.className = 'boot-overlay';
@@ -66,7 +88,7 @@
       var i = 0;
       var lines = [];
       function next() {
-        if (i >= Boot.sequence.length) {
+        if (i >= seq.length) {
           // Reveal content + fade overlay
           setTimeout(function() {
             html.classList.add('boot-content');
@@ -79,7 +101,7 @@
           }, 220);
           return;
         }
-        var step = Boot.sequence[i++];
+        var step = seq[i++];
         var line = document.createElement('div');
         line.className = 'boot-line';
         line.innerHTML =
@@ -94,6 +116,38 @@
         setTimeout(next, step.d + 60);
       }
       next();
+    },
+
+    runLastLogin: function() {
+      var lastVisit = null;
+      try { lastVisit = localStorage.getItem(VISIT_KEY); } catch(_) {}
+      try { localStorage.setItem(VISIT_KEY, Date.now()); } catch(_) {}
+      if (!lastVisit) return;
+
+      var overlay = document.createElement('div');
+      overlay.className = 'boot-overlay boot-overlay--slim';
+      var console_ = document.createElement('div');
+      console_.className = 'boot-console';
+      var line = document.createElement('div');
+      line.className = 'boot-line';
+      line.innerHTML =
+        '<span class="lbl">&gt; LAST LOGIN</span>' +
+        '<span class="val">' + fmtLastLogin(lastVisit) + '</span>' +
+        '<span class="ok">[OK]</span>';
+      console_.appendChild(line);
+      overlay.appendChild(console_);
+      document.body.appendChild(overlay);
+
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { line.classList.add('shown'); });
+      });
+
+      setTimeout(function() {
+        overlay.classList.add('done');
+        setTimeout(function() {
+          overlay.parentNode && overlay.parentNode.removeChild(overlay);
+        }, 750);
+      }, 1800);
     }
   };
 
@@ -637,6 +691,9 @@
           markBooted();
           if (enableType) Type.run();
         });
+      } else if (!!opts.boot && !isFirstVisit() && !prefersReducedMotion) {
+        // Return visit — show just the last login line.
+        Boot.runLastLogin();
       } else if (enableType) {
         // No boot, but still first visit — just do the type-in.
         Type.run();

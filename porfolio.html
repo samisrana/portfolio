@@ -291,8 +291,11 @@
     /* Projects grid */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--g-h);
+    }
+    @media (max-width: 720px) {
+      .projects-grid { grid-template-columns: 1fr; }
     }
     .projects-grid > .module-card--featured {
       grid-column: 1 / -1;
@@ -710,8 +713,8 @@
   <header>
     <div class="container nav">
       <a class="brand" href="porfolio.html" aria-label="Sami's Workshop, home">
-<span class="brand-text">
-<span class="brand-name">Sami's Workshop</span>
+        <span class="brand-text">
+          <span class="brand-name">Sami's Workshop</span>
         </span>
       </a>
 
@@ -784,7 +787,7 @@
           </div>
           <div class="portrait-stat">
             <div class="val">UPenn '28</div>
-            <div class="lbl">MS EE</div>
+            <div class="lbl">MSE EE</div>
           </div>
           <div class="portrait-stat" style="grid-column: 1 / -1; border-left: none; border-top: 1px solid var(--border);">
             <div class="val">2+</div>
@@ -803,55 +806,110 @@
       </div>
 
       <div class="projects-grid">
-        <!-- VLSI Module Card — featured -->
-        <article class="module-card module-card--featured">
-          <div class="module-thumb-hero">
-            <a href="vlsi-cmos-design.html" aria-label="Open CMOS Logic Circuit Design module">
-              <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
-            </a>
-            <div class="module-thumb-meta">
-              <span class="module-id">MODULE-01</span>
-              <span class="module-status">COMPLETE</span>
+        <!-- VLSI Module Card -->
+        <article class="module-card">
+          <div class="module-card-header">
+            <span class="module-id">MODULE-01</span>
+            <span class="module-status">COMPLETE</span>
+          </div>
+          <div class="module-card-body">
+            <div class="module-thumb">
+              <a href="vlsi-cmos-design.html">
+                <img src="images/cmos_layout.png" alt="CMOS circuit layout" />
+              </a>
+            </div>
+            <div class="module-specs">
+              <h3>CMOS Logic Circuit Design</h3>
+              <dl class="spec-grid">
+                <dt>Function</dt>
+                <dd>F = B(A+C)</dd>
+                <dt>Tool</dt>
+                <dd>Cadence Virtuoso</dd>
+                <dt>Process</dt>
+                <dd>GlobalFoundries PDK</dd>
+                <dt>Area</dt>
+                <dd>12.748 µm²</dd>
+              </dl>
             </div>
           </div>
-          <div class="module-feature-body">
-            <h3>CMOS Logic Circuit Design</h3>
-            <p class="module-feature-lede">
-              A full-custom CMOS implementation of the boolean function
-              <code>F = B(A&nbsp;+&nbsp;C)</code> — schematic capture, transistor sizing, and physical
-              layout in Cadence Virtuoso against the GlobalFoundries 180nm PDK. Verified with
-              DRC/LVS, then characterized for delay and area.
-            </p>
-            <ul class="module-spec-chips">
-              <li><span>Tool</span><b>Cadence Virtuoso</b></li>
-              <li><span>Process</span><b>GF 180nm</b></li>
-              <li><span>Area</span><b>12.748&nbsp;µm²</b></li>
-            </ul>
-            <div class="module-card-footer">
-              <div class="tags">
-                <span class="tag">VLSI</span>
-                <span class="tag">Cadence</span>
-                <span class="tag">CMOS</span>
-              </div>
-              <a class="btn btn-secondary" href="vlsi-cmos-design.html">Open Module →</a>
+          <div class="module-card-footer">
+            <div class="tags">
+              <span class="tag">VLSI</span>
+              <span class="tag">Cadence</span>
+              <span class="tag">CMOS</span>
             </div>
+            <a class="btn btn-secondary" href="vlsi-cmos-design.html">Open Module →</a>
           </div>
         </article>
 
-        <!-- Next module - queued -->
-        <div class="placeholder-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="ph-label">MODULE-02</span>
-            <span class="ph-label">QUEUED</span>
+        <!-- Gesture RC Car Module Card -->
+        <article class="module-card">
+          <div class="module-card-header">
+            <span class="module-id">MODULE-02</span>
+            <span class="module-status">COMPLETE</span>
           </div>
-          <h3>Embedded Firmware Project</h3>
-          <p>Next build from firmware, PCB design, or computer architecture work. In progress.</p>
-          <div class="tags" style="margin-top: 4px;">
-            <span class="tag">Firmware</span>
-            <span class="tag">STM32</span>
-            <span class="tag">PCB</span>
+          <div class="module-card-body">
+            <div class="module-thumb">
+              <a href="gesture-rc-car.html">
+                <img src="images/EmCar.jpeg" alt="Gesture RC Car on RPI-RSLK platform" />
+              </a>
+            </div>
+            <div class="module-specs">
+              <h3>Gesture RC Car</h3>
+              <dl class="spec-grid">
+                <dt>Platform</dt>
+                <dd>RPI-RSLK</dd>
+                <dt>MCU</dt>
+                <dd>MSP432</dd>
+                <dt>Interface</dt>
+                <dd>I2C</dd>
+                <dt>Control</dt>
+                <dd>PID</dd>
+              </dl>
+            </div>
           </div>
-        </div>
+          <div class="module-card-footer">
+            <div class="tags">
+              <span class="tag">Embedded</span>
+              <span class="tag">Robotics</span>
+              <span class="tag">C</span>
+              <span class="tag">I2C</span>
+            </div>
+            <a class="btn btn-secondary" href="gesture-rc-car.html">Open Module →</a>
+          </div>
+        </article>
+
+        <!-- ESP8266 Time Sync Module Card -->
+        <article class="module-card">
+          <div class="module-card-header">
+            <span class="module-id">MODULE-03</span>
+            <span class="module-status" style="color: #e8a838;">IN PROGRESS</span>
+          </div>
+          <div class="module-card-body">
+            <div class="module-specs">
+              <h3>ESP8266 Wireless Time Sync</h3>
+              <dl class="spec-grid">
+                <dt>Platform</dt>
+                <dd>ESP8266 NodeMCU</dd>
+                <dt>Nodes</dt>
+                <dd>3</dd>
+                <dt>Protocol</dt>
+                <dd>Wi-Fi / UDP</dd>
+                <dt>Inspired by</dt>
+                <dd>Yener &amp; Sivrikaya 2004</dd>
+              </dl>
+            </div>
+          </div>
+          <div class="module-card-footer">
+            <div class="tags">
+              <span class="tag">Embedded</span>
+              <span class="tag">C++</span>
+              <span class="tag">Wi-Fi</span>
+              <span class="tag">Distributed Systems</span>
+            </div>
+            <a class="btn btn-secondary" href="esp8266-time-sync.html">Open Module →</a>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -866,7 +924,7 @@
       <div class="log-entries-list" style="--zone-accent: var(--gold); --zone-dim: var(--gold-dim); --zone-border: var(--gold-border);">
         <article class="log-entry">
           <div class="entry-margin">
-            <span class="entry-id">LOG-001</span>
+            <span class="entry-id">LOG-002</span>
             <span class="entry-date">2025<br>MAY 14</span>
             <span class="entry-type">Field Note</span>
           </div>
@@ -885,6 +943,31 @@
                 <span class="tag">RPI</span>
               </div>
               <a class="entry-read-link" href="posts/meeting-lisa-su.html">→ Read entry</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="log-entry">
+          <div class="entry-margin">
+            <span class="entry-id">LOG-001</span>
+            <span class="entry-date">2026<br>MAR 29</span>
+            <span class="entry-type">Field Note</span>
+          </div>
+          <div class="entry-body">
+            <a class="entry-title" href="posts/gf-visit.html">Inside a GlobalFoundries Fab</a>
+            <div class="entry-meta">
+              <span class="entry-meta-item">S. Rana</span>
+              <span class="entry-meta-item">Event</span>
+              <span class="entry-meta-item">Semiconductors</span>
+            </div>
+            <p class="entry-excerpt">Touring a GF fab after years of studying computing top to bottom. Seeing where the abstraction stack meets physical reality.</p>
+            <div class="entry-footer">
+              <div class="tags">
+                <span class="tag">GlobalFoundries</span>
+                <span class="tag">Semiconductors</span>
+                <span class="tag">CHIPS Act</span>
+              </div>
+              <a class="entry-read-link" href="posts/gf-visit.html">→ Read entry</a>
             </div>
           </div>
         </article>
@@ -908,13 +991,14 @@
           <p>
             Graduate student at the <strong>University of Pennsylvania</strong> (M.S., expected 2028),
             and a graduate of <strong>Rensselaer Polytechnic Institute</strong> with dual degrees in
-            Electrical and Computer Systems Engineering. I work at the boundary of hardware and software,
-            where design decisions at the silicon level ripple through to running systems.
+            Electrical and Computer Systems Engineering. I work across hardware and software. What gets
+            decided at the silicon level ends up shaping how systems actually run.
           </p>
           <p>
-            During my internship at <strong>Kulicke &amp; Soffa</strong>, I gained industry experience
-            in semiconductor back-end assembly and advanced chip packaging. At RPI I contributed to
-            undergraduate research in robotics and computer hardware.
+            At <strong>Kulicke &amp; Soffa</strong> I worked in semiconductor back-end assembly and
+            chip packaging. At RPI I did research in robotics and computer hardware. I'm also co-founder
+            and firmware engineer at <a href="https://deuracontrols.com/" target="_blank" rel="noopener noreferrer"><strong>Deura Controls</strong></a>,
+            building embedded software for environmental sensor and control systems.
           </p>
         </div>
 
@@ -931,13 +1015,13 @@
                 <button class="sys-tab" role="tab" aria-selected="true" id="tab-lang" aria-controls="panel-lang">Languages</button>
               </li>
               <li role="presentation">
-                <button class="sys-tab" role="tab" aria-selected="false" id="tab-hw" aria-controls="panel-hw">Hardware</button>
+                <button class="sys-tab" role="tab" aria-selected="false" id="tab-hw" aria-controls="panel-hw">Embedded</button>
               </li>
               <li role="presentation">
                 <button class="sys-tab" role="tab" aria-selected="false" id="tab-tools" aria-controls="panel-tools">Tools</button>
               </li>
               <li role="presentation">
-                <button class="sys-tab" role="tab" aria-selected="false" id="tab-domains" aria-controls="panel-domains">Domains</button>
+                <button class="sys-tab" role="tab" aria-selected="false" id="tab-domains" aria-controls="panel-domains">Libraries &amp; OS</button>
               </li>
             </ul>
           </div>
@@ -946,36 +1030,60 @@
               <div class="skill-rack">
                 <span class="skill-item">C / C++</span>
                 <span class="skill-item">Python</span>
+                <span class="skill-item">Java</span>
+                <span class="skill-item">TypeScript</span>
+                <span class="skill-item">x86 / ARM Assembly</span>
                 <span class="skill-item">Bash</span>
-                <span class="skill-item">RTOS</span>
-                <span class="skill-item">Embedded Linux</span>
-                <span class="skill-item">SystemVerilog</span>
+                <span class="skill-item">HTML / CSS</span>
+                <span class="skill-item">VHDL</span>
+                <span class="skill-item">Verilog</span>
+                <span class="skill-item">MATLAB</span>
               </div>
             </div>
             <div class="sys-tab-panel" id="panel-hw" role="tabpanel" aria-labelledby="tab-hw">
               <div class="skill-rack">
+                <span class="skill-item">STM32 HAL / LL</span>
+                <span class="skill-item">RTOS Threading</span>
+                <span class="skill-item">DMA</span>
+                <span class="skill-item">ADC / DAC</span>
+                <span class="skill-item">UART</span>
+                <span class="skill-item">I2C</span>
+                <span class="skill-item">SPI</span>
+                <span class="skill-item">PWM</span>
+                <span class="skill-item">Timers</span>
+                <span class="skill-item">Interrupts</span>
+                <span class="skill-item">GPIO</span>
                 <span class="skill-item">PCB Design</span>
                 <span class="skill-item">VLSI</span>
-                <span class="skill-item">STM32</span>
-                <span class="skill-item">Computer Architecture</span>
               </div>
             </div>
             <div class="sys-tab-panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools">
               <div class="skill-rack">
-                <span class="skill-item">Cadence</span>
-                <span class="skill-item">Altium</span>
+                <span class="skill-item">Cadence Virtuoso</span>
+                <span class="skill-item">Altium Designer</span>
                 <span class="skill-item">Vivado</span>
-                <span class="skill-item">Quartus</span>
-                <span class="skill-item">MATLAB</span>
+                <span class="skill-item">Intel Quartus</span>
+                <span class="skill-item">LTSpice</span>
+                <span class="skill-item">LabVIEW</span>
+                <span class="skill-item">STM32CubeIDE</span>
+                <span class="skill-item">gem5</span>
                 <span class="skill-item">Yocto</span>
+                <span class="skill-item">Git</span>
+                <span class="skill-item">Docker</span>
+                <span class="skill-item">VIM / Neovim</span>
+                <span class="skill-item">WSL</span>
               </div>
             </div>
             <div class="sys-tab-panel" id="panel-domains" role="tabpanel" aria-labelledby="tab-domains">
               <div class="skill-rack">
-                <span class="skill-item">Robotics</span>
-                <span class="skill-item">Computer Vision</span>
-                <span class="skill-item">Motor Controls</span>
+                <span class="skill-item">OpenCV</span>
+                <span class="skill-item">TensorFlow</span>
+                <span class="skill-item">NumPy</span>
+                <span class="skill-item">CMSIS</span>
                 <span class="skill-item">ROS</span>
+                <span class="skill-item">freeRTOS</span>
+                <span class="skill-item">Linux (Ubuntu / Debian / RHEL)</span>
+                <span class="skill-item">Windows 10 / 11</span>
               </div>
             </div>
           </div>

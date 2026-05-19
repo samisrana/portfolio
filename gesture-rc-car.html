@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gesture RC Car - Build Bench - Sami's Workshop</title>
+  <meta name="description" content="Gesture-controlled differential-drive robot using a handheld CMPS12 IMU, I2C, encoder dead reckoning, and proportional heading control on the RPI-RSLK platform." />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%232ea89a' font-family='monospace' font-weight='700'>SR</text></svg>">
+  <link rel="stylesheet" href="workshop.css" />
+  <link rel="stylesheet" href="workshop-anim.css" />
+  <style>
+    /* ── Project detail - page-specific styles ── */
+
+    .doc-container { max-width: 860px; }
+
+    .module-header { padding: 48px 0 32px; }
+    .module-kicker {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .module-kicker::before { content: ''; width: 20px; height: 1px; background: var(--turquoise); }
+    .module-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 700;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      margin-bottom: 28px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--turquoise); }
+
+    .doc-section { margin: 48px 0; }
+    .doc-section h2 {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .spec-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin-bottom: 32px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+    .spec-strip-item {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 18px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 100px;
+    }
+    .spec-strip-item:last-child { border-right: none; }
+    .spec-strip-key {
+      color: var(--text-dim);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      margin-bottom: 3px;
+    }
+    .spec-strip-val {
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .spec-strip-val.complete { color: var(--turquoise); }
+
+    .doc-section h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 20px 0 10px;
+    }
+    .doc-section p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      margin: 0 0 14px;
+    }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section strong { color: var(--text); font-weight: 500; }
+    .doc-section ul, .doc-section ol {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      padding-left: 20px;
+      margin: 0 0 14px;
+      line-height: 1.7;
+    }
+    .doc-section li { margin-bottom: 6px; }
+
+    .callout {
+      background: var(--turquoise-dim);
+      border-left: 3px solid var(--turquoise);
+      padding: 14px 18px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin: 16px 0;
+    }
+    .callout p {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+    }
+    .callout p + p { margin-top: 8px; }
+
+    figure { margin: 20px 0; }
+    figure img {
+      width: 100%;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      display: block;
+    }
+    figcaption {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    .fig-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 580px) { .fig-grid-2 { grid-template-columns: 1fr; } }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; }
+    th {
+      background: var(--surface-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    td {
+      color: var(--text-dim);
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+    }
+    td:first-child { color: var(--text); }
+
+    code {
+      font-family: var(--mono);
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: var(--r-sm);
+      font-size: 0.85em;
+      color: var(--turquoise);
+    }
+  </style>
+
+  <script>
+    (function(){
+      var p = localStorage.getItem('theme');
+      if (p) { document.documentElement.classList.toggle('light', p === 'light'); }
+      else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+  </script>
+</head>
+
+<body class="zone-bench">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Background Layer 1: Circuit Traces -->
+  <div class="bg-layer bg-circuit" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <path class="trace-thick" d="M0,120 H350 L380,150 H760"/>
+      <path class="trace-thick" d="M0,320 H180 L220,360 H560 L600,320 H1920"/>
+      <path class="trace-thick" d="M0,620 H280 L320,660 H680"/>
+      <path class="trace-thick" d="M1920,220 H1480 L1440,260 H1080"/>
+      <path class="trace-thick" d="M1920,520 H1560 L1520,480 H1160"/>
+      <path class="trace-thick" d="M1920,820 H1360 L1320,860 H880"/>
+      <path class="trace" d="M180,0 V210 L220,250 V420"/>
+      <path class="trace" d="M380,120 V320"/>
+      <path class="trace" d="M580,0 V160 L620,200 V360"/>
+      <path class="trace" d="M760,150 V300 L800,340 V520"/>
+      <path class="trace" d="M1160,480 V620 L1120,660 V820"/>
+      <path class="trace" d="M1360,0 V160 L1320,200 V370"/>
+      <path class="trace" d="M1560,220 V420 L1520,460 V620"/>
+      <path class="trace" d="M1080,260 V470"/>
+      <path class="trace" d="M280,220 L330,270 H480 L530,220"/>
+      <path class="trace" d="M680,360 L730,410 H880 L930,360"/>
+      <path class="trace" d="M980,520 L1030,570 H1120 L1170,520"/>
+      <path class="trace" d="M1260,370 L1310,420 H1460 L1510,370"/>
+      <path class="trace-thick" d="M0,920 H240 L280,880 H520 L560,920 H820"/>
+      <path class="trace" d="M240,920 V1080"/>
+      <path class="trace" d="M520,880 V720 L560,680 H720"/>
+      <path class="trace" d="M820,920 L860,880 V760"/>
+      <path class="trace-thick" d="M1920,960 H1620 L1580,920 H1320 L1280,960 H1060"/>
+      <path class="trace" d="M1320,920 V800 L1280,760 H1120"/>
+      <circle class="via" cx="180" cy="210" r="3.5"/>
+      <circle class="via" cx="380" cy="120" r="3.5"/>
+      <circle class="via" cx="380" cy="320" r="3.5"/>
+      <circle class="via" cx="580" cy="160" r="3.5"/>
+      <circle class="via" cx="760" cy="150" r="3.5"/>
+      <circle class="via" cx="760" cy="300" r="3.5"/>
+      <circle class="via" cx="220" cy="360" r="3.5"/>
+      <circle class="via" cx="600" cy="320" r="3.5"/>
+      <circle class="via" cx="1080" cy="260" r="3.5"/>
+      <circle class="via" cx="1160" cy="480" r="3.5"/>
+      <circle class="via" cx="1160" cy="620" r="3.5"/>
+      <circle class="via" cx="1360" cy="160" r="3.5"/>
+      <circle class="via" cx="1480" cy="220" r="3.5"/>
+      <circle class="via" cx="1560" cy="420" r="3.5"/>
+      <circle class="via" cx="1520" cy="460" r="3.5"/>
+      <circle class="via" cx="1320" cy="860" r="3.5"/>
+      <circle class="via" cx="240"  cy="920" r="3.5"/>
+      <circle class="via" cx="520"  cy="880" r="3.5"/>
+      <circle class="via" cx="820"  cy="920" r="3.5"/>
+      <circle class="via" cx="1320" cy="920" r="3.5"/>
+      <circle class="via" cx="1620" cy="960" r="3.5"/>
+      <rect class="pad" x="163" y="395" width="18" height="18" rx="2"/>
+      <rect class="pad" x="603" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="802" y="318" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1062" y="448" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1342" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1542" y="598" width="18" height="18" rx="2"/>
+      <rect class="pad" x="318"  y="640" width="18" height="18" rx="2"/>
+      <rect class="pad" x="708"  y="658" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1102" y="798" width="18" height="18" rx="2"/>
+      <rect class="pad" x="848"  y="748" width="18" height="18" rx="2"/>
+      <circle class="glow-orb" cx="280"  cy="270"  r="160"/>
+      <circle class="glow-orb" cx="1580" cy="360"  r="190"/>
+      <circle class="glow-orb" cx="880"  cy="720"  r="210"/>
+      <circle class="glow-orb" cx="1180" cy="920"  r="170"/>
+      <circle class="glow-orb" cx="500"  cy="860"  r="150"/>
+    </svg>
+  </div>
+
+  <!-- Background Layer 2: Girih Geometry (canvas) -->
+  <canvas class="bg-layer bg-geo" id="geo-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 3: Signal Waves (canvas) -->
+  <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 4: Physical Scene - Workbench -->
+  <div class="bg-layer bg-scene" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <line class="s-thick" x1="0"    y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="0"    y1="1080" x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="480"  y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="1440" y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="226"  y1="954"  x2="1694" y2="954"/>
+      <line class="s-line"  x1="338"  y1="840"  x2="1582" y2="840"/>
+      <line class="s-line"  x1="451"  y1="760"  x2="1469" y2="760"/>
+      <rect class="s-fill" x="680" y="355" width="600" height="80" rx="0"/>
+      <line class="s-thick" x1="680"  y1="340" x2="1240" y2="340"/>
+      <line class="s-line"  x1="680"  y1="308" x2="1240" y2="308"/>
+      <line class="s-line"  x1="720"  y1="308" x2="720"  y2="435"/>
+      <line class="s-line"  x1="840"  y1="308" x2="840"  y2="435"/>
+      <line class="s-line"  x1="1080" y1="308" x2="1080" y2="435"/>
+      <line class="s-line"  x1="1200" y1="308" x2="1200" y2="435"/>
+      <circle class="s-line" cx="748" cy="284" r="18"/><circle class="s-line" cx="748" cy="284" r="10"/><circle class="s-line" cx="748" cy="284" r="3"/>
+      <circle class="s-line" cx="790" cy="286" r="16"/><circle class="s-line" cx="790" cy="286" r="9"/> <circle class="s-line" cx="790" cy="286" r="3"/>
+      <circle class="s-line" cx="830" cy="285" r="17"/><circle class="s-line" cx="830" cy="285" r="10"/><circle class="s-line" cx="830" cy="285" r="3"/>
+      <g opacity="0.45">
+        <polygon class="s-fill" points="120,780 1800,780 1358,580 562,580"/>
+        <rect class="s-fill" x="120" y="780" width="1680" height="36"/>
+      </g>
+      <line class="s-thick" x1="120"  y1="780" x2="1800" y2="780"/>
+      <line class="s-thick" x1="562"  y1="580" x2="1358" y2="580"/>
+      <line class="s-line"  x1="120"  y1="780" x2="562"  y2="580"/>
+      <line class="s-line"  x1="1800" y1="780" x2="1358" y2="580"/>
+      <line class="s-thick" x1="120"  y1="816" x2="1800" y2="816"/>
+      <rect class="s-thick" x="146"  y="816" width="22"  height="264"/>
+      <rect class="s-line"  x="134"  y="1062" width="46" height="14" rx="2"/>
+      <rect class="s-thick" x="1752" y="816" width="22"  height="264"/>
+      <rect class="s-line"  x="1740" y="1062" width="46" height="14" rx="2"/>
+      <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
+      <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
+      <circle class="s-line" cx="251" cy="738" r="26"/>
+      <circle class="s-fill" cx="251" cy="738" r="7"/>
+      <rect class="s-fill"  x="568" y="770" width="24" height="14" rx="3"/>
+      <line class="s-thick" x1="580" y1="780" x2="580" y2="700"/>
+      <line class="s-thick" x1="580" y1="700" x2="634" y2="614"/>
+      <line class="s-thick" x1="634" y1="614" x2="672" y2="558"/>
+      <ellipse class="s-line" cx="686" cy="550" rx="28" ry="12"/>
+      <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
+      <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
+      <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
+      <polyline class="s-thick" points="1398,692 1398,650 1420,650 1420,692 1443,692 1443,650 1466,650 1466,692 1489,692 1489,650 1512,650 1512,692 1554,692"/>
+      <circle class="s-line" cx="1614" cy="642" r="14"/><circle class="s-fill" cx="1614" cy="642" r="4"/>
+      <circle class="s-line" cx="1656" cy="642" r="14"/><circle class="s-fill" cx="1656" cy="642" r="4"/>
+      <circle class="s-line" cx="1614" cy="684" r="12"/><circle class="s-fill" cx="1614" cy="684" r="4"/>
+      <circle class="s-line" cx="1656" cy="684" r="12"/><circle class="s-fill" cx="1656" cy="684" r="4"/>
+      <circle class="s-glow" cx="251"  cy="700" r="110"/>
+      <circle class="s-glow" cx="960"  cy="420" r="180"/>
+      <circle class="s-glow" cx="1514" cy="700" r="130"/>
+    </svg>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop - home">
+        <span class="brand-text">
+          <span class="brand-name">Sami's Workshop</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="porfolio.html">Workbench</a>
+        <a href="porfolio.html#projects" class="active">Build Bench</a>
+        <a href="blog.html">Sami's Log</a>
+        <a href="porfolio.html#about">About</a>
+        <a href="porfolio.html#contact">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a href="https://github.com/samisrana" target="_blank" rel="noopener"
+           aria-label="GitHub" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" rel="noopener"
+           aria-label="LinkedIn" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+        </a>
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="container doc-container">
+
+      <div style="padding-top: 40px;">
+        <a href="porfolio.html#projects" class="back-link">← Build Bench</a>
+      </div>
+
+      <header class="module-header">
+        <p class="module-kicker">EMBEDDED / MODULE-02</p>
+        <h1>Gesture RC Car</h1>
+        <div class="tags">
+          <span class="tag">Embedded Systems</span>
+          <span class="tag">C</span>
+          <span class="tag">MSP432</span>
+          <span class="tag">I2C</span>
+          <span class="tag">PID</span>
+          <span class="tag">Robotics</span>
+          <span class="tag">RSLK</span>
+        </div>
+      </header>
+
+      <div class="spec-strip">
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Platform</span>
+          <span class="spec-strip-val">RPI-RSLK</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">MCU</span>
+          <span class="spec-strip-val">MSP432</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Language</span>
+          <span class="spec-strip-val">C</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Interface</span>
+          <span class="spec-strip-val">I2C · 0x60</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Control</span>
+          <span class="spec-strip-val">PID</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Loop Period</span>
+          <span class="spec-strip-val">50 ms</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Status</span>
+          <span class="spec-strip-val complete">COMPLETE</span>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <section class="doc-section">
+        <h2>Overview</h2>
+        <figure>
+          <img src="images/EmCar.jpeg" alt="Gesture RC Car on the RPI-RSLK platform" />
+          <figcaption>RPI-RSLK with CMPS12 handheld controller — ENGR-2350 Lab 5</figcaption>
+        </figure>
+        <div class="card card-pad">
+          <p>Final lab of ENGR-2350 at RPI. I replaced the potentiometers from Lab 4 with a handheld <strong>CMPS12 compass/IMU</strong> on a breadboard. Tilt the board forward and the car speeds up. Rotate it and the car turns to match. Flick it up sharply and the motors enable; flick it down and they cut off.</p>
+          <p>Wheel speed is regulated by an <strong>integral controller</strong> carried forward from Lab 4. Each wheel accumulates the error between desired and measured speed and adds a correction term, so the wheels actually hit their targets instead of just being commanded open-loop.</p>
+          <p>The tricky part was heading control. There's no absolute position reference, so the car estimates its own orientation by integrating encoder-based angle deltas every 50 ms into a relative heading. A <strong>proportional controller</strong> compares that to the desired heading from the compass and drives a differential wheel speed to correct the error. Between the I-loop on speed and the P-loop on heading, the full control scheme is effectively PID.</p>
+        </div>
+      </section>
+
+      <!-- System Analysis Tabs -->
+      <section class="doc-section">
+        <h2>System Analysis</h2>
+
+        <div class="sys-tabs">
+          <div class="sys-tabs-bar" role="tablist" aria-label="Project analysis sections">
+            <div class="sys-tabs-label">
+              <svg class="sys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span>Analysis</span>
+            </div>
+
+            <button class="sys-tab" role="tab" aria-selected="true" aria-controls="panel-arch" id="tab-arch" tabindex="0">
+              Architecture
+              <span class="tab-num">01</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-speed" id="tab-speed" tabindex="-1">
+              Speed Control
+              <span class="tab-num">02</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-heading" id="tab-heading" tabindex="-1">
+              Heading Control
+              <span class="tab-num">03</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-gesture" id="tab-gesture" tabindex="-1">
+              Gesture Control
+              <span class="tab-num">04</span>
+            </button>
+
+            <div class="sys-tabs-status">
+              <span class="status-led"></span>
+              READY
+            </div>
+          </div>
+
+          <div class="sys-tabs-panels">
+            <!-- Architecture Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-arch" aria-labelledby="tab-arch" data-active="true">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                  <polyline points="2 17 12 22 22 17"/>
+                  <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                <h3>System Architecture</h3>
+                <span class="panel-id">ARCH-001</span>
+              </div>
+
+              <p>The RPI-RSLK is a differential drive robot. The CMPS12 sits on a small breadboard you hold in your hand, wired back to the car over long I2C lines. Same physical setup as Lab 4 where you held potentiometers, just with an IMU instead.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Hardware</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Car</span>
+                    <span class="value">RPI-RSLK</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">MCU</span>
+                    <span class="value">MSP432</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Remote Sensor</span>
+                    <span class="value">CMPS12</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Range Sensor</span>
+                    <span class="value">SRF08</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li><strong>Speed input:</strong> CMPS12 pitch register (tilt forward/back)</li>
+                <li><strong>Heading input:</strong> CMPS12 compass bearing (rotate left/right)</li>
+                <li><strong>On/off input:</strong> CMPS12 accelerometer Z-axis (shake up/down)</li>
+                <li><strong>Heading feedback:</strong> wheel encoders via dead reckoning</li>
+                <li><strong>Speed feedback:</strong> wheel encoders, I-control carried from Lab 4</li>
+              </ul>
+            </div>
+
+            <!-- Speed Control Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-speed" aria-labelledby="tab-speed" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <h3>Speed Control</h3>
+                <span class="panel-id">SPD-001</span>
+              </div>
+
+              <p>Pitch angle maps to desired speed. The conversion factor determines how sensitive it is to tilt. Below 10% the car stops, above 50% it caps.</p>
+
+              <p>Wheel speed is regulated by the integral controller carried forward from Lab 4. Each wheel runs an independent I-loop: the desired speed sets the feedforward term, and the accumulated error between desired and measured speed drives a correction. The discrete update is:</p>
+
+              <div class="callout">
+                <p>v<sub>c</sub>(k) = v<sub>d</sub>(k) + k<sub>I</sub> × Σ ( v<sub>d</sub>(n) − v<sub>m</sub>(n) )</p>
+              </div>
+
+              <p><strong>v<sub>d</sub>(k)</strong> is the desired speed this tick, <strong>v<sub>m</sub>(n)</strong> is the measured wheel speed, and the sum accumulates all past errors. In Lab 5 the heading controller sets the per-wheel v<sub>d</sub> values and the I-loop makes each wheel track them.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Speed Limits</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Min |Speed|</span>
+                    <span class="value">10<span class="unit">%</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Max |Speed|</span>
+                    <span class="value">50<span class="unit">%</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Min PWM</span>
+                    <span class="value">10<span class="unit">%</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Max PWM</span>
+                    <span class="value">90<span class="unit">%</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>If |v<sub>d</sub>| &lt; 10%: set v<sub>d</sub> = 0 (dead band)</li>
+                <li>If |v<sub>d</sub>| &gt; 50%: cap at 50%</li>
+                <li>Pitch-to-speed mapping determined empirically per group</li>
+                <li>Integral controller per wheel: v<sub>c</sub>(k) = v<sub>d</sub>(k) + k<sub>I</sub> × Σ error</li>
+                <li>Each wheel runs an independent I-loop; heading controller sets the per-wheel targets</li>
+              </ul>
+            </div>
+
+            <!-- Heading Control Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-heading" aria-labelledby="tab-heading" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <h3>Heading Control</h3>
+                <span class="panel-id">HDG-001</span>
+              </div>
+
+              <p>The compass bearing on the handheld board is the setpoint. The car estimates its own heading from encoder counts accumulated every 50 ms. The error between the two drives a differential speed that speeds up one wheel and slows the other until they match.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Control Parameters</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Controller</span>
+                    <span class="value">P-control</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Max |Δv|</span>
+                    <span class="value">20<span class="unit">%</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Error Range</span>
+                    <span class="value">±180<span class="unit">°</span></span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Period</span>
+                    <span class="value">50<span class="unit">ms</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>Heading error wrapped to [-180°, 180°] to handle periodicity</li>
+                <li>Δv = k<sub>P</sub><sup>h</sup> × ε<sub>h</sub>, capped at ±20%</li>
+                <li>v<sub>l</sub> = v<sub>d</sub> - Δv, v<sub>r</sub> = v<sub>d</sub> + Δv</li>
+                <li>Encoder counters reset each loop; only the segment delta feeds Δθ</li>
+                <li>Encoder event direction tracked via motor direction GPIO</li>
+              </ul>
+            </div>
+
+            <!-- Gesture Control Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-gesture" aria-labelledby="tab-gesture" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                  <line x1="6" y1="1" x2="6" y2="4"/>
+                  <line x1="10" y1="1" x2="10" y2="4"/>
+                  <line x1="14" y1="1" x2="14" y2="4"/>
+                </svg>
+                <h3>Gesture On/Off Control</h3>
+                <span class="panel-id">GES-001</span>
+              </div>
+
+              <p>Moving the board sharply up or down spikes the Z-axis accelerometer. The threshold was found by printing raw values and physically moving the board to see what the peaks looked like. The car starts disabled; a quick upward flick enables it, a quick downward flick kills it.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">State Machine</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Default State</span>
+                    <span class="value">Disabled</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">LED: Disabled</span>
+                    <span class="value">Red</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">LED: Enabled</span>
+                    <span class="value">Green</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Transition Delay</span>
+                    <span class="value">1<span class="unit">s</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>Startup: Disabled state, RGB LED red</li>
+                <li>Large upward Z acceleration: LED green, 1 s delay, then Enabled</li>
+                <li>Large downward Z acceleration: LED red, 1 s delay, then Disabled</li>
+                <li>During 1 s delay: all CMPS12 outputs ignored (masks deceleration artifact)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Heading Calculation -->
+      <section class="doc-section">
+        <h2>Heading Calculation from Encoders</h2>
+        <div class="card card-pad">
+          <p>Every 50 ms the control loop calculates how much the car rotated based on the encoder counts from each wheel during that segment. The math models the path as a circular arc, which holds as long as the loop is fast enough relative to the car's motion:</p>
+
+          <div class="callout">
+            <p>Δθ = (C / a) × (n<sub>L</sub> - n<sub>R</sub>)</p>
+          </div>
+
+          <p><strong>C</strong> converts encoder counts to distance (derived in an earlier lab), <strong>a</strong> is the wheelbase, and <strong>n<sub>L</sub></strong>, <strong>n<sub>R</sub></strong> are signed counts for the segment: forward pulses add, reverse pulses subtract. Result is in radians.</p>
+
+          <p>Each Δθ gets added to the accumulated relative heading:</p>
+
+          <div class="callout">
+            <p>h<sub>rm</sub>(k) = h<sub>rm</sub>(k-1) + Δθ(k)</p>
+          </div>
+
+          <p>The counters reset to zero after each calculation so the next iteration only sees motion since the last sample. The accumulated heading is kept in [0°, 360°] by adding or subtracting 360° at the boundaries.</p>
+
+          <h3>Direction Tracking</h3>
+          <p>Reverse pulses need to subtract from the count, so the counter variables have to be <code>int32_t</code>. Using <code>uint32_t</code> wraps around on reverse and corrupts the heading estimate. Direction is tracked from the motor direction GPIO, which the control loop already sets.</p>
+        </div>
+      </section>
+
+      <!-- Turn Control -->
+      <section class="doc-section">
+        <h2>Angle-Based Turn Control</h2>
+        <div class="card card-pad">
+          <h3>Differential Speed</h3>
+          <p>Δv offsets each wheel equally in opposite directions around the desired speed:</p>
+          <div class="callout">
+            <p>v<sub>l</sub> = v<sub>d</sub> - Δv &nbsp;&nbsp;&nbsp; v<sub>r</sub> = v<sub>d</sub> + Δv</p>
+          </div>
+
+          <h3>Proportional Control</h3>
+          <p>The heading error feeds straight into the P controller to produce Δv:</p>
+          <div class="callout">
+            <p>Δv(k) = k<sub>P</sub><sup>h</sup> × ε<sub>h</sub>(k)</p>
+          </div>
+          <p>Tuned by starting low and increasing until the car started hunting, then backing off. Too low and it barely reacts; too high and it oscillates continuously around the target.</p>
+
+          <h3>Angle Wrapping</h3>
+          <p>Heading wraps at 360°, so a naive subtraction gives the wrong direction. An error of +270° is really -90° since that's the shorter path. Clamping to [-180°, 180°] fixes this before the error hits the controller:</p>
+          <div class="callout">
+            <p>ε<sub>h</sub> = θ<sub>desired</sub> - h<sub>rm</sub></p>
+            <p>if ε<sub>h</sub> &gt; 180: subtract 360</p>
+            <p>if ε<sub>h</sub> &lt; -180: add 360</p>
+          </div>
+          <p>Wrap the error only. The raw heading values stay untouched.</p>
+        </div>
+      </section>
+
+      <!-- Control Specs Table -->
+      <section class="doc-section">
+        <h2>Control Specifications</h2>
+        <div class="card card-pad">
+          <table>
+            <thead>
+              <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Max |Δv|</td><td>20%</td><td>Clamp differential speed</td></tr>
+              <tr><td>Min |v<sub>d</sub>|</td><td>10%</td><td>Set to 0 if below (dead band)</td></tr>
+              <tr><td>Max |v<sub>d</sub>|</td><td>50%</td><td>Cap desired speed</td></tr>
+              <tr><td>Min PWM duty</td><td>10%</td><td>Hardware floor</td></tr>
+              <tr><td>Max PWM duty</td><td>90%</td><td>Hardware ceiling</td></tr>
+              <tr><td>Control loop period</td><td>50 ms</td><td>Timer interrupt driven</td></tr>
+              <tr><td>I2C address (CMPS12)</td><td>0x60</td><td>Fixed by device</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Engineering Notes -->
+      <section class="doc-section">
+        <h2>Engineering Notes</h2>
+
+        <div class="tech-notes">
+          <div class="tech-notes-header">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <span class="notes-title">Technical Reference</span>
+            <span class="notes-count"></span>
+          </div>
+
+          <!-- Design Decisions -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§1</span>
+              <div class="note-header-content">
+                <p class="note-title">Design Decisions</p>
+                <p class="note-summary">Control architecture choices</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Heading Control</p>
+                    <p>Proportional control on heading error. Derivative control was optional per the lab spec and wasn't needed. P-control was sufficient for stable heading tracking.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Resetting Encoder Counts Each Loop</p>
+                    <p>Resetting per-segment encoder counters to zero after each Δθ calculation isolates each loop iteration's contribution to the heading. Without the reset, the accumulated count would cause Δθ to grow unboundedly instead of tracking only the motion since the last sample.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Gesture Delay</p>
+                    <p>The 1-second ignore window after a gesture trigger exists because moving the board quickly up produces a large positive acceleration followed immediately by a large negative deceleration. Without the delay, the deceleration would immediately re-trigger the opposite state transition.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Implementation Details -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§2</span>
+              <div class="note-header-content">
+                <p class="note-title">Implementation Details</p>
+                <p class="note-summary">Encoder tracking and I2C setup</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Signed Encoder Variables</p>
+                    <p>Encoder counts for each segment must be <code>int32_t</code> so that reverse pulses decrement the count. Using <code>uint32_t</code> causes wrap-around on reverse motion and produces incorrect Δθ values. The running total (if kept separately) also needs to be signed.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Heading Units</p>
+                    <p>Δθ from the encoder math comes out in radians. The CMPS12 compass bearing is in tenths of degrees (0 to 3600). Before computing the error, both values need to be in the same units. Converting Δθ to tenths of degrees and keeping everything in that domain avoids floating-point issues on the MSP432.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">I2C Reads</p>
+                    <p>The CMPS12 is read over I2C at address 0x60. Pitch, compass bearing, and accelerometer registers are all pulled each loop. Reading them in a single burst rather than separate transactions cuts down on bus time, which matters at 50 ms.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tuning -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§3</span>
+              <div class="note-header-content">
+                <p class="note-title">Tuning</p>
+                <p class="note-summary">Gain selection and gesture threshold</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">I Gain (wheel speed)</p>
+                    <p>k<sub>I</sub> was tuned in Lab 4 before this lab started. A value too high causes the accumulated error to overcorrect and the wheels oscillate in speed. Too low and the wheels don't reach the target, which shows up as heading drift since the heading controller assumes the wheels are actually hitting their speed targets.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">P Gain (heading)</p>
+                    <p>Started very low and cranked it up until the car began oscillating, then backed off. The window between "barely responds" and "hunts constantly" was pretty narrow. Once it was in that range, small adjustments made a noticeable difference in how cleanly it settled.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Gesture Threshold</p>
+                    <p>Printed all three accelerometer axes with the car sitting still, then moved the board sharply in each direction and watched the peaks. The threshold was set somewhere above the idle noise and below the obvious flick peak.</p>
+                    <div class="note-callout">
+                      <p>Print raw sensor values before writing any control logic. Much easier to pick a threshold when you can see what the sensor is actually outputting.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div style="margin: 40px 0 16px;">
+        <a class="btn btn-secondary" href="porfolio.html#projects">← Back to Build Bench</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="copyright">© <span id="yr"></span> Sami Rana</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/samisrana">GitHub</a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/">LinkedIn</a>
+        <a href="porfolio.html">Workbench</a>
+        <a href="#top">↑ Top</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="workshop-bg.js"></script>
+  <script src="workshop-anim.js"></script>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    WorkshopBG.init();
+    WorkshopAnim.init({ acq: true, station: true, reels: true, signal: true, parallax: true, sectionLabel: true });
+  </script>
+</body>
+</html>

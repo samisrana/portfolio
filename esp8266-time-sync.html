@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESP8266 Wireless Time Sync - Build Bench - Sami's Workshop</title>
+  <meta name="description" content="Wireless clock synchronization across three ESP8266 NodeMCU nodes over Wi-Fi. Implements two-way timestamp exchange, offset and drift estimation inspired by Sivrikaya and Yener 2004." />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0f14'/><text x='50' y='66' font-size='48' text-anchor='middle' fill='%232ea89a' font-family='monospace' font-weight='700'>SR</text></svg>">
+  <link rel="stylesheet" href="workshop.css" />
+  <link rel="stylesheet" href="workshop-anim.css" />
+  <style>
+    .doc-container { max-width: 860px; }
+
+    .module-header { padding: 48px 0 32px; }
+    .module-kicker {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .module-kicker::before { content: ''; width: 20px; height: 1px; background: var(--turquoise); }
+    .module-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 700;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      margin-bottom: 28px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--turquoise); }
+
+    .doc-section { margin: 48px 0; }
+    .doc-section h2 {
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      color: var(--turquoise);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .spec-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin-bottom: 32px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+    .spec-strip-item {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 18px;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 100px;
+    }
+    .spec-strip-item:last-child { border-right: none; }
+    .spec-strip-key {
+      color: var(--text-dim);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      margin-bottom: 3px;
+    }
+    .spec-strip-val {
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .spec-strip-val.complete { color: var(--turquoise); }
+    .spec-strip-val.wip { color: #e8a838; }
+
+    .doc-section h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 20px 0 10px;
+    }
+    .doc-section p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      margin: 0 0 14px;
+    }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section strong { color: var(--text); font-weight: 500; }
+    .doc-section ul, .doc-section ol {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      padding-left: 20px;
+      margin: 0 0 14px;
+      line-height: 1.7;
+    }
+    .doc-section li { margin-bottom: 6px; }
+
+    .callout {
+      background: var(--turquoise-dim);
+      border-left: 3px solid var(--turquoise);
+      padding: 14px 18px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin: 16px 0;
+    }
+    .callout p {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+    }
+    .callout p + p { margin-top: 8px; }
+
+    figure { margin: 20px 0; }
+    figure img {
+      width: 100%;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      display: block;
+    }
+    figcaption {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; }
+    th {
+      background: var(--surface-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    td {
+      color: var(--text-dim);
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+    }
+    td:first-child { color: var(--text); }
+
+    code {
+      font-family: var(--mono);
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: var(--r-sm);
+      font-size: 0.85em;
+      color: var(--turquoise);
+    }
+  </style>
+
+  <script>
+    (function(){
+      var p = localStorage.getItem('theme');
+      if (p) { document.documentElement.classList.toggle('light', p === 'light'); }
+      else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+    function toggleTheme() {
+      var isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+  </script>
+</head>
+
+<body class="zone-bench">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Background Layer 1: Circuit Traces -->
+  <div class="bg-layer bg-circuit" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <path class="trace-thick" d="M0,120 H350 L380,150 H760"/>
+      <path class="trace-thick" d="M0,320 H180 L220,360 H560 L600,320 H1920"/>
+      <path class="trace-thick" d="M0,620 H280 L320,660 H680"/>
+      <path class="trace-thick" d="M1920,220 H1480 L1440,260 H1080"/>
+      <path class="trace-thick" d="M1920,520 H1560 L1520,480 H1160"/>
+      <path class="trace-thick" d="M1920,820 H1360 L1320,860 H880"/>
+      <path class="trace" d="M180,0 V210 L220,250 V420"/>
+      <path class="trace" d="M380,120 V320"/>
+      <path class="trace" d="M580,0 V160 L620,200 V360"/>
+      <path class="trace" d="M760,150 V300 L800,340 V520"/>
+      <path class="trace" d="M1160,480 V620 L1120,660 V820"/>
+      <path class="trace" d="M1360,0 V160 L1320,200 V370"/>
+      <path class="trace" d="M1560,220 V420 L1520,460 V620"/>
+      <path class="trace" d="M1080,260 V470"/>
+      <path class="trace" d="M280,220 L330,270 H480 L530,220"/>
+      <path class="trace" d="M680,360 L730,410 H880 L930,360"/>
+      <path class="trace" d="M980,520 L1030,570 H1120 L1170,520"/>
+      <path class="trace" d="M1260,370 L1310,420 H1460 L1510,370"/>
+      <path class="trace-thick" d="M0,920 H240 L280,880 H520 L560,920 H820"/>
+      <path class="trace" d="M240,920 V1080"/>
+      <path class="trace" d="M520,880 V720 L560,680 H720"/>
+      <path class="trace" d="M820,920 L860,880 V760"/>
+      <path class="trace-thick" d="M1920,960 H1620 L1580,920 H1320 L1280,960 H1060"/>
+      <path class="trace" d="M1320,920 V800 L1280,760 H1120"/>
+      <circle class="via" cx="180" cy="210" r="3.5"/>
+      <circle class="via" cx="380" cy="120" r="3.5"/>
+      <circle class="via" cx="380" cy="320" r="3.5"/>
+      <circle class="via" cx="580" cy="160" r="3.5"/>
+      <circle class="via" cx="760" cy="150" r="3.5"/>
+      <circle class="via" cx="760" cy="300" r="3.5"/>
+      <circle class="via" cx="220" cy="360" r="3.5"/>
+      <circle class="via" cx="600" cy="320" r="3.5"/>
+      <circle class="via" cx="1080" cy="260" r="3.5"/>
+      <circle class="via" cx="1160" cy="480" r="3.5"/>
+      <circle class="via" cx="1160" cy="620" r="3.5"/>
+      <circle class="via" cx="1360" cy="160" r="3.5"/>
+      <circle class="via" cx="1480" cy="220" r="3.5"/>
+      <circle class="via" cx="1560" cy="420" r="3.5"/>
+      <circle class="via" cx="1520" cy="460" r="3.5"/>
+      <circle class="via" cx="1320" cy="860" r="3.5"/>
+      <circle class="via" cx="240"  cy="920" r="3.5"/>
+      <circle class="via" cx="520"  cy="880" r="3.5"/>
+      <circle class="via" cx="820"  cy="920" r="3.5"/>
+      <circle class="via" cx="1320" cy="920" r="3.5"/>
+      <circle class="via" cx="1620" cy="960" r="3.5"/>
+      <rect class="pad" x="163" y="395" width="18" height="18" rx="2"/>
+      <rect class="pad" x="603" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="802" y="318" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1062" y="448" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1342" y="182" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1542" y="598" width="18" height="18" rx="2"/>
+      <rect class="pad" x="318"  y="640" width="18" height="18" rx="2"/>
+      <rect class="pad" x="708"  y="658" width="18" height="18" rx="2"/>
+      <rect class="pad" x="1102" y="798" width="18" height="18" rx="2"/>
+      <rect class="pad" x="848"  y="748" width="18" height="18" rx="2"/>
+      <circle class="glow-orb" cx="280"  cy="270"  r="160"/>
+      <circle class="glow-orb" cx="1580" cy="360"  r="190"/>
+      <circle class="glow-orb" cx="880"  cy="720"  r="210"/>
+      <circle class="glow-orb" cx="1180" cy="920"  r="170"/>
+      <circle class="glow-orb" cx="500"  cy="860"  r="150"/>
+    </svg>
+  </div>
+
+  <!-- Background Layer 2: Girih Geometry (canvas) -->
+  <canvas class="bg-layer bg-geo" id="geo-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 3: Signal Waves (canvas) -->
+  <canvas class="bg-layer bg-waves" id="wave-canvas" aria-hidden="true"></canvas>
+
+  <!-- Background Layer 4: Physical Scene - Workbench -->
+  <div class="bg-layer bg-scene" aria-hidden="true">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+      <line class="s-thick" x1="0"    y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="0"    x2="960" y2="400"/>
+      <line class="s-thick" x1="0"    y1="1080" x2="960" y2="400"/>
+      <line class="s-thick" x1="1920" y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="480"  y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="1440" y1="1080" x2="960" y2="400"/>
+      <line class="s-line"  x1="226"  y1="954"  x2="1694" y2="954"/>
+      <line class="s-line"  x1="338"  y1="840"  x2="1582" y2="840"/>
+      <line class="s-line"  x1="451"  y1="760"  x2="1469" y2="760"/>
+      <rect class="s-fill" x="680" y="355" width="600" height="80" rx="0"/>
+      <line class="s-thick" x1="680"  y1="340" x2="1240" y2="340"/>
+      <line class="s-line"  x1="680"  y1="308" x2="1240" y2="308"/>
+      <line class="s-line"  x1="720"  y1="308" x2="720"  y2="435"/>
+      <line class="s-line"  x1="840"  y1="308" x2="840"  y2="435"/>
+      <line class="s-line"  x1="1080" y1="308" x2="1080" y2="435"/>
+      <line class="s-line"  x1="1200" y1="308" x2="1200" y2="435"/>
+      <circle class="s-line" cx="748" cy="284" r="18"/><circle class="s-line" cx="748" cy="284" r="10"/><circle class="s-line" cx="748" cy="284" r="3"/>
+      <circle class="s-line" cx="790" cy="286" r="16"/><circle class="s-line" cx="790" cy="286" r="9"/> <circle class="s-line" cx="790" cy="286" r="3"/>
+      <circle class="s-line" cx="830" cy="285" r="17"/><circle class="s-line" cx="830" cy="285" r="10"/><circle class="s-line" cx="830" cy="285" r="3"/>
+      <g opacity="0.45">
+        <polygon class="s-fill" points="120,780 1800,780 1358,580 562,580"/>
+        <rect class="s-fill" x="120" y="780" width="1680" height="36"/>
+      </g>
+      <line class="s-thick" x1="120"  y1="780" x2="1800" y2="780"/>
+      <line class="s-thick" x1="562"  y1="580" x2="1358" y2="580"/>
+      <line class="s-line"  x1="120"  y1="780" x2="562"  y2="580"/>
+      <line class="s-line"  x1="1800" y1="780" x2="1358" y2="580"/>
+      <line class="s-thick" x1="120"  y1="816" x2="1800" y2="816"/>
+      <rect class="s-thick" x="146"  y="816" width="22"  height="264"/>
+      <rect class="s-line"  x="134"  y="1062" width="46" height="14" rx="2"/>
+      <rect class="s-thick" x="1752" y="816" width="22"  height="264"/>
+      <rect class="s-line"  x="1740" y="1062" width="46" height="14" rx="2"/>
+      <rect class="s-line" x="196" y="638" width="110" height="140" rx="5"/>
+      <rect class="s-fill" x="210" y="652" width="82"  height="42"  rx="2"/>
+      <circle class="s-line" cx="251" cy="738" r="26"/>
+      <circle class="s-fill" cx="251" cy="738" r="7"/>
+      <rect class="s-fill"  x="568" y="770" width="24" height="14" rx="3"/>
+      <line class="s-thick" x1="580" y1="780" x2="580" y2="700"/>
+      <line class="s-thick" x1="580" y1="700" x2="634" y2="614"/>
+      <line class="s-thick" x1="634" y1="614" x2="672" y2="558"/>
+      <ellipse class="s-line" cx="686" cy="550" rx="28" ry="12"/>
+      <rect class="s-line" x="1370" y="604" width="344" height="200" rx="7"/>
+      <rect class="s-line" x="1384" y="618" width="182" height="122" rx="3"/>
+      <rect class="s-fill" x="1388" y="622" width="174" height="114" rx="2"/>
+      <polyline class="s-thick" points="1398,692 1398,650 1420,650 1420,692 1443,692 1443,650 1466,650 1466,692 1489,692 1489,650 1512,650 1512,692 1554,692"/>
+      <circle class="s-line" cx="1614" cy="642" r="14"/><circle class="s-fill" cx="1614" cy="642" r="4"/>
+      <circle class="s-line" cx="1656" cy="642" r="14"/><circle class="s-fill" cx="1656" cy="642" r="4"/>
+      <circle class="s-line" cx="1614" cy="684" r="12"/><circle class="s-fill" cx="1614" cy="684" r="4"/>
+      <circle class="s-line" cx="1656" cy="684" r="12"/><circle class="s-fill" cx="1656" cy="684" r="4"/>
+      <circle class="s-glow" cx="251"  cy="700" r="110"/>
+      <circle class="s-glow" cx="960"  cy="420" r="180"/>
+      <circle class="s-glow" cx="1514" cy="700" r="130"/>
+    </svg>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="porfolio.html" aria-label="Sami's Workshop - home">
+        <span class="brand-text">
+          <span class="brand-name">Sami's Workshop</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="porfolio.html">Workbench</a>
+        <a href="porfolio.html#projects" class="active">Build Bench</a>
+        <a href="blog.html">Sami's Log</a>
+        <a href="porfolio.html#about">About</a>
+        <a href="porfolio.html#contact">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a href="https://github.com/samisrana" target="_blank" rel="noopener"
+           aria-label="GitHub" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/" target="_blank" rel="noopener"
+           aria-label="LinkedIn" class="icon-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+        </a>
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="container doc-container">
+
+      <div style="padding-top: 40px;">
+        <a href="porfolio.html#projects" class="back-link">← Build Bench</a>
+      </div>
+
+      <header class="module-header">
+        <p class="module-kicker">EMBEDDED / MODULE-03</p>
+        <h1>ESP8266 Wireless Time Synchronization</h1>
+        <div class="tags">
+          <span class="tag">Embedded Systems</span>
+          <span class="tag">C++</span>
+          <span class="tag">ESP8266</span>
+          <span class="tag">Wi-Fi</span>
+          <span class="tag">Distributed Systems</span>
+          <span class="tag">Arduino</span>
+        </div>
+      </header>
+
+      <div class="spec-strip">
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Platform</span>
+          <span class="spec-strip-val">ESP8266 NodeMCU</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Nodes</span>
+          <span class="spec-strip-val">3</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Protocol</span>
+          <span class="spec-strip-val">Wi-Fi / UDP</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Language</span>
+          <span class="spec-strip-val">C++ / Python</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Inspired by</span>
+          <span class="spec-strip-val">Yener &amp; Sivrikaya 2004</span>
+        </div>
+        <div class="spec-strip-item">
+          <span class="spec-strip-key">Status</span>
+          <span class="spec-strip-val wip">IN PROGRESS</span>
+        </div>
+      </div>
+
+      <!-- Overview -->
+      <section class="doc-section">
+        <h2>Overview</h2>
+        <div class="card card-pad">
+          <p>Three ESP8266 NodeMCU boards on the same Wi-Fi network, each running its own local clock. The goal is to get them synchronized by exchanging timestamps over UDP and correcting for offset and drift in software. No external time source, no GPS. Just the boards talking to each other.</p>
+          <p>The idea came from a paper by Sivrikaya and Yener at RPI, "Time Synchronization in Sensor Networks" (IEEE Network, 2004). It was assigned reading in one of my courses. The paper surveys the problem from first principles: hardware clocks drift unpredictably, message delays add noise, and cheap devices can't afford the overhead of NTP or GPS. The approaches it covers, specifically TPSN and Tiny-Sync/Mini-Sync, give a clean framework for thinking about how to estimate offset and drift from timestamp exchanges alone.</p>
+          <p>This project is an independent implementation to see what those algorithms actually look like running on real hardware with real Wi-Fi latency.</p>
+        </div>
+      </section>
+
+      <!-- System Analysis Tabs -->
+      <section class="doc-section">
+        <h2>System Analysis</h2>
+
+        <div class="sys-tabs">
+          <div class="sys-tabs-bar" role="tablist" aria-label="Project analysis sections">
+            <div class="sys-tabs-label">
+              <svg class="sys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span>Analysis</span>
+            </div>
+
+            <button class="sys-tab" role="tab" aria-selected="true" aria-controls="panel-arch" id="tab-arch" tabindex="0">
+              Architecture
+              <span class="tab-num">01</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-clock" id="tab-clock" tabindex="-1">
+              Clock Model
+              <span class="tab-num">02</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-sync" id="tab-sync" tabindex="-1">
+              Synchronization
+              <span class="tab-num">03</span>
+            </button>
+            <button class="sys-tab" role="tab" aria-selected="false" aria-controls="panel-exp" id="tab-exp" tabindex="-1">
+              Experiments
+              <span class="tab-num">04</span>
+            </button>
+
+            <div class="sys-tabs-status">
+              <span class="status-led"></span>
+              READY
+            </div>
+          </div>
+
+          <div class="sys-tabs-panels">
+            <!-- Architecture Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-arch" aria-labelledby="tab-arch" data-active="true">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                  <polyline points="2 17 12 22 22 17"/>
+                  <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                <h3>System Architecture</h3>
+                <span class="panel-id">ARCH-001</span>
+              </div>
+
+              <p>One board acts as master (reference clock). The other two are slave nodes that synchronize to it. All three are on the same Wi-Fi network. The master either hosts its own access point or connects to an existing router alongside the slaves.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Hardware</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Board</span>
+                    <span class="value">ESP8266 NodeMCU</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Module</span>
+                    <span class="value">ESP-12E</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">USB-Serial</span>
+                    <span class="value">CP2102</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">IDE</span>
+                    <span class="value">Arduino IDE</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li><strong>master_node/</strong>: reference clock firmware, sends sync pulses</li>
+                <li><strong>slave_node/</strong>: receives timestamps, estimates offset, corrects local clock</li>
+                <li><strong>common/</strong>: shared timestamp structs and clock utilities</li>
+                <li><strong>experiments/</strong>: Python scripts for logging and evaluating sync accuracy</li>
+              </ul>
+            </div>
+
+            <!-- Clock Model Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-clock" aria-labelledby="tab-clock" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <h3>Clock Model</h3>
+                <span class="panel-id">CLK-001</span>
+              </div>
+
+              <p>Every hardware clock has two imperfections: drift and offset. Drift is the rate error, how fast or slow the oscillator runs relative to real time. Offset is the value difference at any given instant. The paper models each node's clock as a linear function of real time:</p>
+
+              <div class="callout">
+                <p>C<sub>i</sub>(t) = a<sub>i</sub> · t + b<sub>i</sub></p>
+              </div>
+
+              <p><strong>a<sub>i</sub></strong> is the clock drift (ideally 1.0 for a perfect clock) and <strong>b<sub>i</sub></strong> is the offset from real time. Two clocks can be related to each other as:</p>
+
+              <div class="callout">
+                <p>C<sub>1</sub>(t) = a<sub>12</sub> · C<sub>2</sub>(t) + b<sub>12</sub></p>
+              </div>
+
+              <p>where <strong>a<sub>12</sub></strong> is the relative drift between the two and <strong>b<sub>12</sub></strong> is their relative offset. Synchronization means estimating these two values from timestamp exchanges and applying software corrections so each slave can convert its local time to match the master.</p>
+
+              <ul>
+                <li>Correcting only offset is not enough. Clocks will drift apart again immediately.</li>
+                <li>Correcting both offset and drift keeps nodes synchronized over time without constant re-sync.</li>
+                <li>The linear model holds well as long as the sync interval is short relative to the drift rate.</li>
+              </ul>
+            </div>
+
+            <!-- Synchronization Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-sync" aria-labelledby="tab-sync" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <h3>Synchronization Method</h3>
+                <span class="panel-id">SYN-001</span>
+              </div>
+
+              <p>The approach follows the two-way message exchange from TPSN. Node A sends a packet to node B with timestamp T1. B records its receive time T2 and replies with T3. A records T4 on receipt. From those four timestamps:</p>
+
+              <div class="callout">
+                <p>offset  &Delta; = ( (T2 - T1) - (T4 - T3) ) / 2</p>
+                <p>one-way delay  d = ( (T2 - T1) + (T4 - T3) ) / 2</p>
+              </div>
+
+              <p>The offset estimate assumes the propagation delay is symmetric. That's approximately true over a short-range Wi-Fi link but introduces error when the network is uneven. Repeating the exchange and averaging reduces noise from variable message delay.</p>
+
+              <ul>
+                <li>Master initiates sync exchanges periodically</li>
+                <li>Slave estimates offset and applies correction to its local clock</li>
+                <li>Multiple rounds allow linear regression for drift estimation (Tiny-Sync approach)</li>
+                <li>Each (T0, Tb, Tr) triple constrains the possible drift and offset values</li>
+              </ul>
+            </div>
+
+            <!-- Experiments Panel -->
+            <div class="sys-tab-panel" role="tabpanel" id="panel-exp" aria-labelledby="tab-exp" data-active="false">
+              <div class="panel-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4m0-6h6m0 0v6a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4m0-6h-6"/>
+                </svg>
+                <h3>Experiments</h3>
+                <span class="panel-id">EXP-001</span>
+              </div>
+
+              <p>The experiments folder has Python logging scripts that pull serial output from the boards and plot sync accuracy over time. The goal is to measure how far off the slave clocks are before and after correction and how the error grows between sync rounds.</p>
+
+              <div class="data-readout">
+                <p class="data-readout-title">Measurements</p>
+                <div class="data-readout-grid">
+                  <div class="data-readout-item">
+                    <span class="label">Offset error</span>
+                    <span class="value">pre vs. post sync</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Drift</span>
+                    <span class="value">over time (ms/min)</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Round-trip delay</span>
+                    <span class="value">jitter characterization</span>
+                  </div>
+                  <div class="data-readout-item">
+                    <span class="label">Sync accuracy</span>
+                    <span class="value">target: &lt; 10 ms</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul>
+                <li>Log timestamps from all three boards over serial</li>
+                <li>Compare slave clocks to master at known intervals</li>
+                <li>Plot offset error vs. time between sync rounds</li>
+                <li>Characterize how much Wi-Fi jitter contributes to sync error</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two-Way Exchange Detail -->
+      <section class="doc-section">
+        <h2>Two-Way Message Exchange</h2>
+        <div class="card card-pad">
+          <p>The core of the synchronization is four timestamps from a single round trip between master and slave:</p>
+
+          <table>
+            <thead>
+              <tr><th>Timestamp</th><th>Recorded by</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>T1</td><td>Master</td><td>Send time of sync packet</td></tr>
+              <tr><td>T2</td><td>Slave</td><td>Receive time of sync packet</td></tr>
+              <tr><td>T3</td><td>Slave</td><td>Send time of reply</td></tr>
+              <tr><td>T4</td><td>Master</td><td>Receive time of reply</td></tr>
+            </tbody>
+          </table>
+
+          <p>T2 and T3 are in slave time. T1 and T4 are in master time. Combining them cancels out the one-way delay (assuming symmetry) and isolates the offset. The slave then adjusts its clock by the computed offset.</p>
+
+          <h3>Sources of Error</h3>
+          <p>The paper breaks message delay into four components: send time (OS overhead), access time (MAC layer wait), propagation time (speed of light over distance), and receive time (NIC processing). Of these, send time is the biggest source of nondeterminism on a platform like this. Timestamping as close to the radio layer as possible reduces it. On the ESP8266 that means stamping inside the UDP send callback rather than in application code.</p>
+        </div>
+      </section>
+
+      <!-- Engineering Notes -->
+      <section class="doc-section">
+        <h2>Engineering Notes</h2>
+
+        <div class="tech-notes">
+          <div class="tech-notes-header">
+            <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            <span class="notes-title">Technical Reference</span>
+            <span class="notes-count"></span>
+          </div>
+
+          <!-- Design Decisions -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§1</span>
+              <div class="note-header-content">
+                <p class="note-title">Design Decisions</p>
+                <p class="note-summary">Why TPSN-style over RBS</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Sender-Receiver vs. Receiver-Receiver</p>
+                    <p>RBS (Reference Broadcast Synchronization) eliminates sender uncertainty by synchronizing two receivers to a third-party pulse instead of to the sender directly. The paper argues this is more accurate because the sender's nondeterminism is the largest error source. But RBS needs more messages: 4 sent and 3 received per sync pair vs. 2 and 2 for two-way exchange. On three nodes with limited Wi-Fi bandwidth, the simpler sender-receiver approach is a reasonable starting point.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Software Clock Correction</p>
+                    <p>The paper recommends against modifying the raw hardware clock and instead maintaining a conversion table: each node keeps the estimated offset and drift relative to the master and applies the transform when a synchronized timestamp is needed. This avoids discontinuities from hard clock resets.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Implementation Details -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§2</span>
+              <div class="note-header-content">
+                <p class="note-title">Implementation Details</p>
+                <p class="note-summary">Timestamp placement and clock resolution</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">millis() Resolution</p>
+                    <p>The Arduino <code>millis()</code> function returns milliseconds. For sync targets in the single-digit millisecond range, that ceiling matters. The ESP8266 also has <code>micros()</code> for microsecond resolution, which is worth using for T1 and T4 on the master side to reduce quantization error in the offset calculation.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">UDP vs. TCP</p>
+                    <p>UDP is the right choice here. TCP adds retransmission and connection overhead that makes message delay harder to characterize. The sync packets are small and losing one just means skipping a round, which is acceptable.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">millis() Overflow</p>
+                    <p><code>millis()</code> wraps around at about 49 days on a 32-bit counter. For short experiments this doesn't matter, but the timestamp arithmetic needs to handle wrap-around correctly if the boards run for extended periods.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Background -->
+          <div class="tech-note">
+            <button class="tech-note-trigger" aria-expanded="false">
+              <span class="note-section-id">§3</span>
+              <div class="note-header-content">
+                <p class="note-title">Paper Background</p>
+                <p class="note-summary">Sivrikaya and Yener 2004</p>
+              </div>
+              <svg class="note-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="tech-note-content">
+              <div class="tech-note-inner">
+                <div class="tech-note-body">
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Why Traditional Methods Don't Work</p>
+                    <p>NTP is designed for internet-scale networks with stable hardware. Sensor nodes have tight energy budgets, high node density, and potentially unreliable links. GPS is too expensive and doesn't work indoors. The paper's key insight is that algorithms for sensor networks need to be lightweight and tolerant of delay uncertainty.</p>
+                  </div>
+                  <div class="note-subsection">
+                    <p class="note-subsection-title">Tiny-Sync / Mini-Sync</p>
+                    <p>Each two-way exchange produces a data point (T0, Tb, Tr) that constrains the possible drift and offset values. Mini-Sync finds optimal bounds from all data points collected. More exchanges tighten the bounds. This is essentially bounded-error parameter estimation, which is a clean way to think about the problem when message delays are unknown but bounded.</p>
+                    <div class="note-callout">
+                      <p>The paper is worth reading in full. The breakdown of delay sources (send time, access time, propagation time, receive time) is a useful mental model for any distributed timing problem.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <div style="margin: 40px 0 16px;">
+        <a class="btn btn-secondary" href="porfolio.html#projects">← Back to Build Bench</a>
+        <a class="btn btn-secondary" href="https://github.com/samisrana/ESP8266-Wireless-Time-Synchronization" target="_blank" rel="noopener" style="margin-left: 10px;">GitHub →</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span class="copyright">© <span id="yr"></span> Sami Rana</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="https://github.com/samisrana">GitHub</a>
+        <a href="https://www.linkedin.com/in/sami-rana-aa722a210/">LinkedIn</a>
+        <a href="porfolio.html">Workbench</a>
+        <a href="#top">↑ Top</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="workshop-bg.js"></script>
+  <script src="workshop-anim.js"></script>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    WorkshopBG.init();
+    WorkshopAnim.init({ acq: true, station: true, reels: true, signal: true, parallax: true, sectionLabel: true });
+  </script>
+</body>
+</html>

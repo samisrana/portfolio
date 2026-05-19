@@ -21,6 +21,16 @@ html.booting body {
 .boot-overlay.done {
   opacity: 0;
 }
+.boot-overlay--slim {
+  inset: 0 0 auto 0;
+  background: transparent;
+  padding: 60px 24px 0;
+}
+.boot-overlay--slim .boot-console {
+  position: static;
+  transform: none;
+  width: auto;
+}
 
 /* Center boot console */
 .boot-console {

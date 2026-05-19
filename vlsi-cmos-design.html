@@ -485,9 +485,7 @@
   <header>
     <div class="container nav">
       <a class="brand" href="porfolio.html" aria-label="Sami's Workshop - home">
-        <span class="monogram" aria-hidden="true">SR</span>
         <span class="brand-text">
-          <span class="brand-label">Engineer</span>
           <span class="brand-name">Sami's Workshop</span>
         </span>
       </a>
@@ -573,11 +571,10 @@
       <section class="doc-section">
         <h2>Overview</h2>
         <div class="card card-pad">
-          <p>Full custom <span class="term" data-def="Complementary Metal-Oxide-Semiconductor - uses paired NMOS and PMOS transistors for low static power consumption">CMOS</span> design flow for the Boolean function <strong>F = AB + BC</strong>,
-          implementing schematic capture, physical layout, <span class="term" data-def="Design Rule Check - verifies layout meets manufacturing constraints">DRC</span>/<span class="term" data-def="Layout vs. Schematic - confirms physical layout matches circuit schematic">LVS</span> verification, and post-layout
-          performance analysis using <strong>Cadence Virtuoso</strong> and <strong>Calibre</strong>.</p>
-          <p>The design targets the <strong>GlobalFoundries <span class="term" data-def="Process Design Kit - foundry-provided files containing device models, design rules, and layer definitions">PDK</span></strong>, with transistor sizing following
-          a 2:1 <span class="term" data-def="P-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is LOW">PMOS</span>:<span class="term" data-def="N-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is HIGH">NMOS</span> ratio to balance rise/fall times. Total layout area: <strong>12.748 µm²</strong>.</p>
+          <p>I implemented a full custom <span class="term" data-def="Complementary Metal-Oxide-Semiconductor - uses paired NMOS and PMOS transistors for low static power consumption">CMOS</span> circuit for <strong>F = AB + BC</strong> in <strong>Cadence Virtuoso</strong>,
+          covering schematic capture, physical layout, <span class="term" data-def="Design Rule Check - verifies layout meets manufacturing constraints">DRC</span>/<span class="term" data-def="Layout vs. Schematic - confirms physical layout matches circuit schematic">LVS</span> verification, and post-layout simulation with <strong>Calibre</strong>.</p>
+          <p>The circuit targets the <strong>GlobalFoundries <span class="term" data-def="Process Design Kit - foundry-provided files containing device models, design rules, and layer definitions">PDK</span></strong>. I used a 2:1 <span class="term" data-def="P-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is LOW">PMOS</span>:<span class="term" data-def="N-channel Metal-Oxide-Semiconductor - transistor that conducts when gate is HIGH">NMOS</span> ratio to compensate for mobility differences
+          and hit balanced rise/fall times. Final layout area: <strong>12.748 µm²</strong>.</p>
         </div>
       </section>
 
@@ -634,30 +631,6 @@
 
               <p>The circuit implements <strong>F = B(A + C)</strong> using complementary CMOS logic with symmetric pull-up and pull-down networks.</p>
 
-              <div class="signal-path">
-                <div class="signal-path-row">
-                  <span class="signal-node">A</span>
-                  <span class="signal-arrow">─┬─</span>
-                  <span class="signal-node active">PUN</span>
-                  <span class="signal-arrow">──→</span>
-                  <span class="signal-node">F̄</span>
-                  <span class="signal-arrow">──→</span>
-                  <span class="signal-node active">INV</span>
-                  <span class="signal-arrow">──→</span>
-                  <span class="signal-node">F</span>
-                </div>
-                <div class="signal-path-row" style="margin-top: 8px;">
-                  <span class="signal-node">B</span>
-                  <span class="signal-arrow">─┼─</span>
-                  <span class="signal-node active">PDN</span>
-                  <span class="signal-arrow">──↗</span>
-                </div>
-                <div class="signal-path-row" style="margin-top: 8px;">
-                  <span class="signal-node">C</span>
-                  <span class="signal-arrow">─┴─</span>
-                </div>
-              </div>
-
               <div class="data-readout">
                 <p class="data-readout-title">Architecture Specifications</p>
                 <div class="data-readout-grid">
@@ -697,7 +670,7 @@
                 <span class="panel-id">IMPL-001</span>
               </div>
 
-              <p>Layout designed in <strong>Cadence Virtuoso</strong> targeting GlobalFoundries 60nm process with optimized transistor placement for minimum area.</p>
+              <p>Laid out in <strong>Cadence Virtuoso</strong> targeting GlobalFoundries 60nm. Transistor placement was built around diffusion sharing to keep area down.</p>
 
               <div class="data-readout">
                 <p class="data-readout-title">Layout Metrics</p>
@@ -760,7 +733,7 @@
                 <span class="panel-id">SIM-001</span>
               </div>
 
-              <p>Transient analysis performed in <strong>ADE Explorer</strong> with extracted parasitics from Calibre xRC for post-layout accuracy.</p>
+              <p>Transient analysis in <strong>ADE Explorer</strong>, using parasitics extracted from Calibre xRC for the post-layout sims.</p>
 
               <div class="data-readout">
                 <p class="data-readout-title">Test Conditions</p>
@@ -779,7 +752,7 @@
                   </div>
                   <div class="data-readout-item">
                     <span class="label">Load Cap</span>
-                    <span class="value">0.5–15<span class="unit">fF</span></span>
+                    <span class="value">0.5-15<span class="unit">fF</span></span>
                   </div>
                 </div>
               </div>
@@ -808,7 +781,7 @@
 
               <ul>
                 <li>8 input combinations verified against truth table</li>
-                <li>Rise/fall time measurement at 10%–90% thresholds</li>
+                <li>Rise/fall time measurement at 10%-90% thresholds</li>
                 <li>Schematic vs. post-layout comparison for parasitic impact</li>
               </ul>
             </div>
@@ -824,7 +797,7 @@
                 <span class="panel-id">RES-001</span>
               </div>
 
-              <p>All verification checks passed. Post-layout timing shows expected parasitic degradation within acceptable limits.</p>
+              <p>All checks passed. Post-layout timing degrades as expected from parasitics, well within usable range.</p>
 
               <div class="data-readout">
                 <p class="data-readout-title">Timing @ 0.5 fF Load</p>
@@ -885,7 +858,7 @@
         <h2>Function Analysis &amp; Optimization</h2>
         <div class="card card-pad">
           <h3>Boolean Simplification</h3>
-          <p>K-map analysis reduced the transistor count by factoring the function:</p>
+          <p>K-map analysis revealed a common factor, which cut the transistor count:</p>
           <div class="callout">
             <p>F = AB + BC = B(A + C)</p>
           </div>
@@ -923,7 +896,7 @@
       <section class="doc-section">
         <h2>Transistor Sizing</h2>
         <div class="card card-pad">
-          <p>2:1 PMOS:NMOS ratio compensates for lower hole mobility, targeting balanced rise/fall times.</p>
+          <p>2:1 PMOS:NMOS ratio to account for lower hole mobility and keep rise/fall times balanced.</p>
           <table>
             <thead>
               <tr><th>Network</th><th>Transistor</th><th>Width</th><th>Length</th></tr>
@@ -959,7 +932,7 @@
         <div class="card card-pad">
           <figure>
             <img src="images/waveform.png" alt="Waveform - inputs A, B, C and output F" />
-            <figcaption>Waveform: inputs A, B, C and output F - confirms correct Boolean function</figcaption>
+            <figcaption>Waveform: inputs A, B, C and output F - all 8 input combinations check out</figcaption>
           </figure>
         </div>
       </section>
@@ -1001,7 +974,7 @@
           <div class="grid-2">
             <div>
               <h3><span class="term" data-def="Design Rule Check - automated verification that layout meets foundry manufacturing constraints">DRC</span> - Design Rule Check</h3>
-              <p>Verified against foundry rules with <strong>Calibre DRC</strong>. Resolved:</p>
+              <p>Ran <strong>Calibre DRC</strong> against the foundry rules. Two things needed fixing:</p>
               <ul>
                 <li><span class="term" data-def="First metal interconnect layer, typically used for local routing">Metal1</span> track misalignment</li>
                 <li>Minimum spacing violations</li>
@@ -1009,7 +982,7 @@
             </div>
             <div>
               <h3><span class="term" data-def="Layout vs. Schematic - verifies physical layout matches intended circuit connectivity">LVS</span> - Layout vs. Schematic</h3>
-              <p><span class="term" data-def="Circuit connectivity description listing components and their connections">Netlists</span> match via <strong>Calibre LVS</strong>. Resolved:</p>
+              <p><strong>Calibre LVS</strong> confirmed the <span class="term" data-def="Circuit connectivity description listing components and their connections">netlists</span> match. Two issues from the first run:</p>
               <ul>
                 <li>Label settings configuration</li>
                 <li>Missing connection (<span class="term" data-def="Vertical metal connection between different routing layers">via</span> for cross-layer routing)</li>
@@ -1077,9 +1050,9 @@
           </div>
 
           <h3>Analysis</h3>
-          <p>Post-layout delays increase due to <span class="term" data-def="Unintended capacitances from physical layout - junction, overlap, and fringing capacitances">parasitic</span> junction capacitances, metal resistance,
-          contact/via resistance, and gate-to-diffusion coupling. The 30× load increase (0.5 → 15 <span class="term" data-def="Femtofarad - 10⁻¹⁵ farads, typical on-chip capacitance unit">fF</span>)
-          produced ~8× longer delays, consistent with the <span class="term" data-def="Resistance × Capacitance - determines signal propagation delay in interconnects">RC time constant</span> relationship.</p>
+          <p>Post-layout delays go up because of <span class="term" data-def="Unintended capacitances from physical layout - junction, overlap, and fringing capacitances">parasitic</span> junction capacitances, metal resistance,
+          contact/via resistance, and gate-to-diffusion coupling. Going from 0.5 to 15 <span class="term" data-def="Femtofarad - 10⁻¹⁵ farads, typical on-chip capacitance unit">fF</span> (30× increase)
+          only produced ~8× longer delays, which lines up with how <span class="term" data-def="Resistance × Capacitance - determines signal propagation delay in interconnects">RC time constants</span> scale.</p>
         </div>
       </section>
 
@@ -1120,11 +1093,11 @@
         <h2>Takeaways</h2>
         <div class="card card-pad">
           <ul>
-            <li>Boolean simplification before layout reduces transistor count and area</li>
-            <li>Post-layout verification is essential - parasitics significantly impact timing</li>
-            <li>Source/drain sharing and interconnect optimization are critical for compact layouts</li>
-            <li>Iterative DRC/LVS debugging is standard in physical design flows</li>
-            <li>2:1 PMOS:NMOS sizing effectively balances rise/fall times</li>
+            <li>Boolean simplification first - the factored form saved two transistors over sum-of-products</li>
+            <li>Parasitics hit harder than expected; +38-41% timing degradation even at minimum load</li>
+            <li>Source/drain sharing is worth the extra layout effort - got 25% area reduction</li>
+            <li>DRC/LVS debugging takes real time; 12 violations on the first pass alone</li>
+            <li>2:1 PMOS:NMOS worked well for balancing rise/fall times here</li>
           </ul>
         </div>
       </section>
@@ -1163,11 +1136,11 @@
                 <div class="tech-note-body">
                   <div class="note-subsection">
                     <p class="note-subsection-title">Function Form Selection</p>
-                    <p>Chose <strong>F = B(A + C)</strong> over the sum-of-products form <code>F = AB + BC</code> to minimize series transistor stacks. The factored form requires only one series connection in PDN (B with parallel A/C) versus two separate paths.</p>
+                    <p>I went with <strong>F = B(A + C)</strong> over <code>F = AB + BC</code> to keep the series transistor stack shorter. The factored form only needs one series connection in the PDN (B gating the parallel A/C), while sum-of-products would require two separate series paths.</p>
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">Sizing Strategy</p>
-                    <p>Selected 2:1 PMOS:NMOS ratio based on typical hole/electron mobility ratio in the GF process. This is a conservative choice - more aggressive ratios (2.5:1) could further balance timing but increase area.</p>
+                    <p>Used 2:1 PMOS:NMOS based on the typical hole/electron mobility ratio in GF process. You could push to 2.5:1 for better balance, but the area hit wasn't worth it here.</p>
                     <dl class="note-specs">
                       <dt>PMOS Width</dt>
                       <dd>480 nm (8× minimum)</dd>
@@ -1179,7 +1152,7 @@
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">Inverter Placement</p>
-                    <p>Output inverter sized identically to main stage transistors. In a production design, this would be sized based on fanout requirements and load capacitance.</p>
+                    <p>Output inverter uses the same sizing as the main stage. For a real design you'd size it based on actual fanout and load, but minimum sizing was fine here.</p>
                   </div>
                 </div>
               </div>
@@ -1212,14 +1185,14 @@
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">Metal Routing</p>
-                    <p>Single Metal1 layer used for all interconnects. VDD and GND rails run horizontally at top and bottom edges. Internal signal routing uses vertical poly connections where possible to minimize metal crossings.</p>
+                    <p>Single Metal1 layer for all interconnects. VDD and GND rails run horizontally along the top and bottom edges. Signal routing uses vertical poly where possible to avoid extra metal crossings.</p>
                     <div class="note-callout">
-                      <p>Cross-layer via required for C drain to A drain connection - this was a late addition to resolve LVS mismatch.</p>
+                      <p>The via connecting C's drain to A's drain was a late fix after LVS flagged a mismatch. Adding explicit net labels in Virtuoso is non-negotiable.</p>
                     </div>
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">Guard Ring</p>
-                    <p>No explicit guard ring in this design. Production version would include substrate/well ties for latch-up protection.</p>
+                    <p>No guard ring in this design. A real cell would include substrate and well ties for latch-up protection.</p>
                   </div>
                 </div>
               </div>
@@ -1290,7 +1263,7 @@
                 <div class="tech-note-body">
                   <div class="note-subsection">
                     <p class="note-subsection-title">LVS Debugging</p>
-                    <p>Initial LVS failures were caused by <strong>missing label attachments</strong>. Virtuoso requires explicit net labels on layout pins - schematic net names don't automatically propagate.</p>
+                    <p>First LVS run failed because of <strong>missing label attachments</strong>. Virtuoso needs explicit net labels on layout pins. Schematic net names don't carry over automatically.</p>
                     <ul>
                       <li>Always verify pin labels after layout completion</li>
                       <li>Use Calibre's "discrepancy" view to trace net mismatches</li>
@@ -1299,13 +1272,13 @@
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">DRC Iteration</p>
-                    <p>First layout attempt had <strong>12 DRC violations</strong>, primarily metal spacing errors near the output node where multiple traces converged. Resolved by widening the routing channel and using jogs instead of diagonal routes.</p>
+                    <p>First pass had <strong>12 DRC violations</strong>, mostly metal spacing errors where signals converged near the output node. Fixed by widening the routing channel and jogging traces instead of going diagonal.</p>
                   </div>
                   <div class="note-subsection">
                     <p class="note-subsection-title">Simulation Setup</p>
-                    <p>Post-layout simulation requires extracted view selection in ADE. Initial simulations used schematic view accidentally, producing optimistic timing results.</p>
+                    <p>Ran post-layout sim against the schematic view by accident the first time and got suspiciously fast numbers. Need to set the config view to <code>av_extracted</code> in ADE before running.</p>
                     <div class="note-callout">
-                      <p>Always verify "config view" setting shows "av_extracted" before running post-layout sims.</p>
+                      <p>Set config view to <code>av_extracted</code> before post-layout sims. Easy to miss, and the timing numbers look fine until you compare.</p>
                     </div>
                   </div>
                 </div>
